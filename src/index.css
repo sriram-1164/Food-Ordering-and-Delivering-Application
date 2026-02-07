@@ -1,0 +1,29 @@
+.login{
+  background-image: url("../public/FoodPage.jpg") !important;
+  background-position: right;
+  background-repeat: no-repeat;
+  background-size: cover;
+ 
+}
+
+.order{
+  background-image: url("../public/Senthil.png") !important;
+  background-position: right;
+  background-repeat: no-repeat;
+  background-size: cover;
+ 
+}
+
+.Loader{
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 100vh;
+  width: 100vw;
+  background-color: rgba(245, 217, 171, 0.199);
+  z-index: 1000;
+
+}
