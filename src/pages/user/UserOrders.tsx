@@ -1,7 +1,9 @@
 import {
   Typography,
   Box,
-  
+  Tab,
+  Tabs,
+
 } from "@mui/material";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
@@ -12,7 +14,7 @@ import BackButton from "../../components/common/BackButton";
 import CancelOrderDialog from "../../pages/user/CancelOrderDialog";
 import { OrderDetails } from "../../services/Model";
 import FeedbackDialog from "./FeedbackDialog";
-import { order } from "@mui/system";
+
 
 export default function UserOrders() {
   const crud = CrudService();
@@ -20,12 +22,12 @@ export default function UserOrders() {
 
   const [orders, setOrders] = useState<OrderDetails[]>([]);
   const [loading, setLoading] = useState(true);
+  const [tab, setTab] = useState(0);
 
   // cancel order states
   const [cancelOpen, setCancelOpen] = useState(false);
   const [selectedOrder, setSelectedOrder] = useState<OrderDetails | null>(null);
 
-  // const [open, setOpen] = useState(false);
   const [feedbackOpen, setFeedbackOpen] = useState(false);
   const [feedbackOrder, setFeedbackOrder] = useState<OrderDetails | null>(null);
 
@@ -33,7 +35,7 @@ export default function UserOrders() {
     setFeedbackOrder(order);
     setFeedbackOpen(true);
   };
- 
+
   // LOAD USER ORDERS
   const loadOrders = () => {
     const userStr = localStorage.getItem("user");
@@ -79,13 +81,19 @@ export default function UserOrders() {
     loadOrders(); // refresh orders
   };
 
- const sortedUserOrders = [...orders]
-  .filter(o => o.status !== "Cancelled")
-  .sort((a, b) => {
-    const dateA = new Date(a.date).getTime();
-    const dateB = new Date(b.date).getTime();
-    return dateB - dateA; // 🔥 latest first
-  });
+  // FILTER ORDERS
+  const activeOrders = orders.filter(
+    (o) => o.status === "Preparing"
+  );
+
+  const historyOrders = orders.filter(
+    (o) => o.status === "Delivered" || o.status === "Cancelled"
+  );
+
+  const sortByDate = (list: OrderDetails[]) =>
+    [...list].sort(
+      (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()
+    );
 
 
   if (loading) return <Loader />;
@@ -118,6 +126,63 @@ export default function UserOrders() {
         My Orders
       </Typography>
 
+
+      <Tabs
+        value={tab}
+        onChange={(_, v) => setTab(v)}
+        centered
+        TabIndicatorProps={{ style: { display: "none" } }}
+        sx={{
+          mb: 3,
+          "& .MuiTabs-flexContainer": {
+            gap: 2,
+          },
+        }}
+      >
+        <Tab
+          label={`Active Orders (${activeOrders.length})`}
+          sx={{
+            textTransform: "none",
+            fontWeight: "bold",
+            px: 4,
+            py: 1.2,
+            borderRadius: "30px",
+            bgcolor: tab === 0 ? "#ff5722" : "#fff",
+            color: tab === 0 ? "#fff" : "#ff5722",
+            border: "2px solid #ff5722",
+            transition: "0.3s",
+            "&.Mui-selected": {
+              color: "#fff",   
+            },
+            "&:hover": {
+              bgcolor: tab === 0 ? "#e64a19" : "#fff3e0",
+            },
+          }}
+        />
+
+        <Tab
+          label={`Order History (${historyOrders.length})`}
+          sx={{
+            textTransform: "none",
+            fontWeight: "bold",
+            px: 4,
+            py: 1.2,
+            borderRadius: "30px",
+            bgcolor: tab === 1 ? "#ff5722" : "#fff",
+            color: tab === 1 ? "#fff" : "#ff5722",
+            border: "2px solid #ff5722",
+            transition: "0.3s",
+            "&.Mui-selected": {
+              color: "#fff",  
+            },
+            "&:hover": {
+              bgcolor: tab === 1 ? "#e64a19" : "#fff3e0",
+            },
+          }}
+        />
+      </Tabs>
+
+
       {/* ORDERS TABLE */}
       <Box
         p={2}
@@ -128,10 +193,15 @@ export default function UserOrders() {
         }}
       >
         <OrdersTable
-          orders={sortedUserOrders}
+          orders={
+            tab === 0
+              ? sortByDate(activeOrders)
+              : sortByDate(historyOrders)
+          }
           admin={false}
-          onCancelOrder={handleCancelClick}
-          onGiveFeedback={handleGiveFeedback} />
+          onCancelOrder={tab === 0 ? handleCancelClick : undefined}
+          onGiveFeedback={tab === 1 ? handleGiveFeedback : undefined}
+        />
       </Box>
 
       {/* CANCEL CONFIRMATION DIALOG */}

@@ -61,7 +61,8 @@ export interface AddFeedback {
   rating: number;
   createdAt: string;
   username: string;
-  foodname: string
+  foodname: string;
+  imageUrl?: string;
 }
 
 export interface FoodSalesReport {

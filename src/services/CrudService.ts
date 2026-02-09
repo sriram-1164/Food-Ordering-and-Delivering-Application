@@ -30,18 +30,26 @@ interface ICrudService {
 
   deleteOrder: (id: number) => Promise<void>
 
-  addFeedback: (feedbackData: AddFeedback) => Promise<AddFeedback>
-  getFeedback: () => Promise<AddFeedback[]>
+  addFeedback: (feedbackData: FormData) => Promise<any>;
+
+  getFeedbacksFromNode: () => Promise<any>;
+
+
 
 }
 
 export function CrudService(): ICrudService {
   const axiosService = useAxios(
     axios.create({
-      baseURL: "http://192.168.0.83:3001",
+      baseURL: "http://localhost:3001",
       headers: { "Content-Type": "application/json" }
     })
   );
+
+  const uploadAxios = axios.create({
+  baseURL: "http://localhost:3002", // 👈 Node server
+});
+
   // getting user details
   const getUsers = () => {
     const config: AxiosRequestConfig = {
@@ -143,24 +151,18 @@ export function CrudService(): ICrudService {
     };
     await axiosService.makeRequest(config);
   };
-  const addFeedback = (feedbackData: AddFeedback) => {
-    const config: AxiosRequestConfig = {
-      method: "post",
-      url: "/feedbacks",
-      data: feedbackData,
-    };
+const addFeedback = (feedbackData: FormData) => {
+  return uploadAxios.post("/feedbacks", feedbackData, {
+    headers: {
+      "Content-Type": "multipart/form-data",
+    },
+  });
+};
 
-    return axiosService.makeRequest<AddFeedback>(config);
-  };
+const getFeedbacksFromNode = () => {
+  return uploadAxios.get("/feedbacks");
+};
 
-  const getFeedback = () => {
-    const config: AxiosRequestConfig = {
-      method: "get",
-      url: "/feedbacks",
-    };
-
-    return axiosService.makeRequest<AddFeedback[]>(config);
-  };
 
 
   return {
@@ -175,7 +177,7 @@ export function CrudService(): ICrudService {
     deleteOrder,
     addOrder,
     addFeedback,
-    getFeedback
+    getFeedbacksFromNode
     
 
   };

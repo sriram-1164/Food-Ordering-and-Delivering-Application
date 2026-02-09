@@ -46,30 +46,21 @@ export default function OrdersTable({
               background: "linear-gradient(135deg, #ff5722, #ff9800)",
             }}
           >
-            <TableCell sx={{ color: "#fff", fontWeight: "bold" }}>
-              User
-            </TableCell>
-            <TableCell sx={{ color: "#fff", fontWeight: "bold" }}>
-              Food
-            </TableCell>
-            <TableCell sx={{ color: "#fff", fontWeight: "bold" }}>
-              Qty
-            </TableCell>
-            <TableCell sx={{ color: "#fff", fontWeight: "bold" }}>
-              Total
-            </TableCell>
-            <TableCell sx={{ color: "#fff", fontWeight: "bold" }}>
-              Date : Time
-            </TableCell>
-            <TableCell sx={{ color: "#fff", fontWeight: "bold" }}>
-              Address
-            </TableCell>
-            <TableCell sx={{ color: "#fff", fontWeight: "bold" }}>
-              Mobile
-            </TableCell>
-            <TableCell sx={{ color: "#fff", fontWeight: "bold" }}>
-              Status
-            </TableCell>
+            {[
+              "User",
+              "Food",
+              "Qty",
+              "Total",
+              "Date : Time",
+              "Address",
+              "Mobile",
+              "Status",
+              
+            ].map((h) => (
+              <TableCell key={h} sx={{ color: "#fff", fontWeight: "bold" }}>
+                {h}
+              </TableCell>
+            ))}
 
             {(admin || onCancelOrder) && (
               <TableCell sx={{ color: "#fff", fontWeight: "bold" }}>

@@ -1,29 +1,117 @@
-import { Dialog, DialogTitle, DialogContent, DialogActions, Button, TextField, Avatar, Box, Typography } from "@mui/material";
-import PersonAddIcon from '@mui/icons-material/PersonAdd';
+import {
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  Button,
+  TextField,
+  Avatar,
+  Box,
+  Typography,
+} from "@mui/material";
+import PersonAddIcon from "@mui/icons-material/PersonAdd";
 import { useState } from "react";
 import { CrudService } from "../services/CrudService";
 import { AddUserDetails } from "../services/Model";
 import React from "react";
+import { useRef } from "react";
+
+
+import {
+  RecaptchaVerifier,
+  signInWithPhoneNumber,
+} from "firebase/auth";
+import { auth } from "../firebase";
 
 const SignupDialog = () => {
+  const crud = CrudService();
 
-
-  const crud = CrudService()
-  const [username, setUsername] = useState("");
-  const [password, setPassword] = useState("");
-  const [phonenumber,setPhoneNumber]=useState("")
   const [openDialog, setOpenDialog] = useState(false);
   const [loading, setLoading] = useState(false);
+
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
+  const [phonenumber, setPhoneNumber] = useState("");
+
+  const [otp, setOtp] = useState("");
+  const [confirmationResult, setConfirmationResult] = useState<any>(null);
+  const [otpVerified, setOtpVerified] = useState(false);
+
   const [error, setError] = useState("");
+  const recaptchaRef = useRef<RecaptchaVerifier | null>(null);
 
 
+  /* ---------------- VALIDATION ---------------- */
+  const isValidPhoneNumber = (phone: string) =>
+    /^[6-9]\d{9}$/.test(phone);
+
+  /* ---------------- OPEN / CLOSE ---------------- */
   const handleOpen = () => {
     setOpenDialog(true);
-  }
+  };
 
   const handleClose = () => {
     setOpenDialog(false);
+    resetForm();
+  };
+
+  const resetForm = () => {
+    setUsername("");
+    setPassword("");
+    setPhoneNumber("");
+    setOtp("");
+    setConfirmationResult(null);
+    setOtpVerified(false);
+    setError("");
+  };
+
+  /* ---------------- SEND OTP ---------------- */
+  const handleSendOtp = async () => {
+  if (!isValidPhoneNumber(phonenumber)) {
+    setError("Enter a valid 10-digit mobile number");
+    return;
   }
+
+  try {
+    setError("");
+
+    if (!recaptchaRef.current) {
+      recaptchaRef.current = new RecaptchaVerifier(
+        auth,
+        "recaptcha-container",
+        { size: "invisible" }
+      );
+    }
+
+    const result = await signInWithPhoneNumber(
+      auth,
+      `+91${phonenumber}`,
+      recaptchaRef.current
+    );
+
+    setConfirmationResult(result);
+    alert("OTP sent successfully");
+  } catch (error: any) {
+    console.error("OTP ERROR:", error);
+    setError(error.message || "Failed to send OTP");
+  }
+};
+
+  /* ---------------- VERIFY OTP ---------------- */
+  const handleVerifyOtp = async () => {
+    if (!confirmationResult) return;
+
+    try {
+      await confirmationResult.confirm(otp);
+      setOtpVerified(true);
+      setError("");
+      alert("OTP verified successfully");
+    } catch {
+      setError("Invalid OTP");
+    }
+  };
+
+  /* ---------------- SIGNUP ---------------- */
   const handleSignup = async () => {
     if (!username.trim()) {
       setError("Username is required");
@@ -39,8 +127,14 @@ const SignupDialog = () => {
       setError("Password must be more than 3 characters");
       return;
     }
-    setError("");
+
+    if (!otpVerified) {
+      setError("Please verify OTP before signup");
+      return;
+    }
+
     setLoading(true);
+    setError("");
 
     try {
       const users = await crud.getUsers();
@@ -59,7 +153,7 @@ const SignupDialog = () => {
         userId: Date.now(),
         username,
         password,
-        role: "user", //  FORCE USER ROLE
+        role: "user",
         phonenumber
       };
 
@@ -67,9 +161,7 @@ const SignupDialog = () => {
 
       alert("Signup successful. Please login.");
       handleClose();
-      setUsername("");
-      setPassword("");
-    } catch (err) {
+    } catch {
       setError("Signup failed");
     } finally {
       setLoading(false);
@@ -77,7 +169,7 @@ const SignupDialog = () => {
   };
 
   return (
-    <React.Fragment>
+    <>
       <Button
         variant="contained"
         color="info"
@@ -86,7 +178,7 @@ const SignupDialog = () => {
       >
         Sign Up
       </Button>
-     
+
       <Dialog
         open={openDialog}
         onClose={handleClose}
@@ -94,18 +186,15 @@ const SignupDialog = () => {
         maxWidth="xs"
         PaperProps={{
           sx: {
-            position: "absolute",
-            right: 70,
-            top: 100,
-            height: "60vh",
             borderRadius: 3,
-             backgroundColor: "#b3effc"
+            backgroundColor: "#b3effc",
           },
         }}
       >
-   
+        {/* REQUIRED FOR FIREBASE */}
+        <div id="recaptcha-container"></div>
 
-        <Box 
+        <Box
           display="flex"
           flexDirection="column"
           alignItems="center"
@@ -116,12 +205,11 @@ const SignupDialog = () => {
           </Avatar>
 
           <DialogTitle sx={{ pb: 0 }}>
-            <Typography variant="h6" fontWeight="bold" align="center">
+            <Typography variant="h6" fontWeight="bold">
               Create Account
             </Typography>
           </DialogTitle>
         </Box>
-
 
         <DialogContent>
           <TextField
@@ -129,8 +217,6 @@ const SignupDialog = () => {
             fullWidth
             margin="normal"
             value={username}
-            error={Boolean(error)}
-            helperText={error}
             onChange={(e) => setUsername(e.target.value)}
           />
 
@@ -140,22 +226,57 @@ const SignupDialog = () => {
             fullWidth
             margin="normal"
             value={password}
-            error={Boolean(error)}
-            helperText={error}
             onChange={(e) => setPassword(e.target.value)}
           />
-            <TextField
-            label="Phonenumber"
-            
+
+          <TextField
+            label="Mobile Number"
             fullWidth
             margin="normal"
             value={phonenumber}
-            error={Boolean(error)}
-            helperText={error}
-            onChange={(e) => setPhoneNumber(e.target.value)}
+            onChange={(e) =>
+              setPhoneNumber(e.target.value.replace(/\D/g, ""))
+            }
+            inputProps={{ maxLength: 10 }}
           />
-        </DialogContent>
 
+          <Button
+            fullWidth
+            variant="outlined"
+            sx={{ mt: 1 }}
+            onClick={handleSendOtp}
+          >
+            Send OTP
+          </Button>
+
+          {confirmationResult && (
+            <>
+              <TextField
+                label="Enter OTP"
+                fullWidth
+                margin="normal"
+                value={otp}
+                onChange={(e) => setOtp(e.target.value)}
+                inputProps={{ maxLength: 6 }}
+              />
+
+              <Button
+                fullWidth
+                variant="contained"
+                sx={{ mt: 1 }}
+                onClick={handleVerifyOtp}
+              >
+                Verify OTP
+              </Button>
+            </>
+          )}
+
+          {error && (
+            <Typography color="error" mt={1}>
+              {error}
+            </Typography>
+          )}
+        </DialogContent>
 
         <DialogActions sx={{ px: 3, pb: 2 }}>
           <Button onClick={handleClose} color="inherit">
@@ -165,17 +286,15 @@ const SignupDialog = () => {
           <Button
             variant="contained"
             color="info"
+            disabled={!otpVerified || loading}
             onClick={handleSignup}
           >
             Signup
           </Button>
         </DialogActions>
       </Dialog>
-      
-    </React.Fragment>
+    </>
   );
 };
 
 export default SignupDialog;
-
-

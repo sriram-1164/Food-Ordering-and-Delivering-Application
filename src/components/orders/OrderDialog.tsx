@@ -60,6 +60,7 @@ export default function OrderDialog({ open, food, onClose, onSubmit }: any) {
       date: new Date().toISOString(),
       status: "Preparing",
       phonenumber,
+      
     };
 
     setPendingOrder(payload);

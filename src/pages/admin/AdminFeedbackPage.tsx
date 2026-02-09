@@ -8,16 +8,22 @@ import {
   Paper,
   Typography,
   Box,
+  Button,
+  Dialog,
+  DialogContent,
+  IconButton,
 } from "@mui/material";
+import CloseIcon from "@mui/icons-material/Close";
 import Rating from "@mui/material/Rating";
 import { CrudService } from "../../services/CrudService";
 import BackButton from "../../components/common/BackButton";
 
 /* =======================
-   TYPE DEFINITION
+   TYPE
 ======================= */
 interface AdminFeedback {
   id: string;
+  orderId?: string;
   userId: string;
   foodId: string;
   username?: string;
@@ -25,22 +31,34 @@ interface AdminFeedback {
   feedback: string;
   rating: number;
   createdAt: string;
+  imageUrl?: string;
 }
 
 export default function AdminFeedbackPage() {
   const crud = CrudService();
-  const [feedbacks, setFeedbacks] = useState<any[]>([]);
+
+  const [feedbacks, setFeedbacks] = useState<AdminFeedback[]>([]);
   const [loading, setLoading] = useState(true);
 
+  // image dialog
+  const [openImage, setOpenImage] = useState(false);
+  const [selectedImage, setSelectedImage] = useState<string | null>(null);
+
   /* =======================
-     LOAD FEEDBACK
+     LOAD FEEDBACK FROM NODE
   ======================= */
   useEffect(() => {
-    crud.getFeedback().then((res: any[]) => {
-      setFeedbacks(Array.isArray(res) ? res : []);
+    crud.getFeedbacksFromNode().then((res: any) => {
+      setFeedbacks(Array.isArray(res.data) ? res.data : []);
       setLoading(false);
     });
   }, []);
+
+  const handleViewImage = (imageUrl?: string) => {
+    if (!imageUrl) return;
+    setSelectedImage(`http://localhost:3002${imageUrl}`);
+    setOpenImage(true);
+  };
 
   return (
     <Box
@@ -73,7 +91,7 @@ export default function AdminFeedbackPage() {
       {/* TABLE CARD */}
       <Paper
         sx={{
-          maxWidth: 1100,
+          maxWidth: 1200,
           mx: "auto",
           p: 3,
           borderRadius: 3,
@@ -81,10 +99,10 @@ export default function AdminFeedbackPage() {
         }}
       >
         <Table>
-          {/* TABLE HEADER */}
+          {/* HEADER */}
           <TableHead>
             <TableRow sx={{ backgroundColor: "#ff9800" }}>
-               <TableCell sx={{ color: "#fff", fontWeight: "bold" }}>
+              <TableCell sx={{ color: "#fff", fontWeight: "bold" }}>
                 Order Id
               </TableCell>
               <TableCell sx={{ color: "#fff", fontWeight: "bold" }}>
@@ -100,16 +118,19 @@ export default function AdminFeedbackPage() {
                 Rating
               </TableCell>
               <TableCell sx={{ color: "#fff", fontWeight: "bold" }}>
+                Image
+              </TableCell>
+              <TableCell sx={{ color: "#fff", fontWeight: "bold" }}>
                 Date
               </TableCell>
             </TableRow>
           </TableHead>
 
-          {/* TABLE BODY */}
+          {/* BODY */}
           <TableBody>
             {loading ? (
               <TableRow>
-                <TableCell colSpan={5} align="center">
+                <TableCell colSpan={7} align="center">
                   <Typography color="text.secondary">
                     Loading feedback...
                   </Typography>
@@ -117,7 +138,7 @@ export default function AdminFeedbackPage() {
               </TableRow>
             ) : feedbacks.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={5} align="center">
+                <TableCell colSpan={7} align="center">
                   <Typography color="text.secondary">
                     📝 No feedback available yet
                   </Typography>
@@ -128,45 +149,49 @@ export default function AdminFeedbackPage() {
                 <TableRow
                   key={f.id}
                   hover
-                  sx={{
-                    "&:hover": { backgroundColor: "#fff3e0" },
-                  }}
+                  sx={{ "&:hover": { backgroundColor: "#fff3e0" } }}
                 >
-                  <TableCell>
-                    {f.orderId ?? "—"}
-                  </TableCell>
-                  {/* USER */}
-                  <TableCell>
-                    {f.username ?? "—"}
-                  </TableCell>
+                  <TableCell>{f.orderId ?? "—"}</TableCell>
 
-                  {/* FOOD */}
+                  <TableCell>{f.username ?? "—"}</TableCell>
+
                   <TableCell>
                     <Typography fontWeight="bold">
                       {f.foodname ?? "—"}
                     </Typography>
                   </TableCell>
 
-                  {/* FEEDBACK */}
                   <TableCell sx={{ maxWidth: 350 }}>
                     <Typography
                       variant="body2"
                       color="text.secondary"
-                      sx={{
-                        whiteSpace: "pre-wrap",
-                        wordBreak: "break-word",
-                      }}
+                      sx={{ wordBreak: "break-word" }}
                     >
                       {f.feedback}
                     </Typography>
                   </TableCell>
 
-                  {/* RATING */}
                   <TableCell>
                     <Rating value={f.rating || 0} readOnly />
                   </TableCell>
 
-                  {/* DATE */}
+                  {/* IMAGE BUTTON */}
+                  <TableCell>
+                    {f.imageUrl ? (
+                      <Button
+                        size="small"
+                        variant="outlined"
+                        onClick={() => handleViewImage(f.imageUrl)}
+                      >
+                        View Image
+                      </Button>
+                    ) : (
+                      <Typography variant="body2" color="text.secondary">
+                        —
+                      </Typography>
+                    )}
+                  </TableCell>
+
                   <TableCell>
                     <Typography variant="body2" color="text.secondary">
                       {new Date(f.createdAt).toLocaleString()}
@@ -178,6 +203,32 @@ export default function AdminFeedbackPage() {
           </TableBody>
         </Table>
       </Paper>
+
+      {/* IMAGE VIEW DIALOG */}
+      <Dialog open={openImage} onClose={() => setOpenImage(false)} maxWidth="sm">
+        <IconButton
+          onClick={() => setOpenImage(false)}
+          sx={{ position: "absolute", right: 8, top: 8 }}
+        >
+          <CloseIcon />
+        </IconButton>
+
+        <DialogContent sx={{ p: 2 }}>
+          {selectedImage && (
+            <Box
+              component="img"
+              src={selectedImage}
+              alt="Feedback"
+              sx={{
+                width: "100%",
+                maxHeight: 500,
+                objectFit: "contain",
+                borderRadius: 2,
+              }}
+            />
+          )}
+        </DialogContent>
+      </Dialog>
     </Box>
   );
 }

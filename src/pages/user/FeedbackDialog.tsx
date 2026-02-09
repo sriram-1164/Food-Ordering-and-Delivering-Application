@@ -1,12 +1,12 @@
 import {
-    Dialog,
-    DialogTitle,
-    DialogContent,
-    DialogActions,
-    Button,
-    TextField,
-    Typography,
-    Box,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  Button,
+  TextField,
+  Typography,
+  Box,
 } from "@mui/material";
 import { useState } from "react";
 import { CrudService } from "../../services/CrudService";
@@ -24,40 +24,52 @@ interface Order {
 
 
 interface Props {
-    open: boolean;
-    onClose: () => void;
-    order: Order | null;
+  open: boolean;
+  onClose: () => void;
+  order: Order | null;
 }
 
 export default function FeedbackDialog({ open, onClose, order }: Props) {
-    const [feedback, setFeedback] = useState("");
-    const crud = CrudService()
+  const [feedback, setFeedback] = useState("");
+  const [image, setImage] = useState<File | null>(null);
 
-    const wordCount = feedback.trim().split(/\s+/).filter(Boolean).length;
-    const [rating, setRating] = useState<number | null>(0);
+  const crud = CrudService()
+
+  const wordCount = feedback.trim().split(/\s+/).filter(Boolean).length;
+  const [rating, setRating] = useState<number | null>(0);
 
 
-    const handleSubmit = async () => {
-        if (!order) return;
+  const handleSubmit = async () => {
+    if (!order) return;
 
-        const payload: AddFeedback = {
-          orderId: order.id,
-          userId: order.userId,
-          username: order.username,
-          foodname: order.foodname,
-          feedback: feedback.trim(),
-          createdAt: new Date().toISOString(),
-          rating: rating || 0,
-          foodId: ""
-        };
+    const formData = new FormData();
 
-        await crud.addFeedback(payload);
-        setFeedback("");
-        onClose();
-    };
+    formData.append("orderId", order.id);
+    formData.append("userId", order.userId);
+    formData.append("username", order.username);
+    formData.append("foodname", order.foodname);
+    formData.append("feedback", feedback.trim());
+    formData.append("createdAt", new Date().toISOString());
+    formData.append("rating", String(rating || 0));
+    formData.append("foodId", order.foodId);
 
-    return (
-        <Dialog
+    // 👇 THIS IS THE NEW PART
+    if (image) {
+      formData.append("image", image);
+    }
+
+    await crud.addFeedback(formData);
+
+    // reset
+    setFeedback("");
+    setRating(0);
+    setImage(null);
+    onClose();
+  };
+
+
+  return (
+    <Dialog
       open={open}
       onClose={onClose}
       fullWidth
@@ -125,6 +137,50 @@ export default function FeedbackDialog({ open, onClose, order }: Props) {
         >
           {wordCount} / 250 words
         </Typography>
+        <Box mt={2}>
+          <Typography variant="subtitle2" mb={1}>
+            Upload Image (optional)
+          </Typography>
+
+          <Button
+            variant="outlined"
+            component="label"
+          >
+            Choose Image
+            <input
+              type="file"
+              hidden
+              accept="image/*"
+              onChange={(e) => {
+                if (e.target.files && e.target.files[0]) {
+                  setImage(e.target.files[0]);
+                }
+              }}
+            />
+          </Button>
+          {image && (
+            <Box mt={2}>
+              <Typography variant="subtitle2" mb={1}>
+                Preview
+              </Typography>
+
+              <Box
+                component="img"
+                src={URL.createObjectURL(image)}
+                alt="Feedback preview"
+                sx={{
+                  width: 120,
+                  height: 120,
+                  objectFit: "cover",
+                  borderRadius: 2,
+                  border: "1px solid #ddd",
+                }}
+              />
+            </Box>
+          )}
+
+        </Box>
+
       </DialogContent>
 
       <DialogActions sx={{ p: 2 }}>
@@ -150,5 +206,5 @@ export default function FeedbackDialog({ open, onClose, order }: Props) {
         </Button>
       </DialogActions>
     </Dialog>
-    );
+  );
 }
