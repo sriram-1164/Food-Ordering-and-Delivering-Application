@@ -8,6 +8,11 @@ import {
   Button,
   Divider,
   Stack,
+  DialogContent,
+  DialogActions,
+  Dialog,
+  TextField,
+  DialogTitle,
 } from "@mui/material";
 import EditIcon from "@mui/icons-material/Edit";
 import LockIcon from "@mui/icons-material/Lock";
@@ -24,6 +29,16 @@ const UserProfile = () => {
   const [loading, setLoading] = useState(true);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [uploading, setUploading] = useState(false);
+
+  const [openEdit, setOpenEdit] = useState(false);
+  const [editUsername, setEditUsername] = useState("");
+  const [editPhone, setEditPhone] = useState("");
+
+  const [openPassword, setOpenPassword] = useState(false);
+  const [oldPassword, setOldPassword] = useState("");
+  const [newPassword, setNewPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+
 
   useEffect(() => {
     const fetchUser = async () => {
@@ -87,6 +102,100 @@ const UserProfile = () => {
     }
   };
 
+  const handleOpenEdit = () => {
+    if (!user) return;
+    setEditUsername(user.username);
+    setEditPhone(user.phonenumber);
+    setOpenEdit(true);
+  };
+
+  const handleCloseEdit = () => {
+    setOpenEdit(false);
+  };
+
+  const handleSaveProfile = async () => {
+    if (!user) return;
+
+    if (!editUsername.trim()) {
+      alert("Username cannot be empty");
+      return;
+    }
+
+    if (!/^[6-9]\d{9}$/.test(editPhone)) {
+      alert("Enter a valid 10-digit mobile number");
+      return;
+    }
+
+    try {
+      // PATCH only changed fields
+      await axios.patch(
+        `http://localhost:3001/users/${user.id}`,
+        {
+          username: editUsername,
+          phonenumber: editPhone,
+        }
+      );
+
+      // Update UI state
+      setUser({
+        ...user,
+        username: editUsername,
+        phonenumber: editPhone,
+      });
+
+      setOpenEdit(false);
+    } catch (err) {
+      console.error("Failed to update profile", err);
+      alert("Profile update failed");
+    }
+  };
+
+  const handleOpenPassword = () => {
+    setOldPassword("");
+    setNewPassword("");
+    setConfirmPassword("");
+    setOpenPassword(true);
+  };
+
+  const handleClosePassword = () => {
+    setOpenPassword(false);
+  };
+
+  const handleChangePassword = async () => {
+    if (!user) return;
+
+    if (oldPassword !== user.password) {
+      alert("Old password is incorrect");
+      return;
+    }
+
+    if (newPassword.length <= 3) {
+      alert("New password must be more than 3 characters");
+      return;
+    }
+
+    if (newPassword !== confirmPassword) {
+      alert("Passwords do not match");
+      return;
+    }
+
+    try {
+      await axios.patch(
+        `http://localhost:3001/users/${user.id}`,
+        { password: newPassword }
+      );
+
+      setUser({ ...user, password: newPassword });
+      setOpenPassword(false);
+      alert("Password updated successfully");
+    } catch (err) {
+      console.error("Failed to update password", err);
+      alert("Password update failed");
+    }
+  };
+
+
+
   if (loading) {
     return (
       <Box display="flex" justifyContent="center" mt={6}>
@@ -104,16 +213,16 @@ const UserProfile = () => {
   }
 
   return (
-      <Box
-    minHeight="100vh"
-    display="flex"
-    justifyContent="center"
-    alignItems="flex-start"
-    pt={6}
-    sx={{
-      background: "linear-gradient(135deg, #f52922, #ffcc80)",
-    }}
-  >
+    <Box
+      minHeight="100vh"
+      display="flex"
+      justifyContent="center"
+      alignItems="flex-start"
+      pt={6}
+      sx={{
+        background: "linear-gradient(135deg, #f52922, #ffcc80)",
+      }}
+    >
       <Box mb={2}>
         <BackButton to="/usermenu" />
       </Box>
@@ -200,20 +309,93 @@ const UserProfile = () => {
             fullWidth
             startIcon={<EditIcon />}
             variant="outlined"
-            disabled
+            onClick={handleOpenEdit}
           >
-            Edit Profile (Coming Soon)
+            Edit Profile
           </Button>
+
+          <Dialog open={openEdit} onClose={handleCloseEdit} fullWidth maxWidth="xs">
+            <DialogTitle>Edit Profile</DialogTitle>
+
+            <DialogContent>
+              <TextField
+                label="Username"
+                fullWidth
+                margin="normal"
+                value={editUsername}
+                onChange={(e) => setEditUsername(e.target.value)}
+              />
+
+              <TextField
+                label="Phone Number"
+                fullWidth
+                margin="normal"
+                value={editPhone}
+                inputProps={{ maxLength: 10 }}
+                onChange={(e) =>
+                  setEditPhone(e.target.value.replace(/\D/g, ""))
+                }
+              />
+            </DialogContent>
+
+            <DialogActions>
+              <Button onClick={handleCloseEdit}>Cancel</Button>
+              <Button variant="contained" onClick={handleSaveProfile}>
+                Save
+              </Button>
+            </DialogActions>
+          </Dialog>
+
 
           <Button
             fullWidth
             startIcon={<LockIcon />}
             variant="outlined"
-            disabled
+            onClick={handleOpenPassword}
           >
-            Change Password (Coming Soon)
+            Change Password
           </Button>
         </Stack>
+        <Dialog open={openPassword} onClose={handleClosePassword} fullWidth maxWidth="xs">
+          <DialogTitle>Change Password</DialogTitle>
+
+          <DialogContent>
+            <TextField
+              label="Old Password"
+              type="password"
+              fullWidth
+              margin="normal"
+              value={oldPassword}
+              onChange={(e) => setOldPassword(e.target.value)}
+            />
+
+            <TextField
+              label="New Password"
+              type="password"
+              fullWidth
+              margin="normal"
+              value={newPassword}
+              onChange={(e) => setNewPassword(e.target.value)}
+            />
+
+            <TextField
+              label="Confirm New Password"
+              type="password"
+              fullWidth
+              margin="normal"
+              value={confirmPassword}
+              onChange={(e) => setConfirmPassword(e.target.value)}
+            />
+          </DialogContent>
+
+          <DialogActions>
+            <Button onClick={handleClosePassword}>Cancel</Button>
+            <Button variant="contained" onClick={handleChangePassword}>
+              Update
+            </Button>
+          </DialogActions>
+        </Dialog>
+
 
         <Typography
           variant="caption"
