@@ -1,6 +1,6 @@
 import axios, { AxiosRequestConfig } from "axios";
 import { useAxios } from "./Axios";
-import { FoodDetails, AddFoodDetails, OrderDetails, UserDetails, AddUserDetails, AddFeedback } from "../services/Model";
+import { FoodDetails, AddFoodDetails, OrderDetails, UserDetails, AddUserDetails, } from "../services/Model";
 
 interface ICrudService {
   getUsers: () => Promise<UserDetails[]>;
@@ -34,6 +34,14 @@ interface ICrudService {
 
   getFeedbacksFromNode: () => Promise<any>;
 
+  updateUser: (
+  id: number,
+  userInformation: Partial<UserDetails>
+) => Promise<UserDetails>;
+
+
+  uploadProfileImage: (data: FormData) => Promise<any>;
+
 
 
 }
@@ -47,8 +55,8 @@ export function CrudService(): ICrudService {
   );
 
   const uploadAxios = axios.create({
-  baseURL: "http://localhost:3002", // 👈 Node server
-});
+    baseURL: "http://localhost:3002", // 👈 Node server
+  });
 
   // getting user details
   const getUsers = () => {
@@ -151,17 +159,39 @@ export function CrudService(): ICrudService {
     };
     await axiosService.makeRequest(config);
   };
-const addFeedback = (feedbackData: FormData) => {
-  return uploadAxios.post("/feedbacks", feedbackData, {
-    headers: {
-      "Content-Type": "multipart/form-data",
-    },
-  });
+  const addFeedback = (feedbackData: FormData) => {
+    return uploadAxios.post("/feedbacks", feedbackData, {
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
+    });
+  };
+
+  const getFeedbacksFromNode = () => {
+    return uploadAxios.get("/feedbacks");
+  };
+
+  const uploadProfileImage = (formData: FormData) => {
+    return uploadAxios.post("/api/profile-pic", formData, {
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
+    });
+  };
+
+const updateUser = (id: number, data: Partial<UserDetails>) => {
+  const config: AxiosRequestConfig = {
+    method: "patch",
+    url: `/users/${id}`,
+    data,
+  };
+
+  console.log("CONFIG URL BEFORE REQUEST:", config.url);
+
+  return axiosService.makeRequest<UserDetails>(config);
 };
 
-const getFeedbacksFromNode = () => {
-  return uploadAxios.get("/feedbacks");
-};
+
 
 
 
@@ -177,8 +207,10 @@ const getFeedbacksFromNode = () => {
     deleteOrder,
     addOrder,
     addFeedback,
-    getFeedbacksFromNode
-    
+    getFeedbacksFromNode,
+    updateUser,          // 👈 JSON Server
+    uploadProfileImage,
+
 
   };
 }

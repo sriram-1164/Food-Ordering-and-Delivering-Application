@@ -1,4 +1,4 @@
-import { Box, Typography, Button, DialogActions, Dialog, DialogContent, DialogTitle, } from "@mui/material";
+import { Box, Typography, Button, DialogActions, Dialog, DialogContent, DialogTitle, MenuItem, } from "@mui/material";
 import { useEffect, useState } from "react";
 import FoodFilters from "../../components/food/FoodFilters";
 import FoodTable from "../../components/food/FoodTable";
@@ -95,6 +95,9 @@ export default function UserMenu() {
         >
           Call Support
         </Button>
+        <MenuItem onClick={() => navigate("/profile")}>
+          Profile
+        </MenuItem>
       </Box>
       <Box
         display="flex"

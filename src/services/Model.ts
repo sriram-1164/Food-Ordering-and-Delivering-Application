@@ -39,18 +39,23 @@ export interface OrderDetails {
 
 
 export interface UserDetails {
+  id: number;              
+  phonenumber: string;
+  profileImage: any;
   userId: number;
   username: string;
   password: string;
- role: "user" | "admin";
+  role: "user" | "admin";
 }
 
 export interface AddUserDetails {
+  id: number;
   userId: number;
   username: string;
   password: string;
-  role: "user" ;
-  phonenumber:string
+  role: "user";
+  phonenumber: string;
+  profileImage?: string;
 }
 
 export interface AddFeedback {

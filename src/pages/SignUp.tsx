@@ -67,35 +67,35 @@ const SignupDialog = () => {
 
   /* ---------------- SEND OTP ---------------- */
   const handleSendOtp = async () => {
-  if (!isValidPhoneNumber(phonenumber)) {
-    setError("Enter a valid 10-digit mobile number");
-    return;
-  }
-
-  try {
-    setError("");
-
-    if (!recaptchaRef.current) {
-      recaptchaRef.current = new RecaptchaVerifier(
-        auth,
-        "recaptcha-container",
-        { size: "invisible" }
-      );
+    if (!isValidPhoneNumber(phonenumber)) {
+      setError("Enter a valid 10-digit mobile number");
+      return;
     }
 
-    const result = await signInWithPhoneNumber(
-      auth,
-      `+91${phonenumber}`,
-      recaptchaRef.current
-    );
+    try {
+      setError("");
 
-    setConfirmationResult(result);
-    alert("OTP sent successfully");
-  } catch (error: any) {
-    console.error("OTP ERROR:", error);
-    setError(error.message || "Failed to send OTP");
-  }
-};
+      if (!recaptchaRef.current) {
+        recaptchaRef.current = new RecaptchaVerifier(
+          auth,
+          "recaptcha-container",
+          { size: "invisible" }
+        );
+      }
+
+      const result = await signInWithPhoneNumber(
+        auth,
+        `+91${phonenumber}`,
+        recaptchaRef.current
+      );
+
+      setConfirmationResult(result);
+      alert("OTP sent successfully");
+    } catch (error: any) {
+      console.error("OTP ERROR:", error);
+      setError(error.message || "Failed to send OTP");
+    }
+  };
 
   /* ---------------- VERIFY OTP ---------------- */
   const handleVerifyOtp = async () => {
@@ -149,12 +149,16 @@ const SignupDialog = () => {
         return;
       }
 
+      const timestamp = Date.now();
+
       const newUser: AddUserDetails = {
-        userId: Date.now(),
+        id: timestamp,            // 👈 JSON SERVER ID
+        userId: timestamp,        // 👈 APP USER ID
         username,
         password,
         role: "user",
-        phonenumber
+        phonenumber,
+        profileImage: ""
       };
 
       await crud.addUser(newUser);

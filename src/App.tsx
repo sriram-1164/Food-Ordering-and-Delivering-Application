@@ -6,6 +6,7 @@ import AdminMenu from "./pages/admin/AdminMenu";
 import AdminOrders from "./pages/admin/AdminOrders";
 import AdminFeedbackPage from "./pages/admin/AdminFeedbackPage";
 import AdminSalesReport from "./pages/admin/AdminSalesReport"
+import UserProfile from "./pages/user/UserProfile";
 
 
 
@@ -19,6 +20,7 @@ export default function App() {
         <Route path="/" element={<Login />} />
         <Route path="/usermenu" element={<UserMenu />} />
         <Route path="/userorders" element={<UserOrders />} />
+        <Route path="/profile" element={<UserProfile />} />
         
         <Route path="/adminmenu" element={<AdminMenu />} />
         <Route path="/adminorders" element={<AdminOrders />} />
