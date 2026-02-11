@@ -25,7 +25,7 @@ export interface OrderDetails {
   price: number;
   mealtype: string;
   foodtype: string;
-  address: string;
+  address: Address;
   quantity: number;
   date: string;
 
@@ -46,6 +46,15 @@ export interface UserDetails {
   username: string;
   password: string;
   role: "user" | "admin";
+  addresses?: Address[];
+  email?: string;
+}
+export interface Address {
+  id: number;
+  label: string;        // Home / Work / Other
+  addressLine: string;
+  city: string;
+  pincode: string;
 }
 
 export interface AddUserDetails {

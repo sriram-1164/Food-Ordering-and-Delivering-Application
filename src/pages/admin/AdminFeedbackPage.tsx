@@ -48,11 +48,30 @@ export default function AdminFeedbackPage() {
      LOAD FEEDBACK FROM NODE
   ======================= */
   useEffect(() => {
-    crud.getFeedbacksFromNode().then((res: any) => {
-      setFeedbacks(Array.isArray(res.data) ? res.data : []);
+  const loadFeedbacks = async () => {
+    try {
+      const res: any = await crud.getFeedbacksFromNode();
+      const data: AdminFeedback[] = Array.isArray(res.data)
+        ? res.data
+        : [];
+
+      const sorted = [...data].sort(
+        (a, b) =>
+          new Date(b.createdAt).getTime() -
+          new Date(a.createdAt).getTime()
+      );
+
+      setFeedbacks(sorted);
+    } catch (error) {
+      console.error("Error loading feedbacks", error);
+    } finally {
       setLoading(false);
-    });
-  }, []);
+    }
+  };
+
+  loadFeedbacks();
+}, []);
+
 
   const handleViewImage = (imageUrl?: string) => {
     if (!imageUrl) return;
@@ -160,6 +179,11 @@ export default function AdminFeedbackPage() {
                       {f.foodname ?? "—"}
                     </Typography>
                   </TableCell>
+                  {/* <TableCell>
+                    <Typography fontWeight="bold">
+                      {f.foodId ?? "—"}
+                    </Typography>
+                  </TableCell> */}
 
                   <TableCell sx={{ maxWidth: 350 }}>
                     <Typography

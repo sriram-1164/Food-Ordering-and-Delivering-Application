@@ -3,11 +3,28 @@
     {
       "userId": 1,
       "username": "Ram",
-      "password": "1164",
+      "password": "1234",
       "role": "user",
       "id": "9b7d",
       "phonenumber": "9360790976",
-      "profileImage": "/uploads/profile/user_undefined.jfif"
+      "profileImage": "/uploads/profile/user_undefined.jfif",
+      "email": "sriram01400@gmail.com",
+      "addresses": [
+        {
+          "id": 1770704439040,
+          "label": "Home",
+          "addressLine": "Bengaluru",
+          "city": "Kudlu Gate",
+          "pincode": "606804"
+        },
+        {
+          "id": 1770704481057,
+          "label": "Work",
+          "addressLine": "614,Anna Nagar",
+          "city": "Chennai",
+          "pincode": "606800"
+        }
+      ]
     },
     {
       "userId": 2,
@@ -23,7 +40,23 @@
       "username": "san",
       "password": "1234",
       "role": "user",
-      "phonenumber": "7878787878"
+      "phonenumber": "7878787878",
+      "addresses": [
+        {
+          "id": 1770706865296,
+          "label": "Home",
+          "addressLine": "dubaii",
+          "city": "saudi",
+          "pincode": "909877"
+        },
+        {
+          "id": 1770706866337,
+          "label": "Home",
+          "addressLine": "dubaii",
+          "city": "saudi",
+          "pincode": "909877"
+        }
+      ]
     },
     {
       "id": "5d38",
@@ -39,7 +72,18 @@
       "username": "Sriram",
       "password": "1234",
       "role": "user",
-      "phonenumber": "7878787878"
+      "phonenumber": "7878787878",
+      "profileImage": "/uploads/profile/user_undefined.jpg",
+      "email": "sriram01400@gmail.com",
+      "addresses": [
+        {
+          "id": 1770710676590,
+          "label": "Home",
+          "addressLine": "Surya City",
+          "city": "Bengaluru",
+          "pincode": "606804"
+        }
+      ]
     },
     {
       "id": "e071",
@@ -89,13 +133,22 @@
       "role": "user",
       "phonenumber": "9360790976",
       "profileImage": "/uploads/profile/user_undefined.jpg"
+    },
+    {
+      "id": "1770727825479",
+      "userId": 1770727825479,
+      "username": "Raja",
+      "password": "1111",
+      "role": "user",
+      "phonenumber": "9999999999",
+      "profileImage": ""
     }
   ],
   "foods": [
     {
       "id": "c32e",
       "foodname": "Dosa",
-      "price": 21,
+      "price": 22,
       "mealtype": "Breakfast",
       "foodtype": "Veg"
     },
@@ -350,8 +403,50 @@
       "quantity": 2,
       "address": "Dubai,Racing Place",
       "date": "2026-02-09T12:51:00.653Z",
-      "status": "Preparing",
+      "status": "Delivered",
       "phonenumber": "8888888888"
+    },
+    {
+      "id": "1f5d",
+      "userId": "1",
+      "username": "Ram",
+      "foodname": "Dosa",
+      "price": 21,
+      "quantity": 2,
+      "totalPrice": 42,
+      "mealtype": "Breakfast",
+      "foodtype": "Veg",
+      "address": {
+        "id": 1770704439040,
+        "label": "Home",
+        "addressLine": "Bengaluru",
+        "city": "Kudlu Gate",
+        "pincode": "606804"
+      },
+      "phonenumber": "6666666666",
+      "status": "Delivered",
+      "date": "2026-02-10T12:30:32.383Z"
+    },
+    {
+      "id": "dd99",
+      "userId": "1",
+      "username": "Ram",
+      "foodname": "Panni Puri",
+      "price": 20,
+      "quantity": 9,
+      "totalPrice": 180,
+      "mealtype": "Snacks",
+      "foodtype": "Veg",
+      "address": {
+        "id": 1770704481057,
+        "label": "Work",
+        "addressLine": "614,Anna Nagar",
+        "city": "Chennai",
+        "pincode": "606800"
+      },
+      "phonenumber": "8888888888",
+      "status": "Delivered",
+      "date": "2026-02-10T12:45:38.829Z"
     }
   ],
   "feedbacks": [

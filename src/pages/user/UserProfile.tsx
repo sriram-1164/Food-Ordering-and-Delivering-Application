@@ -13,14 +13,19 @@ import {
   Dialog,
   TextField,
   DialogTitle,
+  CardContent,
+  Card,
+  Grid,
 } from "@mui/material";
 import EditIcon from "@mui/icons-material/Edit";
 import LockIcon from "@mui/icons-material/Lock";
 import PhotoCameraIcon from "@mui/icons-material/PhotoCamera";
 import { CrudService } from "../../services/CrudService";
-import { UserDetails } from "../../services/Model";
+import { Address, UserDetails } from "../../services/Model";
 import axios from "axios";
 import BackButton from "../../components/common/BackButton";
+// import Grid from "@mui/material/Grid2";
+
 
 const UserProfile = () => {
   const crud = CrudService();
@@ -39,6 +44,15 @@ const UserProfile = () => {
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
 
+  const [email, setEmail] = useState("");
+  const [editingEmail, setEditingEmail] = useState(false);
+  const [addresses, setAddresses] = useState<Address[]>([]);
+
+  const [openAddress, setOpenAddress] = useState(false);
+  const [addressLabel, setAddressLabel] = useState("Home");
+  const [addressLine, setAddressLine] = useState("");
+  const [city, setCity] = useState("");
+  const [pincode, setPincode] = useState("");
 
   useEffect(() => {
     const fetchUser = async () => {
@@ -194,6 +208,70 @@ const UserProfile = () => {
     }
   };
 
+  useEffect(() => {
+    if (user?.email) setEmail(user.email);
+  }, [user]);
+
+  useEffect(() => {
+    if (user?.addresses) setAddresses(user.addresses);
+  }, [user]);
+
+  const handleOpenAddress = () => {
+    setAddressLabel("Home");
+    setAddressLine("");
+    setCity("");
+    setPincode("");
+    setOpenAddress(true);
+  };
+
+  const handleCloseAddress = () => {
+    setOpenAddress(false);
+  };
+
+  const handleSaveAddress = async () => {
+    if (!user) return;
+
+    if (!addressLine.trim() || !city.trim() || !pincode.trim()) {
+      alert("Please fill all address fields");
+      return;
+    }
+
+    if (!/^\d{6}$/.test(pincode)) {
+      alert("Enter valid 6-digit pincode");
+      return;
+    }
+
+    const newAddress = {
+      id: Date.now(),
+      label: addressLabel,
+      addressLine,
+      city,
+      pincode,
+    };
+
+    const updatedAddresses = user.addresses
+      ? [...user.addresses, newAddress]
+      : [newAddress];
+
+    try {
+      await axios.patch(
+        `http://localhost:3001/users/${user.id}`,
+        { addresses: updatedAddresses }
+      );
+
+      setUser({
+        ...user,
+        addresses: updatedAddresses,
+      });
+
+      setOpenAddress(false);
+    } catch (err) {
+      console.error("Failed to save address", err);
+      alert("Address save failed");
+    }
+  };
+
+
 
 
   if (loading) {
@@ -213,111 +291,311 @@ const UserProfile = () => {
   }
 
   return (
-    <Box
-      minHeight="100vh"
-      display="flex"
-      justifyContent="center"
-      alignItems="flex-start"
-      pt={6}
-      sx={{
-        background: "linear-gradient(135deg, #f52922, #ffcc80)",
-      }}
-    >
-      <Box mb={2}>
-        <BackButton to="/usermenu" />
-      </Box>
-      <Paper
-        elevation={6}
-        sx={{
-          width: 620,
-          p: 4,
-          borderRadius: 8,
-        }}
-      >
-        {/* PROFILE HEADER */}
-        <Stack alignItems="center" spacing={1}>
-          <Avatar
-            src={
-              user.profileImage
-                ? `http://localhost:3002${user.profileImage}`
-                : undefined
-            }
+    <React.Fragment>
+      <Box className="order">
+        <Box
+          sx={{
+            minHeight: "100vh",
+            // background: "linear-gradient(135deg, #cd2883, #faf7fb)",
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            p: 2,
+          }}
+        >
+          <Box sx={{ position: "absolute", top: 16, left: 16 }}>
+            <BackButton to="/usermenu" />
+          </Box>
+
+          <Card
             sx={{
-              width: 110,
-              height: 110,
-              bgcolor: "info.main",
-              fontSize: 36,
+              maxWidth: 800,
+              width: "100%",
+              borderRadius: 4,
+              boxShadow: "0 20px 40px rgba(241, 29, 29, 0.23)",
+              overflow: "hidden",
             }}
           >
-            {!user.profileImage &&
-              user.username.charAt(0).toUpperCase()}
-          </Avatar>
-
-          <input
-            type="file"
-            hidden
-            accept="image/*"
-            id="profile-pic-input"
-            onChange={handleFileChange}
-          />
-
-          <label htmlFor="profile-pic-input">
-            <Button
-              startIcon={<PhotoCameraIcon />}
-              size="small"
-              variant="outlined"
-              component="span"
+            {/* HEADER */}
+            <Box className="farm"
+              sx={{
+                background: "linear-gradient(135deg, #ddba1db6, #e9c4c4)",
+                color: "#fff",
+                p: 3,
+                textAlign: "center",
+              }}
             >
-              Change Photo
-            </Button>
-          </label>
+              <Avatar
+                src={
+                  user.profileImage
+                    ? `http://localhost:3002${user.profileImage}`
+                    : undefined
+                }
+                sx={{
+                  width: 140,
+                  height: 140,
+                  mx: "auto",
+                  mb: 1,
+                  fontSize: 40,
+                  bgcolor: "info.main",
+                  border: "4px solid white",
+                }}
+              >
+                {!user.profileImage &&
+                  user.username.charAt(0).toUpperCase()}
+              </Avatar>
 
-          {selectedFile && (
-            <Button
-              variant="contained"
-              size="small"
-              onClick={handleUploadProfilePic}
-              disabled={uploading}
-            >
-              {uploading ? "Uploading..." : "Upload"}
-            </Button>
-          )}
-        </Stack>
+              <Typography variant="h5" fontWeight="bold" color="text.primary">
+                {user.username}
+              </Typography>
 
-        <Divider sx={{ my: 3 }} />
+              {/* <Typography variant="body2">
+          {user.role}
+        </Typography> */}
 
-        {/* PROFILE DETAILS */}
-        <Box textAlign="center">
-          <Typography variant="h6" fontWeight="bold">
-            {user.username}
-          </Typography>
+              <input
+                type="file"
+                hidden
+                accept="image/*"
+                id="profile-pic-input"
+                onChange={handleFileChange}
+              />
 
-          <Typography color="text.secondary" mt={1}>
-            📞 {user.phonenumber}
-          </Typography>
+              <Stack
+                direction="row"
+                spacing={1}
+                justifyContent="center"
+                mt={1}
+              >
+                <label htmlFor="profile-pic-input">
+                  <Button
+                    component="span"
+                    size="small"
+                    variant="contained"
+                    // sx={{ color: "#20c5db", borderColor: "#fff" }}
+                    sx={{
+                      px: 1,
+                      borderRadius: 1,
+                      background: "linear-gradient(135deg, #11a9c1, #aec518)",
+                      ":hover": {
+                        background: "linear-gradient(135deg, #11a9c1, #aec518)",
+                      },
+                    }}
+                    startIcon={<PhotoCameraIcon />}
+                  >
+                    Change Photo
+                  </Button>
+                </label>
 
-          <Typography color="text.secondary" mt={1}>
-            Role: {user.role}
-          </Typography>
-        </Box>
+                {selectedFile && (
+                  <Button
+                    size="small"
+                    variant="contained"
+                      sx={{
+                      px: 1,
+                      borderRadius: 1,
+                      background: "linear-gradient(135deg, #11a9c1, #aec518)",
+                      ":hover": {
+                        background: "linear-gradient(135deg, #11a9c1, #aec518)",
+                      },
+                    }}
+                    onClick={handleUploadProfilePic}
+                    disabled={uploading}
+                  >
+                    {uploading ? "Uploading..." : "Upload"}
+                  </Button>
+                )}
+              </Stack>
+            </Box>
 
-        <Divider sx={{ my: 3 }} />
+            {/* CONTENT */}
+            <CardContent sx={{ p: 4 }}>
+              <Grid spacing={4}>
+                {/* LEFT INFO */}
+                <Grid size={{ xs: 12, md: 5 }}>
+                  <Stack spacing={2}>
+                    <Typography fontWeight="bold">📞 Phone</Typography>
+                    <Typography color="text.secondary">
+                      {user.phonenumber}
+                    </Typography>
 
-        {/* ACTIONS (DESIGN ONLY) */}
-        <Stack spacing={1}>
-          <Button
+                    <Divider />
+
+                    <Typography fontWeight="bold">📧 Email</Typography>
+
+                    {editingEmail ? (
+                      <>
+                        <TextField
+                          fullWidth
+                          value={email}
+                          onChange={(e) => setEmail(e.target.value)}
+                        />
+                        <Box display={"flex"} justifyContent={"flex-start"}>
+                          <Button
+                            sx={{
+                              px: 1,
+
+                              background: "linear-gradient(135deg, #1c4be4, #97acf0)",
+                              ":hover": {
+                                background: "linear-gradient(135deg, #1c4be4, #97acf0)",
+                              },
+                            }}
+
+                            variant="contained"
+                            onClick={async () => {
+                              await axios.patch(
+                                `http://localhost:3001/users/${user.id}`,
+                                { email }
+                              );
+                              setUser({ ...user, email });
+                              setEditingEmail(false);
+                            }}
+                          >
+                            Save Email
+                          </Button>
+                        </Box>
+
+                      </>
+                    ) : (
+                      <>
+                        <Typography color="text.secondary">
+                          {user.email || "No email added"}
+                        </Typography>
+                        <Box display={"flex"} justifyContent={"flex-start"} mb={1}>
+                          <Button sx={{
+                            px: 1,
+
+                            background: "linear-gradient(135deg, #1c4be4, #97acf0)",
+                            ":hover": {
+                              background: "linear-gradient(135deg, #1c4be4, #97acf0)",
+                            },
+                          }}
+                            variant="contained"
+                            onClick={() => setEditingEmail(true)}>
+                            {user.email ? "Edit Email" : "Add Email"}
+                          </Button></Box>
+                      </>
+                    )}
+                  </Stack>
+                </Grid>
+
+                {/* RIGHT ACTIONS */}
+                <Grid size={{ xl: 12, md: 7 }}>
+                  <Stack spacing={2}>
+                    <Typography fontWeight="bold">⚙️Account Actions</Typography>
+                    <Box display="flex" justifyContent="flex-start">
+                      <Button
+                        variant="contained"
+                        startIcon={<EditIcon />}
+                        onClick={handleOpenEdit}
+                        sx={{
+                          px: 1,
+                          borderRadius: 1,
+                          background: "linear-gradient(135deg, #f92e00, #e7c6c6)",
+                          ":hover": {
+                            background: "linear-gradient(135deg, #fe3103, #e7c6c6)",
+                          },
+                        }}
+                      >
+                        Edit Profile
+                      </Button>
+                    </Box>
+
+                    <Box display="flex" justifyContent="flex-start">
+                      <Button
+                        variant="contained"
+                        sx={{
+                          px: 1,
+                          mb: 1,
+                          borderRadius: 1,
+                          background: "linear-gradient(135deg, #e04c2a, #efdada)",
+                          ":hover": {
+                            background: "linear-gradient(135deg, #e04c2a, #efdada)",
+                          },
+                        }}
+                        startIcon={<LockIcon />}
+                        onClick={handleOpenPassword}
+                      >
+                        Change Password
+                      </Button>
+                    </Box>
+                  </Stack>
+                </Grid>
+              </Grid>
+
+
+              <Divider />
+
+              <Typography fontWeight="bold" mb={1}>🏠 Saved Addresses</Typography>
+
+              {user.addresses?.length === 0 && (
+                <Typography color="text.secondary">
+                  No addresses added
+                </Typography>
+              )}
+
+              {user.addresses?.map((addr) => (
+                <Paper
+                  key={addr.id}
+                  sx={{
+                    p: 2,
+                    mb: 1,
+                    borderRadius: 2,
+                    backgroundColor: "#fffefc",
+                  }}
+                >
+                  <Typography fontWeight="bold">
+                    {addr.label}
+                  </Typography>
+                  <Typography variant="body2">
+                    {addr.addressLine}, {addr.city} - {addr.pincode}
+                  </Typography>
+                </Paper>
+              ))}
+
+              <Button
+              
+                sx={{
+                  px: 1,
+
+                  background: "linear-gradient(135deg, #cbb132, #ed3916)",
+                  ":hover": {
+                    background: "linear-gradient(135deg, #cbb132, #ed3916)",
+                  },
+                }}
+                variant="contained"
+                onClick={handleOpenAddress}
+              >
+                + Add New Address
+              </Button>
+
+
+            </CardContent>
+          </Card>
+
+          <Dialog
+            open={openEdit}
+            onClose={handleCloseEdit}
             fullWidth
-            startIcon={<EditIcon />}
-            variant="outlined"
-            onClick={handleOpenEdit}
+            maxWidth="xs"
+            PaperProps={{
+              sx: {
+                borderRadius: 4,
+                overflow: "hidden",
+              },
+            }}
           >
-            Edit Profile
-          </Button>
+            <DialogTitle
+              sx={{
+                background: "linear-gradient(135deg, #4b93f0, #ff9800)",
+                color: "#fff",
+                fontWeight: "bold",
+              }}
+            >
+              ✏️ Edit Profile
+            </DialogTitle>
 
-          <Dialog open={openEdit} onClose={handleCloseEdit} fullWidth maxWidth="xs">
-            <DialogTitle>Edit Profile</DialogTitle>
-
-            <DialogContent>
+            <DialogContent sx={{ mt: 2 }}>
               <TextField
                 label="Username"
                 fullWidth
@@ -338,76 +616,177 @@ const UserProfile = () => {
               />
             </DialogContent>
 
-            <DialogActions>
-              <Button onClick={handleCloseEdit}>Cancel</Button>
-              <Button variant="contained" onClick={handleSaveProfile}>
-                Save
+            <DialogActions sx={{ px: 3, pb: 2 }}>
+              <Button onClick={handleCloseEdit} color="inherit">
+                Cancel
+              </Button>
+              <Button
+                variant="contained"
+                sx={{
+                  background: "linear-gradient(135deg, #ebebe1, #ff9800)",
+                }}
+                onClick={handleSaveProfile}
+              >
+                Save Changes
+              </Button>
+            </DialogActions>
+          </Dialog>
+          <Dialog
+            open={openPassword}
+            onClose={handleClosePassword}
+            fullWidth
+            maxWidth="xs"
+            PaperProps={{
+              sx: {
+                borderRadius: 4,
+                overflow: "hidden",
+                 
+              },
+            }}
+          >
+            <DialogTitle
+              sx={{
+                background: "linear-gradient(135deg, #4b93f0, #ff9800)",
+                color: "#fff",
+                fontWeight: "bold",
+              }}
+            >
+              🔒 Change Password
+            </DialogTitle>
+
+            <DialogContent sx={{ mt: 2 }}>
+              <TextField
+                label="Old Password"
+                type="password"
+                fullWidth
+                margin="normal"
+                value={oldPassword}
+                onChange={(e) => setOldPassword(e.target.value)}
+              />
+
+              <TextField
+                label="New Password"
+                type="password"
+                fullWidth
+                margin="normal"
+                value={newPassword}
+                onChange={(e) => setNewPassword(e.target.value)}
+              />
+
+              <TextField
+                label="Confirm New Password"
+                type="password"
+                fullWidth
+                margin="normal"
+                value={confirmPassword}
+                onChange={(e) => setConfirmPassword(e.target.value)}
+              />
+            </DialogContent>
+
+            <DialogActions sx={{ px: 3, pb: 2 }}>
+              <Button onClick={handleClosePassword} color="inherit">
+                Cancel
+              </Button>
+              <Button
+                variant="contained"
+                sx={{
+                  background: "linear-gradient(135deg, #ebebe1, #ff9800)",
+                }}
+                onClick={handleChangePassword}
+              >
+                Update Password
               </Button>
             </DialogActions>
           </Dialog>
 
 
-          <Button
+          <Dialog
+            open={openAddress}
+            onClose={handleCloseAddress}
             fullWidth
-            startIcon={<LockIcon />}
-            variant="outlined"
-            onClick={handleOpenPassword}
+            maxWidth="xs"
+            PaperProps={{
+              sx: {
+                borderRadius: 4,
+                overflow: "hidden",
+              },
+            }}
           >
-            Change Password
-          </Button>
-        </Stack>
-        <Dialog open={openPassword} onClose={handleClosePassword} fullWidth maxWidth="xs">
-          <DialogTitle>Change Password</DialogTitle>
+            <DialogTitle
+              sx={{
+                background: "linear-gradient(135deg, #4b93f0, #ff9800)",
+                color: "#fff",
+                fontWeight: "bold",
+              }}
+            >
+              🏠 Add New Address
+            </DialogTitle>
 
-          <DialogContent>
-            <TextField
-              label="Old Password"
-              type="password"
-              fullWidth
-              margin="normal"
-              value={oldPassword}
-              onChange={(e) => setOldPassword(e.target.value)}
-            />
+            <DialogContent sx={{ mt: 2 }}>
+              <TextField
+                select
+                label="Address Type"
+                fullWidth
+                margin="normal"
+                value={addressLabel}
+                onChange={(e) => setAddressLabel(e.target.value)}
+                SelectProps={{ native: true }}
+              >
+                <option value="Home">Home</option>
+                <option value="Work">Work</option>
+                <option value="Other">Other</option>
+              </TextField>
 
-            <TextField
-              label="New Password"
-              type="password"
-              fullWidth
-              margin="normal"
-              value={newPassword}
-              onChange={(e) => setNewPassword(e.target.value)}
-            />
+              <TextField
+                label="Address"
+                fullWidth
+                multiline
+                rows={2}
+                margin="normal"
+                value={addressLine}
+                onChange={(e) => setAddressLine(e.target.value)}
+              />
 
-            <TextField
-              label="Confirm New Password"
-              type="password"
-              fullWidth
-              margin="normal"
-              value={confirmPassword}
-              onChange={(e) => setConfirmPassword(e.target.value)}
-            />
-          </DialogContent>
+              <TextField
+                label="City"
+                fullWidth
+                margin="normal"
+                value={city}
+                onChange={(e) => setCity(e.target.value)}
+              />
 
-          <DialogActions>
-            <Button onClick={handleClosePassword}>Cancel</Button>
-            <Button variant="contained" onClick={handleChangePassword}>
-              Update
-            </Button>
-          </DialogActions>
-        </Dialog>
+              <TextField
+                label="Pincode"
+                fullWidth
+                margin="normal"
+                value={pincode}
+                inputProps={{ maxLength: 6 }}
+                onChange={(e) =>
+                  setPincode(e.target.value.replace(/\D/g, ""))
+                }
+              />
+            </DialogContent>
+
+            <DialogActions sx={{ px: 3, pb: 2 }}>
+              <Button onClick={handleCloseAddress} color="inherit">
+                Cancel
+              </Button>
+              <Button
+                variant="contained"
+                sx={{
+                  background: "linear-gradient(135deg, #ebebe1, #ff9800)",
+                }}
+                onClick={handleSaveAddress}
+              >
+                Save Address
+              </Button>
+            </DialogActions>
+          </Dialog>
 
 
-        <Typography
-          variant="caption"
-          color="text.secondary"
-          display="block"
-          textAlign="center"
-          mt={3}
-        >
-          Password is hidden for security reasons
-        </Typography>
-      </Paper>
-    </Box>
+        </Box>
+      </Box>
+    </React.Fragment>
   );
 };
 

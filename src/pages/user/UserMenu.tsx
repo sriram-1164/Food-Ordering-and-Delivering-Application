@@ -1,4 +1,4 @@
-import { Box, Typography, Button, DialogActions, Dialog, DialogContent, DialogTitle, MenuItem, } from "@mui/material";
+import { Box, Typography, Button, DialogActions, Dialog, DialogContent, DialogTitle,  } from "@mui/material";
 import { useEffect, useState } from "react";
 import FoodFilters from "../../components/food/FoodFilters";
 import FoodTable from "../../components/food/FoodTable";
@@ -7,6 +7,7 @@ import { CrudService } from "../../services/CrudService";
 import { useNavigate } from "react-router-dom";
 import Loader from "../../components/common/Loader";
 import CallIcon from "@mui/icons-material/Call";
+import CoPresentIcon from '@mui/icons-material/CoPresent';
 
 
 export default function UserMenu() {
@@ -81,7 +82,16 @@ export default function UserMenu() {
       }}
     >
       <Box display="flex" justifyContent="flex-end" mb={2}>
-        <Button color="error" variant="contained" onClick={() => setLogoutOpen(true)}>
+        <Button 
+        sx={{
+          px: 4,
+          borderRadius: 3,
+          background: "linear-gradient(135deg, #f04b4b, #95391f)",
+          ":hover": {
+            background: "linear-gradient(135deg, #e64a19, #fb8c00)",
+          },
+        }}
+         variant="contained" onClick={() => setLogoutOpen(true)}>
           Logout
         </Button>
       </Box>
@@ -89,15 +99,34 @@ export default function UserMenu() {
       <Box display="flex" justifyContent="flex-end" gap={2} mb={2}>
         <Button
           variant="contained"
-          color="success"
+          sx={{
+            px: 4,
+            borderRadius: 3,
+            background: "linear-gradient(135deg, #6dee31, #3c921f)",
+            ":hover": {
+              background: "linear-gradient(135deg, #e64a19, #fb8c00)",
+            },
+          }}
           startIcon={<CallIcon />}
           onClick={handleOpenCallDialog}
         >
-          Call Support
+          Support
         </Button>
-        <MenuItem onClick={() => navigate("/profile")}>
+        <Button
+
+          variant="contained"
+          sx={{
+            px: 4,
+            borderRadius: 3,
+            background: "linear-gradient(135deg, #6dee31, #3c921f)",
+            ":hover": {
+              background: "linear-gradient(135deg, #e64a19, #fb8c00)",
+            },
+          }}
+          startIcon={<CoPresentIcon />}
+          onClick={() => navigate("/profile")}>
           Profile
-        </MenuItem>
+        </Button>
       </Box>
       <Box
         display="flex"

@@ -7,12 +7,23 @@
 }
 
 .order{
-  background-image: url("../public/Senthil.png") !important;
+  background-image: url("../public/ChatGPT\ Image\ Feb\ 10\,\ 2026\,\ 03_37_47\ PM.png") !important;
   background-position: right;
   background-repeat: no-repeat;
   background-size: cover;
  
 }
+
+.farm {
+  background-image: url("../public/image.png") !important;
+  background-position: right;
+  background-repeat: no-repeat;
+  background-size: cover;
+}
+
+
+
+
 
 .Loader{
   display: flex;

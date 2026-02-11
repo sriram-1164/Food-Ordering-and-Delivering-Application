@@ -55,7 +55,7 @@ export default function OrdersTable({
               "Address",
               "Mobile",
               "Status",
-              
+
             ].map((h) => (
               <TableCell key={h} sx={{ color: "#fff", fontWeight: "bold" }}>
                 {h}
@@ -101,7 +101,16 @@ export default function OrdersTable({
                   </Typography>
                 </TableCell>
                 <TableCell>{o.date}</TableCell>
-                <TableCell>{o.address}</TableCell>
+                {/* <TableCell>{o.address}</TableCell> */}
+                <TableCell>
+                  <Typography fontSize={13}>
+                    <strong>{o.address.label}</strong><br />
+                    {o.address.addressLine}<br />
+                    {o.address.city} - {o.address.pincode}
+                  </Typography>
+                </TableCell>
+
+
                 <TableCell>{o.phonenumber}</TableCell>
 
                 {/* STATUS CHIP */}
