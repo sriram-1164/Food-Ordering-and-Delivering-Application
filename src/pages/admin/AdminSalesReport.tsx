@@ -19,7 +19,7 @@ import { CrudService } from "../../services/CrudService";
 import { OrderDetails } from "../../services/Model";
 import BackButton from "../../components/common/BackButton";
 
-// 🔹 Report model
+//  Report model
 interface FoodSalesReport {
     foodname: string;
     price: number;
@@ -44,7 +44,6 @@ export default function AdminSalesReport() {
     const [orders, setOrders] = useState<OrderDetails[]>([]);
     const [range, setRange] = useState<RangeType>("daily");
 
-    // ---------------- LOAD ORDERS ----------------
     useEffect(() => {
         crud.getOrders().then((res: any[]) => {
             const safeOrders = Array.isArray(res) ? res : [];
@@ -90,7 +89,7 @@ export default function AdminSalesReport() {
             );
         }
 
-        // 🔥 ROLLING MONTHS (KEY PART)
+        //  ROLLING MONTHS (KEY PART)
         const monthsMap: Record<string, number> = {
             last1: 1,
             last2: 2,
@@ -204,7 +203,7 @@ export default function AdminSalesReport() {
                 direction={{ xs: "column", sm: "row" }}
                 justifyContent="center"
                 alignItems="center"
-                spacing={3}          // 👈 GAP BETWEEN ITEMS
+                spacing={3}         
                 mb={3}
             >
                 {/* DAILY / WEEKLY */}

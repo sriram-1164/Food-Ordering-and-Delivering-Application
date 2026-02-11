@@ -26,8 +26,6 @@ import { CrudService } from "../../services/CrudService";
 import { Address, UserDetails } from "../../services/Model";
 import axios from "axios";
 import BackButton from "../../components/common/BackButton";
-// import Grid from "@mui/material/Grid2";
-
 
 const UserProfile = () => {
   const crud = CrudService();
@@ -163,7 +161,6 @@ const showSnackbar = (
     }
 
     try {
-      // PATCH only changed fields
       await axios.patch(
         `http://localhost:3001/users/${user.id}`,
         {
@@ -172,7 +169,6 @@ const showSnackbar = (
         }
       );
 
-      // Update UI state
       setUser({
         ...user,
         username: editUsername,
@@ -323,7 +319,6 @@ const showSnackbar = (
         <Box
           sx={{
             minHeight: "100vh",
-            // background: "linear-gradient(135deg, #cd2883, #faf7fb)",
             display: "flex",
             justifyContent: "center",
             alignItems: "center",
@@ -343,7 +338,6 @@ const showSnackbar = (
               overflow: "hidden",
             }}
           >
-            {/* HEADER */}
             <Box className="farm"
               sx={{
                 background: "linear-gradient(135deg, #ddba1db6, #e9c4c4)",
@@ -376,10 +370,6 @@ const showSnackbar = (
                 {user.username}
               </Typography>
 
-              {/* <Typography variant="body2">
-          {user.role}
-        </Typography> */}
-
               <input
                 type="file"
                 hidden
@@ -399,7 +389,6 @@ const showSnackbar = (
                     component="span"
                     size="small"
                     variant="contained"
-                    // sx={{ color: "#20c5db", borderColor: "#fff" }}
                     sx={{
                       px: 1,
                       borderRadius: 1,
@@ -435,10 +424,8 @@ const showSnackbar = (
               </Stack>
             </Box>
 
-            {/* CONTENT */}
             <CardContent sx={{ p: 4 }}>
               <Grid spacing={4}>
-                {/* LEFT INFO */}
                 <Grid size={{ xs: 12, md: 5 }}>
                   <Stack spacing={2}>
                     <Typography fontWeight="bold">📞 Phone</Typography>
@@ -508,7 +495,6 @@ const showSnackbar = (
                   </Stack>
                 </Grid>
 
-                {/* RIGHT ACTIONS */}
                 <Grid size={{ xl: 12, md: 7 }}>
                   <Stack spacing={2}>
                     <Typography fontWeight="bold">⚙️Account Actions</Typography>

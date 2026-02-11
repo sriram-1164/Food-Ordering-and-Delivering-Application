@@ -87,12 +87,10 @@ export default function AdminFeedbackPage() {
         background: "linear-gradient(135deg, #fff7ed, #ffe0d1)",
       }}
     >
-      {/* BACK BUTTON */}
       <Box mb={2}>
         <BackButton to="/adminorders" />
       </Box>
 
-      {/* TITLE */}
       <Typography
         variant="h4"
         fontWeight="bold"
@@ -107,7 +105,6 @@ export default function AdminFeedbackPage() {
         User Feedback
       </Typography>
 
-      {/* TABLE CARD */}
       <Paper
         sx={{
           maxWidth: 1200,
@@ -118,7 +115,6 @@ export default function AdminFeedbackPage() {
         }}
       >
         <Table>
-          {/* HEADER */}
           <TableHead>
             <TableRow sx={{ backgroundColor: "#ff9800" }}>
               <TableCell sx={{ color: "#fff", fontWeight: "bold" }}>
@@ -145,7 +141,6 @@ export default function AdminFeedbackPage() {
             </TableRow>
           </TableHead>
 
-          {/* BODY */}
           <TableBody>
             {loading ? (
               <TableRow>
@@ -199,7 +194,6 @@ export default function AdminFeedbackPage() {
                     <Rating value={f.rating || 0} readOnly />
                   </TableCell>
 
-                  {/* IMAGE BUTTON */}
                   <TableCell>
                     {f.imageUrl ? (
                       <Button
@@ -228,7 +222,6 @@ export default function AdminFeedbackPage() {
         </Table>
       </Paper>
 
-      {/* IMAGE VIEW DIALOG */}
       <Dialog open={openImage} onClose={() => setOpenImage(false)} maxWidth="sm">
         <IconButton
           onClick={() => setOpenImage(false)}

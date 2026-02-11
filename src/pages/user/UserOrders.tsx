@@ -36,7 +36,6 @@ export default function UserOrders() {
     setFeedbackOpen(true);
   };
 
-  // LOAD USER ORDERS
   const loadOrders = () => {
     const userStr = localStorage.getItem("user");
     if (!userStr) {
@@ -62,13 +61,11 @@ export default function UserOrders() {
     loadOrders();
   }, []);
 
-  // WHEN USER CLICKS CANCEL
   const handleCancelClick = (order: OrderDetails) => {
     setSelectedOrder(order);
     setCancelOpen(true);
   };
 
-  // CONFIRM CANCEL
   const confirmCancelOrder = async () => {
     if (!selectedOrder) return;
 
@@ -81,7 +78,6 @@ export default function UserOrders() {
     loadOrders(); // refresh orders
   };
 
-  // FILTER ORDERS
   const activeOrders = orders.filter(
     (o) => o.status === "Preparing"
   );
@@ -106,12 +102,10 @@ export default function UserOrders() {
         background: "linear-gradient(135deg, #fff7ed, #ffe0d1)",
       }}
     >
-      {/* BACK BUTTON */}
       <Box mb={2}>
         <BackButton to="/usermenu" />
       </Box>
 
-      {/* TITLE */}
       <Typography
         variant="h4"
         fontWeight="bold"
@@ -182,8 +176,6 @@ export default function UserOrders() {
         />
       </Tabs>
 
-
-      {/* ORDERS TABLE */}
       <Box
         p={2}
         sx={{
@@ -204,7 +196,6 @@ export default function UserOrders() {
         />
       </Box>
 
-      {/* CANCEL CONFIRMATION DIALOG */}
       <CancelOrderDialog
         open={cancelOpen}
         onClose={() => setCancelOpen(false)}

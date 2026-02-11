@@ -233,7 +233,6 @@ export default function UserMenu() {
         </DialogActions>
       </Dialog></>
 
-      {/* Dialog Tab for Customer support */}
       <Dialog open={openCallDialog} onClose={handleCloseCallDialog}>
         <DialogTitle>Call Support</DialogTitle>
 

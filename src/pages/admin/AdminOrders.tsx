@@ -32,7 +32,7 @@ export default function AdminOrders() {
   const [open, setOpen] = useState(false);
   const [snackbarOpen, setSnackbarOpen] = useState(false);
 
-  // ✅ STATUS FILTER STATE
+  //  STATUS FILTER STATE
   const [statusFilter, setStatusFilter] = useState({
     Preparing: true,
     Delivered: true,
@@ -66,7 +66,7 @@ export default function AdminOrders() {
 
   if (loading) return <Loader />;
 
-  // ✅ APPLY STATUS FILTER
+  //  APPLY STATUS FILTER
   const sortedOrders = [...orders].sort(
     (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()
   );
@@ -118,8 +118,6 @@ export default function AdminOrders() {
           </Button>
 
         </Box>
-
-        {/* TITLE */}
         <Typography
           variant="h4"
           fontWeight="bold"
@@ -133,8 +131,6 @@ export default function AdminOrders() {
         >
           Customer Orders
         </Typography>
-
-        {/*  STATUS FILTER CHECKBOXES */}
         <Box
           mb={2}
           p={2}
@@ -188,7 +184,6 @@ export default function AdminOrders() {
           />
         </Box>
 
-        {/* PAGINATION */}
         <Box display="flex" justifyContent="center" mt={3}>
           <Pagination
             count={Math.ceil(filteredOrders.length / rowsPerPage)}
@@ -197,8 +192,6 @@ export default function AdminOrders() {
             color="primary"
           />
         </Box>
-
-        {/* STATUS DIALOG */}
         <StatusDialog
           open={open}
           onClose={() => setOpen(false)}
@@ -207,8 +200,6 @@ export default function AdminOrders() {
           }
         />
       </Box>
-
-      {/* SNACKBAR */}
       <Snackbar
         open={snackbarOpen}
         autoHideDuration={3000}

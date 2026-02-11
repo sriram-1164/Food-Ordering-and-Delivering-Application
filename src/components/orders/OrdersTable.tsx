@@ -39,7 +39,6 @@ export default function OrdersTable({
       }}
     >
       <Table>
-        {/* TABLE HEADER */}
         <TableHead>
           <TableRow
             sx={{
@@ -75,8 +74,6 @@ export default function OrdersTable({
 
           </TableRow>
         </TableHead>
-
-        {/* TABLE BODY */}
         <TableBody>
           {orders.length === 0 ? (
             <TableRow>
@@ -112,8 +109,6 @@ export default function OrdersTable({
 
 
                 <TableCell>{o.phonenumber}</TableCell>
-
-                {/* STATUS CHIP */}
                 <TableCell>
                   <Chip
                     label={o.status}
@@ -129,12 +124,9 @@ export default function OrdersTable({
                     }
                   />
                 </TableCell>
-
-                {/* ACTIONS */}
                 {(admin || onCancelOrder) && (
                   <TableCell>
                     <Box display="flex" gap={1}>
-                      {/* ADMIN ACTION */}
                       {admin  && (
                         <Button
                           size="small"
@@ -156,7 +148,6 @@ export default function OrdersTable({
                         </Button>
                       )}
 
-                      {/* USER CANCEL ACTION */}
                       {!admin &&
                         o.status === "Preparing" &&
                         onCancelOrder && (
@@ -170,7 +161,6 @@ export default function OrdersTable({
                             Cancel
                           </Button>
                         )}
-                      {/* CANCELLED TEXT */}
                       {!admin && o.status === "Delivered" && (
                         <Typography
                           variant="body2"
@@ -204,9 +194,6 @@ export default function OrdersTable({
                     )}
                   </TableCell>
                 )}
-
-
-
               </TableRow>
             ))
           )}

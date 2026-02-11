@@ -16,7 +16,7 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 export default function OrderDialog({ open, food, onClose, onSubmit }: any) {
-  /* ---------------- STATE ---------------- */
+
   const [quantity, setQuantity] = useState(1);
   const [phonenumber, setPhoneNumber] = useState("");
   const [addresses, setAddresses] = useState<any[]>([]);
@@ -27,10 +27,8 @@ export default function OrderDialog({ open, food, onClose, onSubmit }: any) {
   const [pendingOrder, setPendingOrder] = useState<any>(null);
   const navigate = useNavigate();
 
-  /* ---------------- USER ---------------- */
   const user = JSON.parse(localStorage.getItem("user") || "{}");
 
-  /* ---------------- LOAD USER ADDRESSES ---------------- */
   useEffect(() => {
     if (!open || !user?.userId) return;
 
@@ -58,16 +56,13 @@ export default function OrderDialog({ open, food, onClose, onSubmit }: any) {
     loadAddresses();
   }, [open, user.userId]);
 
-  /* ---------------- SAFE EARLY RETURN ---------------- */
   if (!food) return null;
 
-  /* ---------------- HELPERS ---------------- */
   const isValidPhoneNumber = (phone: string) =>
     /^[6-9]\d{9}$/.test(phone);
 
   const totalPrice = quantity * food.price;
 
-  /* ---------------- PREPARE ORDER ---------------- */
   const handlePrepareOrder = () => {
     if (!isValidPhoneNumber(phonenumber)) {
       alert("Please enter a valid 10-digit mobile number");
@@ -99,7 +94,6 @@ export default function OrderDialog({ open, food, onClose, onSubmit }: any) {
     setConfirmOpen(true);
   };
 
-  /* ---------------- CONFIRM ORDER ---------------- */
   const handleConfirmOrder = () => {
     onSubmit(pendingOrder);
 
@@ -110,10 +104,8 @@ export default function OrderDialog({ open, food, onClose, onSubmit }: any) {
     setSuccessOpen(true);
   };
 
-  /* ---------------- UI ---------------- */
   return (
     <>
-      {/* ================= ORDER DIALOG ================= */}
       <Dialog open={open} onClose={onClose} fullWidth maxWidth="xs">
         <DialogTitle
           sx={{
@@ -128,7 +120,6 @@ export default function OrderDialog({ open, food, onClose, onSubmit }: any) {
         </DialogTitle>
 
         <DialogContent>
-          {/* Quantity */}
           <TextField
             label="Quantity"
             type="number"
@@ -139,8 +130,6 @@ export default function OrderDialog({ open, food, onClose, onSubmit }: any) {
               setQuantity(Math.max(1, Number(e.target.value)))
             }
           />
-
-          {/* TOTAL PRICE */}
           <Box
             mt={1}
             mb={2}
@@ -155,7 +144,6 @@ export default function OrderDialog({ open, food, onClose, onSubmit }: any) {
 
           <Divider sx={{ my: 2 }} />
 
-          {/* ADDRESS SELECTION */}
           <Typography fontWeight="bold" mb={1}>
             🏠 Select Delivery Address
           </Typography>
@@ -209,7 +197,6 @@ export default function OrderDialog({ open, food, onClose, onSubmit }: any) {
 
           <Divider sx={{ my: 2 }} />
 
-          {/* PHONE NUMBER */}
           <TextField
             label="Mobile Number"
             fullWidth
@@ -230,7 +217,6 @@ export default function OrderDialog({ open, food, onClose, onSubmit }: any) {
             }
           />
 
-          {/* ACTION BUTTONS */}
           <Box display="flex" justifyContent="flex-end" mt={2} gap={2}>
             <Button onClick={onClose} color="inherit">
               Cancel
@@ -255,7 +241,6 @@ export default function OrderDialog({ open, food, onClose, onSubmit }: any) {
         </DialogContent>
       </Dialog>
 
-      {/* ================= CONFIRM DIALOG ================= */}
       <Dialog open={confirmOpen} fullWidth maxWidth="xs">
         <DialogTitle sx={{ textAlign: "center", fontWeight: "bold" }}>
           Confirm Order
@@ -293,7 +278,6 @@ export default function OrderDialog({ open, food, onClose, onSubmit }: any) {
         </DialogActions>
       </Dialog>
 
-      {/* ================= SUCCESS ================= */}
       <Snackbar
         open={successOpen}
         autoHideDuration={3000}

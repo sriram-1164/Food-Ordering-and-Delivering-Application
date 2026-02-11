@@ -40,12 +40,9 @@ const SignupDialog = () => {
   const [error, setError] = useState("");
   const recaptchaRef = useRef<RecaptchaVerifier | null>(null);
 
-
-  /* ---------------- VALIDATION ---------------- */
   const isValidPhoneNumber = (phone: string) =>
     /^[6-9]\d{9}$/.test(phone);
 
-  /* ---------------- OPEN / CLOSE ---------------- */
   const handleOpen = () => {
     setOpenDialog(true);
   };
@@ -65,7 +62,6 @@ const SignupDialog = () => {
     setError("");
   };
 
-  /* ---------------- SEND OTP ---------------- */
   const handleSendOtp = async () => {
     if (!isValidPhoneNumber(phonenumber)) {
       setError("Enter a valid 10-digit mobile number");
@@ -97,7 +93,6 @@ const SignupDialog = () => {
     }
   };
 
-  /* ---------------- VERIFY OTP ---------------- */
   const handleVerifyOtp = async () => {
     if (!confirmationResult) return;
 
@@ -111,7 +106,6 @@ const SignupDialog = () => {
     }
   };
 
-  /* ---------------- SIGNUP ---------------- */
   const handleSignup = async () => {
     if (!username.trim()) {
       setError("Username is required");
@@ -152,8 +146,8 @@ const SignupDialog = () => {
       const timestamp = Date.now();
 
       const newUser: AddUserDetails = {
-        id: timestamp,            // 👈 JSON SERVER ID
-        userId: timestamp,        // 👈 APP USER ID
+        id: timestamp,         
+        userId: timestamp,      
         username,
         password,
         role: "user",

@@ -45,7 +45,6 @@ export default function AdminMenu() {
     navigate("/");
   };
 
-  /* ---------------- FETCH FOODS ---------------- */
   const loadFoods = async () => {
     try {
       setLoading(true);

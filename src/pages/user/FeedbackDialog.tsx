@@ -53,7 +53,6 @@ export default function FeedbackDialog({ open, onClose, order }: Props) {
     formData.append("rating", String(rating || 0));
     formData.append("foodId", order.foodId);
 
-    // 👇 THIS IS THE NEW PART
     if (image) {
       formData.append("image", image);
     }
