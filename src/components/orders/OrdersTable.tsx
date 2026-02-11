@@ -135,10 +135,11 @@ export default function OrdersTable({
                   <TableCell>
                     <Box display="flex" gap={1}>
                       {/* ADMIN ACTION */}
-                      {admin && o.status !== "Cancelled" && (
+                      {admin  && (
                         <Button
                           size="small"
                           variant="contained"
+                          disabled={o.status === "Cancelled" || o.status === "Delivered"}
                           sx={{
                             px: 3,
                             borderRadius: 3,

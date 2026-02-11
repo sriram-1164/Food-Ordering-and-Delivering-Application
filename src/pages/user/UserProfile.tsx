@@ -16,6 +16,8 @@ import {
   CardContent,
   Card,
   Grid,
+  Snackbar,
+  Alert,
 } from "@mui/material";
 import EditIcon from "@mui/icons-material/Edit";
 import LockIcon from "@mui/icons-material/Lock";
@@ -53,6 +55,24 @@ const UserProfile = () => {
   const [addressLine, setAddressLine] = useState("");
   const [city, setCity] = useState("");
   const [pincode, setPincode] = useState("");
+
+  const [snackbar, setSnackbar] = useState({
+  open: false,
+  message: "",
+  severity: "success" as "success" | "error" | "info" | "warning",
+});
+
+const showSnackbar = (
+  message: string,
+  severity: "success" | "error" | "info" | "warning" = "success"
+) => {
+  setSnackbar({
+    open: true,
+    message,
+    severity,
+  });
+};
+
 
   useEffect(() => {
     const fetchUser = async () => {
@@ -109,6 +129,8 @@ const UserProfile = () => {
 
       setUser({ ...user, profileImage: imageUrl });
       setSelectedFile(null);
+      showSnackbar("Profile photo updated 📸");
+
     } catch (err) {
       console.error("Profile image upload failed", err);
     } finally {
@@ -158,6 +180,7 @@ const UserProfile = () => {
       });
 
       setOpenEdit(false);
+      showSnackbar("Profile updated successfully");
     } catch (err) {
       console.error("Failed to update profile", err);
       alert("Profile update failed");
@@ -201,7 +224,9 @@ const UserProfile = () => {
 
       setUser({ ...user, password: newPassword });
       setOpenPassword(false);
-      alert("Password updated successfully");
+      // alert("Password updated successfully");
+      showSnackbar("Password changed successfully 🔐");
+
     } catch (err) {
       console.error("Failed to update password", err);
       alert("Password update failed");
@@ -265,6 +290,8 @@ const UserProfile = () => {
       });
 
       setOpenAddress(false);
+      showSnackbar("Address added successfully 🏠");
+
     } catch (err) {
       console.error("Failed to save address", err);
       alert("Address save failed");
@@ -449,6 +476,8 @@ const UserProfile = () => {
                               );
                               setUser({ ...user, email });
                               setEditingEmail(false);
+                              showSnackbar("Email Updated");
+
                             }}
                           >
                             Save Email
@@ -786,6 +815,22 @@ const UserProfile = () => {
 
         </Box>
       </Box>
+      <Snackbar
+  open={snackbar.open}
+  autoHideDuration={3000}
+  onClose={() => setSnackbar({ ...snackbar, open: false })}
+  anchorOrigin={{ vertical: "top", horizontal: "center" }}
+>
+  <Alert
+    severity={snackbar.severity}
+    variant="filled"
+    onClose={() => setSnackbar({ ...snackbar, open: false })}
+    sx={{ width: "100%" }}
+  >
+    {snackbar.message}
+  </Alert>
+</Snackbar>
+
     </React.Fragment>
   );
 };
