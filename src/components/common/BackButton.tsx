@@ -1,6 +1,5 @@
 import { Button } from "@mui/material";
 import { useNavigate } from "react-router-dom";
-
 const BackButton = ({ to }: { to: string }) => {
   const navigate = useNavigate();
   return (
@@ -19,5 +18,4 @@ const BackButton = ({ to }: { to: string }) => {
     </Button>
   );
 };
-
 export default BackButton;

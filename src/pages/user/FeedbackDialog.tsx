@@ -13,7 +13,6 @@ import { CrudService } from "../../services/CrudService";
 import { AddFeedback } from "../../services/Model";
 import Rating from "@mui/material/Rating";
 
-
 interface Order {
   username: string;
   id: string;
@@ -21,7 +20,6 @@ interface Order {
   foodId: string;
   foodname: string;
 }
-
 
 interface Props {
   open: boolean;
@@ -65,7 +63,6 @@ export default function FeedbackDialog({ open, onClose, order }: Props) {
     setImage(null);
     onClose();
   };
-
 
   return (
     <Dialog

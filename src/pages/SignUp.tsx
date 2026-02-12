@@ -15,12 +15,7 @@ import { CrudService } from "../services/CrudService";
 import { AddUserDetails } from "../services/Model";
 import React from "react";
 import { useRef } from "react";
-
-
-import {
-  RecaptchaVerifier,
-  signInWithPhoneNumber,
-} from "firebase/auth";
+import {RecaptchaVerifier,signInWithPhoneNumber,} from "firebase/auth";
 import { auth } from "../firebase";
 
 const SignupDialog = () => {
@@ -185,11 +180,10 @@ const SignupDialog = () => {
         PaperProps={{
           sx: {
             borderRadius: 3,
-            backgroundColor: "#b3effc",
+            backgroundColor:  "#bfdfea",    
           },
         }}
       >
-        {/* REQUIRED FOR FIREBASE */}
         <div id="recaptcha-container"></div>
 
         <Box

@@ -27,7 +27,6 @@ export default function FoodTable({
     setAllFoods(foods)
   }, [foods])
 
-
   return (
     <TableContainer
       component={Paper}
@@ -62,7 +61,6 @@ export default function FoodTable({
           </TableRow>
         </TableHead>
 
-
         <TableBody>
           {foods.map((food: any) => (
             <TableRow
@@ -75,8 +73,6 @@ export default function FoodTable({
             >
               <TableCell>{food.foodname}</TableCell>
               <TableCell>₹{food.price}</TableCell>
-
-
               <TableCell>
                 <Chip
                   label={food.foodtype}
@@ -88,8 +84,6 @@ export default function FoodTable({
               </TableCell>
 
               <TableCell>{food.mealtype}</TableCell>
-
-
               <TableCell>
                 {user && (
                   <Button

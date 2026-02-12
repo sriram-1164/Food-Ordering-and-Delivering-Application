@@ -11,9 +11,7 @@ import {
 import { useEffect, useState } from "react";
 import { CrudService } from "../../services/CrudService";
 import { AddFoodDetails, FoodDetails } from "../../services/Model";
-
 const meals = ["Breakfast", "Lunch", "Dinner", "Snacks"];
-
 export default function AddFood({
   editFood,
   onSave,
@@ -22,19 +20,15 @@ export default function AddFood({
   onSave: () => void;
 }) {
   const crud = CrudService();
-
   const [foodname, setFoodName] = useState("");
   const [price, setPrice] = useState<any>();
   const [foodtype, setFoodType] = useState<"Veg" | "Non-Veg">("Veg");
   const [mealtype, setMealType] = useState("");
   const [foods, setFoods] = useState<AddFoodDetails[]>();
-
- 
   const getAllFoods = async () => {
     const responce= await crud.getFoods()
     setFoods(responce)
     }
-
   const handleSubmit = async () => {
     const payload: AddFoodDetails = {
       foodname,
@@ -42,7 +36,6 @@ export default function AddFood({
       mealtype,
       foodtype,
     };
-
     if (editFood) {
       await crud.updateFood(editFood.id, payload);
       getAllFoods()
@@ -51,9 +44,6 @@ export default function AddFood({
       getAllFoods()
     }
     onSave(); //  refresh parent list
-
-
-
   };
   useEffect(() => {
     if (editFood) {
@@ -74,7 +64,6 @@ export default function AddFood({
         p: 3,
       }}
     >
-
       <Typography
         variant="h6"
         fontWeight="bold"
@@ -83,8 +72,6 @@ export default function AddFood({
       >
         {editFood ? "Edit Food Item" : "Add New Item"}
       </Typography>
-
-
       <TextField
         label="Food Name"
         fullWidth
@@ -92,8 +79,6 @@ export default function AddFood({
         value={foodname}
         onChange={(e) => setFoodName(e.target.value)}
       />
-
-
       <TextField
         label="Price (₹)"
         type="number"
@@ -102,8 +87,6 @@ export default function AddFood({
         value={price}
         onChange={(e) => setPrice(Number(e.target.value))}
       />
-
-
       <Autocomplete
         options={meals}
         value={mealtype}
@@ -113,13 +96,10 @@ export default function AddFood({
         )}
         sx={{ mt: 1 }}
       />
-
-
       <Box mt={2}>
         <Typography variant="subtitle1" fontWeight="bold"  sx={{ color: "#ff5722" }}>
           Food Type
         </Typography>
-
         <RadioGroup
           row
           value={foodtype}
@@ -135,8 +115,6 @@ export default function AddFood({
           />
         </RadioGroup>
       </Box>
-
-
       <Box display="flex" justifyContent="flex-end" mt={2}>
         <Button
           variant="contained"

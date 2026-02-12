@@ -8,11 +8,6 @@ import AdminFeedbackPage from "./pages/admin/AdminFeedbackPage";
 import AdminSalesReport from "./pages/admin/AdminSalesReport"
 import UserProfile from "./pages/user/UserProfile";
 
-
-
-
-
-
 export default function App() {
   return (
     <BrowserRouter>

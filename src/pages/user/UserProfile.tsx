@@ -26,7 +26,6 @@ import { CrudService } from "../../services/CrudService";
 import { Address, UserDetails } from "../../services/Model";
 import axios from "axios";
 import BackButton from "../../components/common/BackButton";
-
 const UserProfile = () => {
   const crud = CrudService();
 
@@ -59,7 +58,6 @@ const UserProfile = () => {
   message: "",
   severity: "success" as "success" | "error" | "info" | "warning",
 });
-
 const showSnackbar = (
   message: string,
   severity: "success" | "error" | "info" | "warning" = "success"
@@ -70,8 +68,6 @@ const showSnackbar = (
     severity,
   });
 };
-
-
   useEffect(() => {
     const fetchUser = async () => {
       try {
@@ -293,10 +289,6 @@ const showSnackbar = (
       alert("Address save failed");
     }
   };
-
-
-
-
   if (loading) {
     return (
       <Box display="flex" justifyContent="center" mt={6}>
@@ -304,7 +296,6 @@ const showSnackbar = (
       </Box>
     );
   }
-
   if (!user) {
     return (
       <Typography align="center" mt={6} color="error">
@@ -328,7 +319,6 @@ const showSnackbar = (
           <Box sx={{ position: "absolute", top: 16, left: 16 }}>
             <BackButton to="/usermenu" />
           </Box>
-
           <Card
             sx={{
               maxWidth: 800,
@@ -365,11 +355,9 @@ const showSnackbar = (
                 {!user.profileImage &&
                   user.username.charAt(0).toUpperCase()}
               </Avatar>
-
               <Typography variant="h5" fontWeight="bold" color="text.primary">
                 {user.username}
               </Typography>
-
               <input
                 type="file"
                 hidden
@@ -377,7 +365,6 @@ const showSnackbar = (
                 id="profile-pic-input"
                 onChange={handleFileChange}
               />
-
               <Stack
                 direction="row"
                 spacing={1}
@@ -402,7 +389,6 @@ const showSnackbar = (
                     Change Photo
                   </Button>
                 </label>
-
                 {selectedFile && (
                   <Button
                     size="small"
@@ -423,7 +409,6 @@ const showSnackbar = (
                 )}
               </Stack>
             </Box>
-
             <CardContent sx={{ p: 4 }}>
               <Grid spacing={4}>
                 <Grid size={{ xs: 12, md: 5 }}>
@@ -432,11 +417,8 @@ const showSnackbar = (
                     <Typography color="text.secondary">
                       {user.phonenumber}
                     </Typography>
-
                     <Divider />
-
                     <Typography fontWeight="bold">📧 Email</Typography>
-
                     {editingEmail ? (
                       <>
                         <TextField
@@ -454,7 +436,6 @@ const showSnackbar = (
                                 background: "linear-gradient(135deg, #1c4be4, #97acf0)",
                               },
                             }}
-
                             variant="contained"
                             onClick={async () => {
                               await axios.patch(
@@ -464,13 +445,11 @@ const showSnackbar = (
                               setUser({ ...user, email });
                               setEditingEmail(false);
                               showSnackbar("Email Updated");
-
                             }}
                           >
                             Save Email
                           </Button>
                         </Box>
-
                       </>
                     ) : (
                       <>
@@ -480,7 +459,6 @@ const showSnackbar = (
                         <Box display={"flex"} justifyContent={"flex-start"} mb={1}>
                           <Button sx={{
                             px: 1,
-
                             background: "linear-gradient(135deg, #1c4be4, #97acf0)",
                             ":hover": {
                               background: "linear-gradient(135deg, #1c4be4, #97acf0)",
@@ -494,7 +472,6 @@ const showSnackbar = (
                     )}
                   </Stack>
                 </Grid>
-
                 <Grid size={{ xl: 12, md: 7 }}>
                   <Stack spacing={2}>
                     <Typography fontWeight="bold">⚙️Account Actions</Typography>
@@ -515,7 +492,6 @@ const showSnackbar = (
                         Edit Profile
                       </Button>
                     </Box>
-
                     <Box display="flex" justifyContent="flex-start">
                       <Button
                         variant="contained"
@@ -537,18 +513,13 @@ const showSnackbar = (
                   </Stack>
                 </Grid>
               </Grid>
-
-
               <Divider />
-
               <Typography fontWeight="bold" mb={1}>🏠 Saved Addresses</Typography>
-
               {user.addresses?.length === 0 && (
                 <Typography color="text.secondary">
                   No addresses added
                 </Typography>
               )}
-
               {user.addresses?.map((addr) => (
                 <Paper
                   key={addr.id}
@@ -567,12 +538,9 @@ const showSnackbar = (
                   </Typography>
                 </Paper>
               ))}
-
               <Button
-              
                 sx={{
                   px: 1,
-
                   background: "linear-gradient(135deg, #cbb132, #ed3916)",
                   ":hover": {
                     background: "linear-gradient(135deg, #cbb132, #ed3916)",
@@ -583,11 +551,8 @@ const showSnackbar = (
               >
                 + Add New Address
               </Button>
-
-
             </CardContent>
           </Card>
-
           <Dialog
             open={openEdit}
             onClose={handleCloseEdit}
@@ -609,7 +574,6 @@ const showSnackbar = (
             >
               ✏️ Edit Profile
             </DialogTitle>
-
             <DialogContent sx={{ mt: 2 }}>
               <TextField
                 label="Username"
@@ -618,7 +582,6 @@ const showSnackbar = (
                 value={editUsername}
                 onChange={(e) => setEditUsername(e.target.value)}
               />
-
               <TextField
                 label="Phone Number"
                 fullWidth
@@ -630,7 +593,6 @@ const showSnackbar = (
                 }
               />
             </DialogContent>
-
             <DialogActions sx={{ px: 3, pb: 2 }}>
               <Button onClick={handleCloseEdit} color="inherit">
                 Cancel
@@ -655,7 +617,6 @@ const showSnackbar = (
               sx: {
                 borderRadius: 4,
                 overflow: "hidden",
-                 
               },
             }}
           >
@@ -668,7 +629,6 @@ const showSnackbar = (
             >
               🔒 Change Password
             </DialogTitle>
-
             <DialogContent sx={{ mt: 2 }}>
               <TextField
                 label="Old Password"
@@ -678,7 +638,6 @@ const showSnackbar = (
                 value={oldPassword}
                 onChange={(e) => setOldPassword(e.target.value)}
               />
-
               <TextField
                 label="New Password"
                 type="password"
@@ -687,7 +646,6 @@ const showSnackbar = (
                 value={newPassword}
                 onChange={(e) => setNewPassword(e.target.value)}
               />
-
               <TextField
                 label="Confirm New Password"
                 type="password"
@@ -697,7 +655,6 @@ const showSnackbar = (
                 onChange={(e) => setConfirmPassword(e.target.value)}
               />
             </DialogContent>
-
             <DialogActions sx={{ px: 3, pb: 2 }}>
               <Button onClick={handleClosePassword} color="inherit">
                 Cancel
@@ -713,8 +670,6 @@ const showSnackbar = (
               </Button>
             </DialogActions>
           </Dialog>
-
-
           <Dialog
             open={openAddress}
             onClose={handleCloseAddress}
@@ -736,7 +691,6 @@ const showSnackbar = (
             >
               🏠 Add New Address
             </DialogTitle>
-
             <DialogContent sx={{ mt: 2 }}>
               <TextField
                 select
@@ -751,7 +705,6 @@ const showSnackbar = (
                 <option value="Work">Work</option>
                 <option value="Other">Other</option>
               </TextField>
-
               <TextField
                 label="Address"
                 fullWidth
@@ -761,7 +714,6 @@ const showSnackbar = (
                 value={addressLine}
                 onChange={(e) => setAddressLine(e.target.value)}
               />
-
               <TextField
                 label="City"
                 fullWidth
@@ -769,7 +721,6 @@ const showSnackbar = (
                 value={city}
                 onChange={(e) => setCity(e.target.value)}
               />
-
               <TextField
                 label="Pincode"
                 fullWidth
@@ -781,7 +732,6 @@ const showSnackbar = (
                 }
               />
             </DialogContent>
-
             <DialogActions sx={{ px: 3, pb: 2 }}>
               <Button onClick={handleCloseAddress} color="inherit">
                 Cancel
@@ -797,8 +747,6 @@ const showSnackbar = (
               </Button>
             </DialogActions>
           </Dialog>
-
-
         </Box>
       </Box>
       <Snackbar
@@ -816,9 +764,7 @@ const showSnackbar = (
     {snackbar.message}
   </Alert>
 </Snackbar>
-
     </React.Fragment>
   );
 };
-
 export default UserProfile;

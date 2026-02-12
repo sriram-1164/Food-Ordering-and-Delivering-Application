@@ -1,11 +1,7 @@
-import { CircularProgress, Box } from "@mui/material";
+import { Box } from "@mui/material";
 import { PacmanLoader } from "react-spinners";
-
-
-
 const Loader = () => (
   <Box  className= "Loader">
-    {/* <CircularProgress /> */}
     <PacmanLoader
       color="#ff1b1b"
       size={23}
@@ -13,5 +9,4 @@ const Loader = () => (
     />
   </Box>
 );
-
 export default Loader;

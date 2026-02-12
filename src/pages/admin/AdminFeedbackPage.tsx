@@ -44,9 +44,6 @@ export default function AdminFeedbackPage() {
   const [openImage, setOpenImage] = useState(false);
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
 
-  /* =======================
-     LOAD FEEDBACK FROM NODE
-  ======================= */
   useEffect(() => {
   const loadFeedbacks = async () => {
     try {
@@ -71,7 +68,6 @@ export default function AdminFeedbackPage() {
 
   loadFeedbacks();
 }, []);
-
 
   const handleViewImage = (imageUrl?: string) => {
     if (!imageUrl) return;
@@ -174,12 +170,6 @@ export default function AdminFeedbackPage() {
                       {f.foodname ?? "—"}
                     </Typography>
                   </TableCell>
-                  {/* <TableCell>
-                    <Typography fontWeight="bold">
-                      {f.foodId ?? "—"}
-                    </Typography>
-                  </TableCell> */}
-
                   <TableCell sx={{ maxWidth: 350 }}>
                     <Typography
                       variant="body2"
@@ -229,7 +219,7 @@ export default function AdminFeedbackPage() {
         >
           <CloseIcon />
         </IconButton>
-
+        
         <DialogContent sx={{ p: 2 }}>
           {selectedImage && (
             <Box

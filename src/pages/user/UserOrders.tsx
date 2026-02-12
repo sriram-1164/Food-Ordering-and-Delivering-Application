@@ -200,7 +200,8 @@ export default function UserOrders() {
         open={cancelOpen}
         onClose={() => setCancelOpen(false)}
         onConfirm={confirmCancelOrder} />
-    </Box><FeedbackDialog
+    </Box>
+    <FeedbackDialog
         open={feedbackOpen}
         onClose={() => setFeedbackOpen(false)}
         order={feedbackOrder} /></>

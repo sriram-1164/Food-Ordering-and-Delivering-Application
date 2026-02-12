@@ -58,7 +58,6 @@ export default function AdminMenu() {
     }
   };
 
-  /* ---------------- DELETE FOOD ---------------- */
   const handleDeleteConfirm = async () => {
     if (!deleteId) return;
 
@@ -97,15 +96,9 @@ export default function AdminMenu() {
           Logout
         </Button>
       </Box>
-
-
-
-
-
       <Box
         mb={3}
         p={2}
-
         sx={{
           backgroundColor: "#f67c0a",
           borderRadius: 2,
@@ -127,7 +120,6 @@ export default function AdminMenu() {
           } } />
       </Box>
 
-
       <Box
         p={2}
         sx={{
@@ -145,7 +137,6 @@ export default function AdminMenu() {
             setConfirmOpen(true);
           } } />
       </Box>
-
 
       <Box display="flex" justifyContent="center" p={4}>
         <Button
@@ -165,7 +156,6 @@ export default function AdminMenu() {
         </Button>
       </Box>
 
-
       <Dialog open={confirmOpen} onClose={() => setConfirmOpen(false)}>
         <DialogTitle>Delete Food</DialogTitle>
         <DialogContent>
@@ -184,7 +174,6 @@ export default function AdminMenu() {
           </Button>
         </DialogActions>
       </Dialog>
-
 
       <Snackbar
         open={snackbarOpen}
@@ -231,6 +220,5 @@ export default function AdminMenu() {
           </Button>
         </DialogActions>
       </Dialog></>
-
   );
 }

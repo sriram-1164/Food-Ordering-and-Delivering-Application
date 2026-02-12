@@ -90,7 +90,6 @@ export default function StatusDialog({ open, onClose, onSubmit }: any) {
         </Button>
       </Box>
     </DialogContent>
-  </Dialog>
-  
+  </Dialog> 
 );
 }

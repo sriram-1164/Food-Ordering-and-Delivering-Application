@@ -55,7 +55,6 @@ export default function AdminSalesReport() {
         const orderDate = new Date(dateStr);
         const now = new Date();
 
-        // Normalize dates (remove time)
         const order = new Date(
             orderDate.getFullYear(),
             orderDate.getMonth(),
@@ -71,25 +70,20 @@ export default function AdminSalesReport() {
         const diffDays =
             (today.getTime() - order.getTime()) / (1000 * 60 * 60 * 24);
 
-        // DAILY
         if (range === "daily") {
             return diffDays === 0;
         }
 
-        // WEEKLY (last 7 days)
         if (range === "weekly") {
             return diffDays >= 0 && diffDays <= 7;
         }
 
-        // CALENDAR MONTH (current month only)
         if (range === "monthly") {
             return (
                 order.getMonth() === today.getMonth() &&
                 order.getFullYear() === today.getFullYear()
             );
         }
-
-        //  ROLLING MONTHS (KEY PART)
         const monthsMap: Record<string, number> = {
             last1: 1,
             last2: 2,
@@ -108,8 +102,6 @@ export default function AdminSalesReport() {
         return false;
     };
 
-
-    // ---------------- REPORT GENERATION ----------------
     const generateReport = (): FoodSalesReport[] => {
         const deliveredOrders = orders.filter(
             (o) => o.status === "Delivered" && isWithinRange(o.date, range)
@@ -138,7 +130,6 @@ export default function AdminSalesReport() {
 
     const report = generateReport();
 
-    // ---------------- CSV DOWNLOAD ----------------
     const downloadCSV = () => {
         if (report.length === 0) return;
 
@@ -206,7 +197,6 @@ export default function AdminSalesReport() {
                 spacing={3}         
                 mb={3}
             >
-                {/* DAILY / WEEKLY */}
                 <Paper
                     elevation={3}
                     sx={{
@@ -252,7 +242,6 @@ export default function AdminSalesReport() {
                     </ToggleButtonGroup>
                 </Paper>
 
-                {/* MONTH SELECTOR */}
                 <Paper
                     elevation={3}
                     sx={{
@@ -280,13 +269,10 @@ export default function AdminSalesReport() {
                 </Paper>
             </Stack>
 
-
-            {/* SUMMARY */}
             <Typography align="center" fontWeight="bold" mb={2}>
                 Total Revenue: ₹{totalRevenue}
             </Typography>
 
-            {/* TABLE */}
             <Paper sx={{ maxWidth: 1100, mx: "auto", p: 3 }}>
                 <Table>
                     <TableHead>

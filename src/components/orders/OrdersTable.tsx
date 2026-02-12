@@ -19,7 +19,6 @@ interface OrdersTableProps {
   onStatusChange?: (order: OrderDetails) => void;   // admin
   onCancelOrder?: (order: OrderDetails) => void;    // user
   onGiveFeedback?: (order: OrderDetails) => void;
-
 }
 
 export default function OrdersTable({
@@ -54,7 +53,6 @@ export default function OrdersTable({
               "Address",
               "Mobile",
               "Status",
-
             ].map((h) => (
               <TableCell key={h} sx={{ color: "#fff", fontWeight: "bold" }}>
                 {h}
@@ -71,7 +69,6 @@ export default function OrdersTable({
                 Feedback
               </TableCell>
             )}
-
           </TableRow>
         </TableHead>
         <TableBody>
@@ -98,7 +95,6 @@ export default function OrdersTable({
                   </Typography>
                 </TableCell>
                 <TableCell>{o.date}</TableCell>
-                {/* <TableCell>{o.address}</TableCell> */}
                 <TableCell>
                   <Typography fontSize={13}>
                     <strong>{o.address.label}</strong><br />
@@ -106,8 +102,6 @@ export default function OrdersTable({
                     {o.address.city} - {o.address.pincode}
                   </Typography>
                 </TableCell>
-
-
                 <TableCell>{o.phonenumber}</TableCell>
                 <TableCell>
                   <Chip

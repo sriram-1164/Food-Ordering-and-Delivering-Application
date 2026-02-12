@@ -89,7 +89,7 @@ export default function OrderDialog({ open, food, onClose, onSubmit }: any) {
       status: "Preparing",
       date: new Date().toISOString(),
     };
-
+console.log(payload)
     setPendingOrder(payload);
     setConfirmOpen(true);
   };

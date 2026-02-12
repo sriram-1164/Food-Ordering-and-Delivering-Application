@@ -5,18 +5,13 @@ const fs = require("fs");
 
 const router = express.Router();
 
-/* =======================
-   ENSURE PROFILE FOLDER
-======================= */
+
 const PROFILE_DIR = path.join(__dirname, "uploads/profile");
 
 if (!fs.existsSync(PROFILE_DIR)) {
   fs.mkdirSync(PROFILE_DIR, { recursive: true });
 }
 
-/* =======================
-   MULTER CONFIG (PROFILE)
-======================= */
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
     cb(null, PROFILE_DIR);
@@ -33,9 +28,6 @@ const upload = multer({
   limits: { fileSize: 2 * 1024 * 1024 }, // 2MB
 });
 
-/* =======================
-   PROFILE PIC API
-======================= */
 router.post("/profile-pic", upload.single("image"), (req, res) => {
   try {
     const userId = req.body.userId;

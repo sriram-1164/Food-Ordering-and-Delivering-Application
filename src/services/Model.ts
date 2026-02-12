@@ -19,7 +19,7 @@ export interface OrderDetails {
   userId: string;
   username: string;
 
-  foodId: string;          // ✅ NEW
+  foodId: string;          
   foodname: string;
 
   price: number;
@@ -32,7 +32,7 @@ export interface OrderDetails {
   status: "Preparing" | "Delivered" | "Cancelled";
   phonenumber: string;
 
-  feedbackGiven?: boolean; // ✅ NEW (from backend)
+  feedbackGiven?: boolean; 
 }
 
 
@@ -51,7 +51,7 @@ export interface UserDetails {
 }
 export interface Address {
   id: number;
-  label: string;        // Home / Work / Other
+  label: string;        
   addressLine: string;
   city: string;
   pincode: string;

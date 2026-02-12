@@ -165,7 +165,6 @@ export default function AdminOrders() {
           </FormGroup>
         </Box>
 
-        {/* TABLE */}
         <Box
           p={2}
           sx={{

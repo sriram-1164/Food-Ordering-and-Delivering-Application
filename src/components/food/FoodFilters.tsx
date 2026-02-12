@@ -8,13 +8,9 @@ import {
   Typography,
 } from "@mui/material";
 import { useEffect, useState } from "react";
-
 const meals = ["Breakfast", "Lunch", "Dinner", "Snacks"];
-
 export default function FoodFilters({ foods = [], onFilter }: any) {
-
   const safeFoods = Array.isArray(foods) ? foods : [];
-
   const [search, setSearch] = useState("");
   const [type, setType] = useState("");
   const [meal, setMeal] = useState<string | null>(null);
@@ -49,7 +45,6 @@ export default function FoodFilters({ foods = [], onFilter }: any) {
         boxShadow: 1,
       }}
     >
-
       <Typography
         variant="subtitle1"
         fontWeight="bold"
@@ -58,28 +53,22 @@ export default function FoodFilters({ foods = [], onFilter }: any) {
       >
         Filter Food Items
       </Typography>
-
       <Box
         display="flex"
         gap={2}
         flexWrap="wrap"
         alignItems="center"
       >
-
         <TextField
           label="Search Here"
-          value={search}
-          
+          value={search}   
           onChange={(e) => setSearch(e.target.value)}
           sx={{ minWidth: 220 }}
         />
-
-
         <Box>
           <Typography variant="caption" fontWeight="bold">
             Food Type
           </Typography>
-
           <RadioGroup
             row
             value={type}
@@ -97,8 +86,6 @@ export default function FoodFilters({ foods = [], onFilter }: any) {
             />
           </RadioGroup>
         </Box>
-
-
         <Autocomplete
           options={meals}
           value={meal}

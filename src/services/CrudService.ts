@@ -11,9 +11,7 @@ interface ICrudService {
 
   addFoods: (foodInformation: AddFoodDetails) => Promise<AddFoodDetails>;
 
-
   updateFood: (id: string, foodInformation: AddFoodDetails) => Promise<FoodDetails>;
-
 
   deleteFood: (id: string) => Promise<void>;
 
@@ -21,12 +19,7 @@ interface ICrudService {
 
   addOrder: (orderInformation: OrderDetails) => Promise<OrderDetails>;
 
-
-  updateOrder: (
-    id: string,
-    orderInformation: Partial<OrderDetails>
-  ) => Promise<OrderDetails>;
-
+  updateOrder: (id: string,orderInformation: Partial<OrderDetails>) => Promise<OrderDetails>;
 
   deleteOrder: (id: number) => Promise<void>
 
@@ -34,16 +27,9 @@ interface ICrudService {
 
   getFeedbacksFromNode: () => Promise<any>;
 
-  updateUser: (
-  id: number,
-  userInformation: Partial<UserDetails>
-) => Promise<UserDetails>;
-
+  updateUser: (id: number,userInformation: Partial<UserDetails>) => Promise<UserDetails>;
 
   uploadProfileImage: (data: FormData) => Promise<any>;
-
-
-
 }
 
 export function CrudService(): ICrudService {
@@ -76,8 +62,6 @@ export function CrudService(): ICrudService {
     };
     return axiosService.makeRequest<AddUserDetails>(config);
   };
-
-
   // getting food details
   const getFoods = () => {
     const config: AxiosRequestConfig = {
@@ -86,9 +70,7 @@ export function CrudService(): ICrudService {
     };
     return axiosService.makeRequest<FoodDetails[]>(config);
   };
-
   // add food 
-
   const addFoods = (foodInformation: AddFoodDetails) => {
     const config: AxiosRequestConfig = {
       method: "post",
@@ -97,9 +79,7 @@ export function CrudService(): ICrudService {
     };
     return axiosService.makeRequest<AddFoodDetails>(config);
   };
-
   //update food details
-
   const updateFood = (id: string, foodInformation: AddFoodDetails) => {
     const config: AxiosRequestConfig = {
       method: "patch",
@@ -108,7 +88,6 @@ export function CrudService(): ICrudService {
     };
     return axiosService.makeRequest<FoodDetails>(config);
   };
-
   //delete food
   const deleteFood = async (id: string) => {
     const config: AxiosRequestConfig = {
@@ -117,9 +96,7 @@ export function CrudService(): ICrudService {
     };
     await axiosService.makeRequest(config);
   };
-
   // getting orders
-
   const getOrders = () => {
     const config: AxiosRequestConfig = {
       method: "get",
@@ -127,8 +104,6 @@ export function CrudService(): ICrudService {
     };
     return axiosService.makeRequest<OrderDetails[]>(config);
   };
-
-
   // adding order
   const addOrder = (orderInformation: OrderDetails) => {
     const config: AxiosRequestConfig = {
@@ -138,9 +113,6 @@ export function CrudService(): ICrudService {
     };
     return axiosService.makeRequest<OrderDetails>(config);
   };
-
-
-
   // updating order by pending or delivered
   const updateOrder = (id: string, status: Partial<OrderDetails>) => {
     const config: AxiosRequestConfig = {
@@ -150,7 +122,6 @@ export function CrudService(): ICrudService {
     };
     return axiosService.makeRequest<OrderDetails>(config);
   };
-
   // deleting the order
   const deleteOrder = async (id: number) => {
     const config: AxiosRequestConfig = {
@@ -185,15 +156,9 @@ const updateUser = (id: number, data: Partial<UserDetails>) => {
     url: `/users/${id}`,
     data,
   };
-
   console.log("CONFIG URL BEFORE REQUEST:", config.url);
-
   return axiosService.makeRequest<UserDetails>(config);
 };
-
-
-
-
 
   return {
     getUsers,
@@ -208,9 +173,7 @@ const updateUser = (id: number, data: Partial<UserDetails>) => {
     addOrder,
     addFeedback,
     getFeedbacksFromNode,
-    updateUser,          // 👈 JSON Server
+    updateUser,         
     uploadProfileImage,
-
-
   };
 }
