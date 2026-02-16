@@ -11,7 +11,7 @@ import {
 import { useEffect, useState } from "react";
 import { CrudService } from "../../services/CrudService";
 import { AddFoodDetails, FoodDetails } from "../../services/Model";
-const meals = ["Breakfast", "Lunch", "Dinner", "Snacks"];
+const meals = ["Breakfast", "Lunch", "Dinner", "Snacks","Juice","Desert"];
 export default function AddFood({
   editFood,
   onSave,
@@ -29,15 +29,17 @@ export default function AddFood({
     const responce= await crud.getFoods()
     setFoods(responce)
     }
+    const timestamp = Date.now();
   const handleSubmit = async () => {
     const payload: AddFoodDetails = {
+      foodId:timestamp,
       foodname,
       price,
       mealtype,
       foodtype,
     };
     if (editFood) {
-      await crud.updateFood(editFood.id, payload);
+      await crud.updateFood(editFood.foodId, payload);
       getAllFoods()
     } else {
       await crud.addFoods(payload);
@@ -45,6 +47,7 @@ export default function AddFood({
     }
     onSave(); //  refresh parent list
   };
+  
   useEffect(() => {
     if (editFood) {
       setFoodName(editFood.foodname);

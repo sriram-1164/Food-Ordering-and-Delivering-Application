@@ -12,15 +12,12 @@ import {
   Dialog,
   DialogContent,
   IconButton,
+  TablePagination
 } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
 import Rating from "@mui/material/Rating";
 import { CrudService } from "../../services/CrudService";
 import BackButton from "../../components/common/BackButton";
-
-/* =======================
-   TYPE
-======================= */
 interface AdminFeedback {
   id: string;
   orderId?: string;
@@ -40,34 +37,43 @@ export default function AdminFeedbackPage() {
   const [feedbacks, setFeedbacks] = useState<AdminFeedback[]>([]);
   const [loading, setLoading] = useState(true);
 
+  const [page, setPage] = useState(0);
+  const rowsPerPage = 5;
+
+  const paginatedFeedbacks = feedbacks.slice(
+    page * rowsPerPage,
+    page * rowsPerPage + rowsPerPage
+  );
+
+
   // image dialog
   const [openImage, setOpenImage] = useState(false);
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
 
   useEffect(() => {
-  const loadFeedbacks = async () => {
-    try {
-      const res: any = await crud.getFeedbacksFromNode();
-      const data: AdminFeedback[] = Array.isArray(res.data)
-        ? res.data
-        : [];
+    const loadFeedbacks = async () => {
+      try {
+        const res: any = await crud.getFeedbacksFromNode();
+        const data: AdminFeedback[] = Array.isArray(res.data)
+          ? res.data
+          : [];
 
-      const sorted = [...data].sort(
-        (a, b) =>
-          new Date(b.createdAt).getTime() -
-          new Date(a.createdAt).getTime()
-      );
+        const sorted = [...data].sort(
+          (a, b) =>
+            new Date(b.createdAt).getTime() -
+            new Date(a.createdAt).getTime()
+        );
 
-      setFeedbacks(sorted);
-    } catch (error) {
-      console.error("Error loading feedbacks", error);
-    } finally {
-      setLoading(false);
-    }
-  };
+        setFeedbacks(sorted);
+      } catch (error) {
+        console.error("Error loading feedbacks", error);
+      } finally {
+        setLoading(false);
+      }
+    };
 
-  loadFeedbacks();
-}, []);
+    loadFeedbacks();
+  }, []);
 
   const handleViewImage = (imageUrl?: string) => {
     if (!imageUrl) return;
@@ -76,6 +82,7 @@ export default function AdminFeedbackPage() {
   };
 
   return (
+
     <Box
       p={3}
       sx={{
@@ -123,6 +130,9 @@ export default function AdminFeedbackPage() {
                 Food
               </TableCell>
               <TableCell sx={{ color: "#fff", fontWeight: "bold" }}>
+                Food-Id
+              </TableCell>
+              <TableCell sx={{ color: "#fff", fontWeight: "bold" }}>
                 Feedback
               </TableCell>
               <TableCell sx={{ color: "#fff", fontWeight: "bold" }}>
@@ -155,7 +165,7 @@ export default function AdminFeedbackPage() {
                 </TableCell>
               </TableRow>
             ) : (
-              feedbacks.map((f) => (
+              paginatedFeedbacks.map((f) => (
                 <TableRow
                   key={f.id}
                   hover
@@ -170,6 +180,7 @@ export default function AdminFeedbackPage() {
                       {f.foodname ?? "—"}
                     </Typography>
                   </TableCell>
+                  <TableCell>{f.foodId ?? "-"}</TableCell>
                   <TableCell sx={{ maxWidth: 350 }}>
                     <Typography
                       variant="body2"
@@ -211,6 +222,16 @@ export default function AdminFeedbackPage() {
           </TableBody>
         </Table>
       </Paper>
+      <TablePagination
+        component="div"
+        count={feedbacks.length}
+        page={page}
+        onPageChange={(event, newPage) => setPage(newPage)}
+        rowsPerPage={rowsPerPage}
+        rowsPerPageOptions={[5]}
+        onRowsPerPageChange={() => { }}
+      />
+
 
       <Dialog open={openImage} onClose={() => setOpenImage(false)} maxWidth="sm">
         <IconButton
@@ -219,7 +240,7 @@ export default function AdminFeedbackPage() {
         >
           <CloseIcon />
         </IconButton>
-        
+
         <DialogContent sx={{ p: 2 }}>
           {selectedImage && (
             <Box

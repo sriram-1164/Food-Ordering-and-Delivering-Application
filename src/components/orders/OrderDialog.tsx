@@ -14,6 +14,7 @@ import {
 } from "@mui/material";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { CrudService } from "../../services/CrudService";
 
 export default function OrderDialog({ open, food, onClose, onSubmit }: any) {
 
@@ -26,6 +27,7 @@ export default function OrderDialog({ open, food, onClose, onSubmit }: any) {
   const [successOpen, setSuccessOpen] = useState(false);
   const [pendingOrder, setPendingOrder] = useState<any>(null);
   const navigate = useNavigate();
+  const crud = CrudService();
 
   const user = JSON.parse(localStorage.getItem("user") || "{}");
 
@@ -34,8 +36,8 @@ export default function OrderDialog({ open, food, onClose, onSubmit }: any) {
 
     const loadAddresses = async () => {
       try {
-        const res = await fetch("http://localhost:3001/users");
-        const users = await res.json();
+        // const res = await fetch("http://localhost:3001/users");
+        const users = await crud.getUsers();
 
         const currentUser = users.find(
           (u: any) => u.userId === user.userId

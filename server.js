@@ -8,29 +8,15 @@ const app = express();
 const PORT = 3002;
 const profilePicRoutes = require("./profilepic");
 
-
-/* =======================
-   MIDDLEWARE
-======================= */
 app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use("/api", profilePicRoutes);
 
-
-/* =======================
-   STATIC FILES
-======================= */
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
-/* =======================
-   FILE PATH
-======================= */
 const FEEDBACK_FILE = path.join(__dirname, "feedbacks.json");
 
-/* =======================
-   HELPER FUNCTIONS
-======================= */
 const readFeedbacks = () => {
   if (!fs.existsSync(FEEDBACK_FILE)) {
     fs.writeFileSync(FEEDBACK_FILE, JSON.stringify([]));
@@ -43,9 +29,6 @@ const writeFeedbacks = (feedbacks) => {
   fs.writeFileSync(FEEDBACK_FILE, JSON.stringify(feedbacks, null, 2));
 };
 
-/* =======================
-   MULTER CONFIG
-======================= */
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
     cb(null, "uploads/");
@@ -57,10 +40,6 @@ const storage = multer.diskStorage({
 });
 
 const upload = multer({ storage });
-
-/* =======================
-   FEEDBACK APIs
-======================= */
 
 // GET all feedbacks
 app.get("/feedbacks", (req, res) => {
@@ -100,9 +79,6 @@ app.post("/feedbacks", upload.single("image"), (req, res) => {
   }
 });
 
-/* =======================
-   START SERVER
-======================= */
 app.listen(PORT, () => {
   console.log(`✅ Feedback server running at http://localhost:${PORT}`);
 });

@@ -64,7 +64,7 @@ export default function FoodTable({
         <TableBody>
           {foods.map((food: any) => (
             <TableRow
-              key={food.id}
+              key={food.foodId}
               sx={{
                 "&:hover": {
                   backgroundColor: "#fff3e0",
@@ -84,6 +84,7 @@ export default function FoodTable({
               </TableCell>
 
               <TableCell>{food.mealtype}</TableCell>
+
               <TableCell>
                 {user && (
                   <Button

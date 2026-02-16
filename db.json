@@ -145,10 +145,19 @@
       "id": "1770727825479",
       "userId": 1770727825479,
       "username": "Raja",
-      "password": "1111",
+      "password": "1234",
       "role": "user",
-      "phonenumber": "9999999999",
-      "profileImage": ""
+      "phonenumber": "9978252525",
+      "profileImage": "/uploads/profile/user_undefined.jpg",
+      "addresses": [
+        {
+          "id": 1770960959877,
+          "label": "Home",
+          "addressLine": "Tvm",
+          "city": "Tiruvannamalai",
+          "pincode": "606804"
+        }
+      ]
     }
   ],
   "foods": [
@@ -206,6 +215,45 @@
       "foodname": "Pizza",
       "price": 79,
       "mealtype": "Snacks",
+      "foodtype": "Veg"
+    },
+    {
+      "id": "fbc0",
+      "foodname": "Egg bonda",
+      "price": 10,
+      "mealtype": "Snacks",
+      "foodtype": "Non-Veg"
+    },
+    {
+      "id": "1f07",
+      "foodId": 1770975674139,
+      "foodname": "Kothu Porata",
+      "price": 50,
+      "mealtype": "Dinner",
+      "foodtype": "Non-Veg"
+    },
+    {
+      "id": "9ff4",
+      "foodId": 1770981879657,
+      "foodname": "Masala Puri",
+      "price": 25,
+      "mealtype": "Snacks",
+      "foodtype": "Veg"
+    },
+    {
+      "id": "90cd",
+      "foodId": 1770982001098,
+      "foodname": "Pine Apple Juice",
+      "price": 50,
+      "mealtype": "Juice",
+      "foodtype": "Veg"
+    },
+    {
+      "id": "9b58",
+      "foodId": 1770986016963,
+      "foodname": "Apple Juice",
+      "price": 45,
+      "mealtype": "Juice",
       "foodtype": "Veg"
     }
   ],
@@ -503,6 +551,115 @@
       "phonenumber": "8888888888",
       "status": "Preparing",
       "date": "2026-02-12T05:10:44.458Z"
+    },
+    {
+      "id": "1744",
+      "userId": "1",
+      "username": "Ram",
+      "foodId": 1770975674139,
+      "foodname": "Kothu Porata",
+      "price": 50,
+      "quantity": 1,
+      "totalPrice": 50,
+      "mealtype": "Dinner",
+      "foodtype": "Non-Veg",
+      "address": {
+        "id": 1770704481057,
+        "label": "Work",
+        "addressLine": "614,Anna Nagar",
+        "city": "Chennai",
+        "pincode": "606800"
+      },
+      "phonenumber": "8778787866",
+      "status": "Delivered",
+      "date": "2026-02-13T09:44:06.796Z"
+    },
+    {
+      "id": "ed86",
+      "userId": "1",
+      "username": "Ram",
+      "foodId": 1770982001098,
+      "foodname": "Pine Apple Juice",
+      "price": 50,
+      "quantity": 1,
+      "totalPrice": 50,
+      "mealtype": "Juice",
+      "foodtype": "Veg",
+      "address": {
+        "id": 1770704481057,
+        "label": "Work",
+        "addressLine": "614,Anna Nagar",
+        "city": "Chennai",
+        "pincode": "606800"
+      },
+      "phonenumber": "9360790976",
+      "status": "Delivered",
+      "date": "2026-02-13T11:27:25.811Z"
+    },
+    {
+      "id": "147b",
+      "userId": "1",
+      "username": "Ram",
+      "foodname": "Dosa",
+      "price": 22,
+      "quantity": 5,
+      "totalPrice": 110,
+      "mealtype": "Breakfast",
+      "foodtype": "Veg",
+      "address": {
+        "id": 1770788639187,
+        "label": "Other",
+        "addressLine": "622",
+        "city": "Pune",
+        "pincode": "567898"
+      },
+      "phonenumber": "9787857202",
+      "status": "Delivered",
+      "date": "2026-02-13T12:27:58.283Z"
+    },
+    {
+      "id": "02bf",
+      "userId": "1",
+      "username": "Ram",
+      "foodId": 1770986016963,
+      "foodname": "Apple Juice",
+      "price": 45,
+      "quantity": 1,
+      "totalPrice": 45,
+      "mealtype": "Juice",
+      "foodtype": "Veg",
+      "address": {
+        "id": 1770704439040,
+        "label": "Home",
+        "addressLine": "Bengaluru",
+        "city": "Kudlu Gate",
+        "pincode": "606804"
+      },
+      "phonenumber": "8888888888",
+      "status": "Preparing",
+      "date": "2026-02-13T12:34:42.949Z"
+    },
+    {
+      "id": "5ace",
+      "userId": "1",
+      "username": "Ram",
+      "foodId": 1770981879657,
+      "foodname": "Masala Puri",
+      "price": 25,
+      "quantity": 2,
+      "totalPrice": 50,
+      "mealtype": "Snacks",
+      "foodtype": "Veg",
+      "address": {
+        "id": 1770788639187,
+        "label": "Other",
+        "addressLine": "622",
+        "city": "Pune",
+        "pincode": "567898"
+      },
+      "phonenumber": "9999999999",
+      "status": "Delivered",
+      "date": "2026-02-13T12:37:15.022Z"
     }
   ],
   "feedbacks": [

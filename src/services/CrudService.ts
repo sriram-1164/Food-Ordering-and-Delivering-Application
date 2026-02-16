@@ -11,7 +11,7 @@ interface ICrudService {
 
   addFoods: (foodInformation: AddFoodDetails) => Promise<AddFoodDetails>;
 
-  updateFood: (id: string, foodInformation: AddFoodDetails) => Promise<FoodDetails>;
+  updateFood: (id: number, foodInformation: AddFoodDetails) => Promise<FoodDetails>;
 
   deleteFood: (id: string) => Promise<void>;
 
@@ -80,7 +80,7 @@ export function CrudService(): ICrudService {
     return axiosService.makeRequest<AddFoodDetails>(config);
   };
   //update food details
-  const updateFood = (id: string, foodInformation: AddFoodDetails) => {
+  const updateFood = (id: number, foodInformation: AddFoodDetails) => {
     const config: AxiosRequestConfig = {
       method: "patch",
       url: `/foods/${id}`,

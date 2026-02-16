@@ -45,6 +45,9 @@ const UserProfile = () => {
 
   const [email, setEmail] = useState("");
   const [editingEmail, setEditingEmail] = useState(false);
+  const [emailError, setEmailError] = useState("");
+
+
   const [addresses, setAddresses] = useState<Address[]>([]);
 
   const [openAddress, setOpenAddress] = useState(false);
@@ -54,20 +57,20 @@ const UserProfile = () => {
   const [pincode, setPincode] = useState("");
 
   const [snackbar, setSnackbar] = useState({
-  open: false,
-  message: "",
-  severity: "success" as "success" | "error" | "info" | "warning",
-});
-const showSnackbar = (
-  message: string,
-  severity: "success" | "error" | "info" | "warning" = "success"
-) => {
-  setSnackbar({
-    open: true,
-    message,
-    severity,
+    open: false,
+    message: "",
+    severity: "success" as "success" | "error" | "info" | "warning",
   });
-};
+  const showSnackbar = (
+    message: string,
+    severity: "success" | "error" | "info" | "warning" = "success"
+  ) => {
+    setSnackbar({
+      open: true,
+      message,
+      severity,
+    });
+  };
   useEffect(() => {
     const fetchUser = async () => {
       try {
@@ -111,15 +114,18 @@ const showSnackbar = (
 
       const formData = new FormData();
       formData.append("image", selectedFile);
-      formData.append("userId", user.userId.toString());
+      formData.append("userId", user.id.toString());
 
       const uploadRes = await crud.uploadProfileImage(formData);
+      console.log(uploadRes);
       const imageUrl = uploadRes.data.imageUrl;
 
-      await axios.patch(
-        `http://localhost:3001/users/${user.id}`,
-        { profileImage: imageUrl }
-      );
+      // await axios.patch(
+      //   `http://localhost:3001/users/${user.id}`,
+      //   { profileImage: imageUrl }
+      // );
+      await crud.updateUser(user.id, { profileImage: imageUrl });
+
 
       setUser({ ...user, profileImage: imageUrl });
       setSelectedFile(null);
@@ -157,13 +163,18 @@ const showSnackbar = (
     }
 
     try {
-      await axios.patch(
-        `http://localhost:3001/users/${user.id}`,
-        {
-          username: editUsername,
-          phonenumber: editPhone,
-        }
-      );
+      // await axios.patch(
+      //   `http://localhost:3001/users/${user.id}`,
+      //   {
+      //     username: editUsername,
+      //     phonenumber: editPhone,
+      //   }
+      // );
+      await crud.updateUser(user.id, {
+        username: editUsername,
+        phonenumber: editPhone
+      });
+
 
       setUser({
         ...user,
@@ -209,10 +220,11 @@ const showSnackbar = (
     }
 
     try {
-      await axios.patch(
-        `http://localhost:3001/users/${user.id}`,
-        { password: newPassword }
-      );
+      // await axios.patch(
+      //   `http://localhost:3001/users/${user.id}`,
+      //   { password: newPassword }
+      // );
+      await crud.updateUser(user.id, { password: newPassword });
 
       setUser({ ...user, password: newPassword });
       setOpenPassword(false);
@@ -271,10 +283,11 @@ const showSnackbar = (
       : [newAddress];
 
     try {
-      await axios.patch(
-        `http://localhost:3001/users/${user.id}`,
-        { addresses: updatedAddresses }
-      );
+      // await axios.patch(
+      //   `http://localhost:3001/users/${user.id}`,
+      //   { addresses: updatedAddresses }
+      // );
+      await crud.updateUser(user.id, { addresses: updatedAddresses });
 
       setUser({
         ...user,
@@ -304,6 +317,41 @@ const showSnackbar = (
     );
   }
 
+const validateEmail = (value: string) => {
+  const emailRegex = /^[a-z0-9.]+@[a-z0-9.]+\.[a-z]{2,}$/;
+  return emailRegex.test(value);
+};
+
+
+
+  const handleSaveEmail = async () => {
+    if (!validateEmail(email)) {
+      setEmailError("Please enter a valid email address");
+      return;
+    }
+    if (email === user.email) {
+      setEditingEmail(false);
+      return;
+    }
+
+    try {
+      // await axios.patch(
+      //   `http://localhost:3001/users/${user.id}`,
+      //   { email }
+      // );
+      await crud.updateUser(user.id, { email: email });
+
+      setUser({ ...user, email });
+      setEditingEmail(false);
+      showSnackbar("Email Updated");
+    } catch (error) {
+      console.error("Error updating email", error);
+    }
+  };
+  const handleEditEmail = () => {
+    setEmail(user.email || "");
+    setEditingEmail(true);
+  };
   return (
     <React.Fragment>
       <Box className="order">
@@ -393,7 +441,7 @@ const showSnackbar = (
                   <Button
                     size="small"
                     variant="contained"
-                      sx={{
+                    sx={{
                       px: 1,
                       borderRadius: 1,
                       background: "linear-gradient(135deg, #11a9c1, #aec518)",
@@ -418,62 +466,63 @@ const showSnackbar = (
                       {user.phonenumber}
                     </Typography>
                     <Divider />
-                    <Typography fontWeight="bold">📧 Email</Typography>
-                    {editingEmail ? (
-                      <>
-                        <TextField
-                          fullWidth
-                          value={email}
-                          onChange={(e) => setEmail(e.target.value)}
-                        />
-                        <Box display={"flex"} justifyContent={"flex-start"}>
-                          <Button
-                            sx={{
-                              px: 1,
+                    <Box mt={3} >
+                      <Typography fontWeight="bold" mb={1}>
+                        📧 Email
+                      </Typography>
 
-                              background: "linear-gradient(135deg, #1c4be4, #97acf0)",
-                              ":hover": {
-                                background: "linear-gradient(135deg, #1c4be4, #97acf0)",
-                              },
-                            }}
+                      {!editingEmail ? (
+                        <>
+                          <Typography color="text.secondary" mb={2}>
+                            {user.email || "No email added"}
+                          </Typography>
+
+                          <Button
                             variant="contained"
-                            onClick={async () => {
-                              await axios.patch(
-                                `http://localhost:3001/users/${user.id}`,
-                                { email }
-                              );
-                              setUser({ ...user, email });
-                              setEditingEmail(false);
-                              showSnackbar("Email Updated");
+                            onClick={handleEditEmail}
+                            sx={{
+                              background: "linear-gradient(135deg, #1c4be4, #97acf0)",
+                              px:1
+                            }}
+                          >
+                            {user.email ? "Edit Email" : "Add Email"}
+                          </Button>
+                        </>
+                      ) : (
+                        <>
+                          <TextField
+                            fullWidth
+                            label="Enter Email"
+                            value={email}
+                            onChange={(e) => {
+                              setEmail(e.target.value);
+                              setEmailError("");
+                            }}
+                            error={!!emailError}
+                            helperText={emailError}
+                            sx={{ mb: 2 }}
+                          />
+
+                          <Button
+                            variant="contained"
+                            onClick={handleSaveEmail}
+                            sx={{
+                              background: "linear-gradient(135deg, #1c4be4, #97acf0)",
+                              px:1
                             }}
                           >
                             Save Email
                           </Button>
-                        </Box>
-                      </>
-                    ) : (
-                      <>
-                        <Typography color="text.secondary">
-                          {user.email || "No email added"}
-                        </Typography>
-                        <Box display={"flex"} justifyContent={"flex-start"} mb={1}>
-                          <Button sx={{
-                            px: 1,
-                            background: "linear-gradient(135deg, #1c4be4, #97acf0)",
-                            ":hover": {
-                              background: "linear-gradient(135deg, #1c4be4, #97acf0)",
-                            },
-                          }}
-                            variant="contained"
-                            onClick={() => setEditingEmail(true)}>
-                            {user.email ? "Edit Email" : "Add Email"}
-                          </Button></Box>
-                      </>
-                    )}
+                        </>
+                      )}
+                    </Box>
+
                   </Stack>
                 </Grid>
+               
                 <Grid size={{ xl: 12, md: 7 }}>
                   <Stack spacing={2}>
+                     <Divider />
                     <Typography fontWeight="bold">⚙️Account Actions</Typography>
                     <Box display="flex" justifyContent="flex-start">
                       <Button
@@ -750,20 +799,20 @@ const showSnackbar = (
         </Box>
       </Box>
       <Snackbar
-  open={snackbar.open}
-  autoHideDuration={3000}
-  onClose={() => setSnackbar({ ...snackbar, open: false })}
-  anchorOrigin={{ vertical: "top", horizontal: "center" }}
->
-  <Alert
-    severity={snackbar.severity}
-    variant="filled"
-    onClose={() => setSnackbar({ ...snackbar, open: false })}
-    sx={{ width: "100%" }}
-  >
-    {snackbar.message}
-  </Alert>
-</Snackbar>
+        open={snackbar.open}
+        autoHideDuration={3000}
+        onClose={() => setSnackbar({ ...snackbar, open: false })}
+        anchorOrigin={{ vertical: "top", horizontal: "center" }}
+      >
+        <Alert
+          severity={snackbar.severity}
+          variant="filled"
+          onClose={() => setSnackbar({ ...snackbar, open: false })}
+          sx={{ width: "100%" }}
+        >
+          {snackbar.message}
+        </Alert>
+      </Snackbar>
     </React.Fragment>
   );
 };

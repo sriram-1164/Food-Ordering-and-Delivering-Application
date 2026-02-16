@@ -69,6 +69,11 @@ export default function OrdersTable({
                 Feedback
               </TableCell>
             )}
+               {admin && (
+              <TableCell sx={{ color: "#fff", fontWeight: "bold" }}>
+                Food-ID
+              </TableCell>
+            )}
           </TableRow>
         </TableHead>
         <TableBody>
@@ -187,6 +192,9 @@ export default function OrdersTable({
                       <Chip label="Hold On" size="small" />
                     )}
                   </TableCell>
+                )}
+                {admin &&(
+                  <TableCell>{o.foodId}</TableCell>
                 )}
               </TableRow>
             ))

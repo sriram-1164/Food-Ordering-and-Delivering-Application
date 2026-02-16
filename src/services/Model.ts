@@ -1,5 +1,5 @@
 export interface FoodDetails {
-  id: string;
+  foodId: number;
   foodname: string;
   price: number;
   mealtype: string;
@@ -8,6 +8,7 @@ export interface FoodDetails {
 
 
 export interface AddFoodDetails {
+  foodId:number;
   foodname: string;
   price: number;
   mealtype: string;
@@ -34,9 +35,6 @@ export interface OrderDetails {
 
   feedbackGiven?: boolean; 
 }
-
-
-
 
 export interface UserDetails {
   id: number;              
