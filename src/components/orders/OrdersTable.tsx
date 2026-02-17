@@ -11,7 +11,8 @@ import {
   Box,
   Typography,
 } from "@mui/material";
-import { OrderDetails } from "../../services/Model";
+import { OrderDetails, UserDetails } from "../../services/Model";
+import { useNavigate } from "react-router-dom";
 
 interface OrdersTableProps {
   orders: OrderDetails[];
@@ -19,7 +20,12 @@ interface OrdersTableProps {
   onStatusChange?: (order: OrderDetails) => void;   // admin
   onCancelOrder?: (order: OrderDetails) => void;    // user
   onGiveFeedback?: (order: OrderDetails) => void;
+
+  // 🔥 NEW PROPS
+  deliveryUsers?: UserDetails[];
+  onAssignDelivery?: (orderId: string, deliveryId: number) => void
 }
+
 
 export default function OrdersTable({
   orders,
@@ -27,7 +33,10 @@ export default function OrdersTable({
   onStatusChange,
   onCancelOrder,
   onGiveFeedback,
+  deliveryUsers,
+  onAssignDelivery,
 }: OrdersTableProps) {
+  const navigate = useNavigate();
 
   return (
     <TableContainer
@@ -69,7 +78,7 @@ export default function OrdersTable({
                 Feedback
               </TableCell>
             )}
-               {admin && (
+            {admin && (
               <TableCell sx={{ color: "#fff", fontWeight: "bold" }}>
                 Food-ID
               </TableCell>
@@ -123,17 +132,23 @@ export default function OrdersTable({
                     }
                   />
                 </TableCell>
+                {/* ================= ACTION COLUMN ================= */}
                 {(admin || onCancelOrder) && (
                   <TableCell>
-                    <Box display="flex" gap={1}>
-                      {admin  && (
+                    <Box display="flex" gap={1} alignItems="center">
+                      {/* ===== ADMIN UPDATE BUTTON ===== */}
+                      {admin && (
                         <Button
                           size="small"
                           variant="contained"
-                          disabled={o.status === "Cancelled" || o.status === "Delivered"}
+                          disabled={
+                            o.status === "Cancelled" ||
+                            o.status === "Delivered" ||
+                            o.status === "OutforDelivery"
+                          }
                           sx={{
-                            px: 3,
-                            borderRadius: 3,
+                            px: 2,
+                            borderRadius: 2,
                             background:
                               "linear-gradient(135deg, #ff5722, #ff9800)",
                             ":hover": {
@@ -147,8 +162,36 @@ export default function OrdersTable({
                         </Button>
                       )}
 
+                      {/* ===== DELIVERY ASSIGN DROPDOWN (ADMIN ONLY) ===== */}
+                      {admin && deliveryUsers && onAssignDelivery && (
+                        <select
+                          value={o.deliveryPartnerId || ""}
+                          onChange={(e) =>
+                            onAssignDelivery(
+                              o.id,
+                              Number(e.target.value)
+                            )
+                          }
+                          style={{
+                            padding: "4px",
+                            borderRadius: "6px",
+                            border: "1px solid #ccc",
+                          }}
+                        >
+                          <option value="">Assign Delivery</option>
+                          {deliveryUsers.map((delivery) => (
+                            <option
+                              key={delivery.id}
+                              value={delivery.id}
+                            >
+                              {delivery.username}
+                            </option>
+                          ))}
+                        </select>
+                      )}
                       {!admin &&
                         o.status === "Preparing" &&
+                        !o.deliveryPartnerId &&
                         onCancelOrder && (
                           <Button
                             size="small"
@@ -160,6 +203,7 @@ export default function OrdersTable({
                             Cancel
                           </Button>
                         )}
+
                       {!admin && o.status === "Delivered" && (
                         <Typography
                           variant="body2"
@@ -188,12 +232,21 @@ export default function OrdersTable({
                           Give Feedback
                         </Button>
                       )
+                    ) : o.status === "OutforDelivery" ? (
+                      <Button
+                        size="small"
+                        variant="contained"
+                        onClick={() => navigate(`/track/${o.id}`)}
+                      >
+                        Track Order
+                      </Button>
                     ) : (
                       <Chip label="Hold On" size="small" />
                     )}
                   </TableCell>
                 )}
-                {admin &&(
+
+                {admin && (
                   <TableCell>{o.foodId}</TableCell>
                 )}
               </TableRow>

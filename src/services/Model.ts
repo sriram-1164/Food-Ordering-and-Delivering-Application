@@ -8,7 +8,7 @@ export interface FoodDetails {
 
 
 export interface AddFoodDetails {
-  foodId:number;
+  foodId: number;
   foodname: string;
   price: number;
   mealtype: string;
@@ -20,7 +20,7 @@ export interface OrderDetails {
   userId: string;
   username: string;
 
-  foodId: string;          
+  foodId: string;
   foodname: string;
 
   price: number;
@@ -30,26 +30,37 @@ export interface OrderDetails {
   quantity: number;
   date: string;
 
-  status: "Preparing" | "Delivered" | "Cancelled";
+  status: "Preparing" | "Delivered" | "Cancelled" | "OutforDelivery";
   phonenumber: string;
 
-  feedbackGiven?: boolean; 
+  feedbackGiven?: boolean;
+  deliveryPartnerId?: number;
 }
 
 export interface UserDetails {
-  id: number;              
+  id: number;
   phonenumber: string;
   profileImage: any;
   userId: number;
   username: string;
   password: string;
-  role: "user" | "admin";
+  
+  role: "user" | "admin" | "delivery";
+  isOnline?: boolean;
+  isBusy?: boolean;
+
   addresses?: Address[];
   email?: string;
+
+  currentLocation?: {
+  lat: number;
+  lng: number;
+};
+
 }
 export interface Address {
   id: number;
-  label: string;        
+  label: string;
   addressLine: string;
   city: string;
   pincode: string;

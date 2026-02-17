@@ -41,7 +41,7 @@ export function CrudService(): ICrudService {
   );
 
   const uploadAxios = axios.create({
-    baseURL: "http://localhost:3002", // 👈 Node server
+    baseURL: "http://localhost:3001", // 👈 Node server
   });
 
   // getting user details

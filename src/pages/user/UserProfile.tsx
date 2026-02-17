@@ -269,6 +269,7 @@ const UserProfile = () => {
       alert("Enter valid 6-digit pincode");
       return;
     }
+console.log("User ID:", user.id);
 
     const newAddress = {
       id: Date.now(),
@@ -302,6 +303,7 @@ const UserProfile = () => {
       alert("Address save failed");
     }
   };
+  
   if (loading) {
     return (
       <Box display="flex" justifyContent="center" mt={6}>
@@ -387,7 +389,7 @@ const validateEmail = (value: string) => {
               <Avatar
                 src={
                   user.profileImage
-                    ? `http://localhost:3002${user.profileImage}`
+                    ? `http://localhost:3001${user.profileImage}`
                     : undefined
                 }
                 sx={{

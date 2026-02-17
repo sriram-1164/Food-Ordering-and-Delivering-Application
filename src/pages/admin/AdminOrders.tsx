@@ -16,7 +16,7 @@ import StatusDialog from "../../components/orders/StatusDialog";
 import Loader from "../../components/common/Loader";
 import BackButton from "../../components/common/BackButton";
 import { useNavigate } from "react-router-dom";
-import { OrderDetails } from "../../services/Model";
+import { OrderDetails, UserDetails } from "../../services/Model";
 
 export default function AdminOrders() {
   const crud = CrudService();
@@ -37,7 +37,9 @@ export default function AdminOrders() {
     Preparing: true,
     Delivered: true,
     Cancelled: true,
+    OutforDelivery: true,
   });
+
 
   // LOAD ORDERS
   const loadOrders = () => {
@@ -50,19 +52,57 @@ export default function AdminOrders() {
 
   useEffect(() => {
     loadOrders();
+
   }, []);
 
   // UPDATE ORDER STATUS
   const handleStatus = async (
     id: string,
-    status: "Preparing" | "Delivered"
+    status: "Preparing" | "Delivered" | "OutforDelivery"
   ) => {
-    await crud.updateOrder(id, { status });
+
+    // 🔥 If OutforDelivery → auto assign
+    if (status === "OutforDelivery") {
+
+      const users = await crud.getUsers();
+
+      const availableDelivery = users.find(
+        (u) =>
+          u.role === "delivery" &&
+          u.isOnline === true &&
+          u.isBusy === false
+      );
+
+      if (!availableDelivery) {
+        alert("No delivery partner available!");
+        return;
+      }
+
+      // 1️⃣ Update order
+      await crud.updateOrder(id, {
+        status: "OutforDelivery",
+        deliveryPartnerId: availableDelivery.id,
+      });
+
+      // 2️⃣ Mark delivery busy
+      await crud.updateUser(availableDelivery.id, {
+        isBusy: true,
+      });
+
+    } else {
+
+      // Normal status update
+      await crud.updateOrder(id, { status });
+
+    }
+
     setOpen(false);
     setSelected(null);
     setSnackbarOpen(true);
     loadOrders();
+
   };
+
 
   if (loading) return <Loader />;
 
@@ -108,13 +148,24 @@ export default function AdminOrders() {
           <Button
             variant="contained"
             onClick={() => navigate("/admin/reports")}
-              sx={{
+            sx={{
               px: 4,
               borderRadius: 3,
               background: "linear-gradient(135deg, #273ab7, #1aa1db)",
             }}
           >
             View Sales Report
+          </Button>
+          <Button
+            variant="contained"
+            onClick={() => navigate("/adminadddelivery")}
+            sx={{
+              px: 4,
+              borderRadius: 3,
+              background: "linear-gradient(135deg, #273ab7, #1aa1db)",
+            }}
+          >
+            Add Delivery Person
           </Button>
 
         </Box>
@@ -145,7 +196,7 @@ export default function AdminOrders() {
           </Typography>
 
           <FormGroup row>
-            {["Preparing", "Delivered", "Cancelled"].map((status) => (
+            {["Preparing", "Delivered", "Cancelled" , "OutforDelivery"].map((status) => (
               <FormControlLabel
                 key={status}
                 control={
@@ -181,6 +232,8 @@ export default function AdminOrders() {
               setOpen(true);
             }}
           />
+
+
         </Box>
 
         <Box display="flex" justifyContent="center" mt={3}>
@@ -194,7 +247,7 @@ export default function AdminOrders() {
         <StatusDialog
           open={open}
           onClose={() => setOpen(false)}
-          onSubmit={(status: "Preparing" | "Delivered") =>
+          onSubmit={(status: "Preparing" | "Delivered" | "OutforDelivery") =>
             handleStatus(selected!.id, status)
           }
         />

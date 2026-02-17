@@ -77,7 +77,7 @@ export default function AdminFeedbackPage() {
 
   const handleViewImage = (imageUrl?: string) => {
     if (!imageUrl) return;
-    setSelectedImage(`http://localhost:3002${imageUrl}`);
+    setSelectedImage(`http://localhost:3001${imageUrl}`);
     setOpenImage(true);
   };
 

@@ -80,7 +80,7 @@ export default function UserOrders() {
   };
 
   const activeOrders = orders.filter(
-    (o) => o.status === "Preparing"
+    (o) => o.status === "Preparing" || o.status === "OutforDelivery"
   );
 
   const historyOrders = orders.filter(

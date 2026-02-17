@@ -5,24 +5,164 @@ const fs = require("fs");
 const path = require("path");
 
 const app = express();
-const PORT = 3002;
+const PORT = 3001; // Same as JSON Server
+
 const profilePicRoutes = require("./profilepic");
 
 app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use("/api", profilePicRoutes);
-
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
+// ================= DATABASE FILE =================
+
+const DB_FILE = path.join(__dirname, "db.json");
 const FEEDBACK_FILE = path.join(__dirname, "feedbacks.json");
+
+// Create db.json if not exists
+const readDB = () => {
+  if (!fs.existsSync(DB_FILE)) {
+    fs.writeFileSync(
+      DB_FILE,
+      JSON.stringify({ users: [], foods: [], orders: [] }, null, 2)
+    );
+  }
+  return JSON.parse(fs.readFileSync(DB_FILE, "utf-8"));
+};
+
+const writeDB = (data) => {
+  fs.writeFileSync(DB_FILE, JSON.stringify(data, null, 2));
+};
+
+// ================= USERS =================
+
+app.get("/users", (req, res) => {
+  const db = readDB();
+  res.json(db.users);
+});
+
+app.post("/users", (req, res) => {
+  const db = readDB();
+  db.users.push(req.body);
+  writeDB(db);
+  res.status(201).json(req.body);
+});
+
+app.patch("/users/:id", (req, res) => {
+  const db = readDB();
+  const id = Number(req.params.id);
+
+  db.users = db.users.map((user) =>
+    user.id === id ? { ...user, ...req.body } : user
+  );
+
+  writeDB(db);
+  res.json({ message: "User updated" });
+});
+
+// ================= FOODS =================
+
+app.get("/foods", (req, res) => {
+  const db = readDB();
+  res.json(db.foods);
+});
+
+app.post("/foods", (req, res) => {
+  const db = readDB();
+  db.foods.push(req.body);
+  writeDB(db);
+  res.status(201).json(req.body);
+});
+
+app.patch("/foods/:id", (req, res) => {
+  const db = readDB();
+  const id = req.params.id; // keep as string
+
+  db.foods = db.foods.map((food) =>
+    food.id === id ? { ...food, ...req.body } : food
+  );
+
+  writeDB(db);
+  res.json({ message: "Food updated successfully" });
+});
+
+
+app.delete("/foods/:id", (req, res) => {
+  const db = readDB();
+  const id = req.params.id; // DO NOT convert to Number
+
+  db.foods = db.foods.filter((food) => food.id !== id);
+
+  writeDB(db);
+  res.json({ message: "Food deleted successfully" });
+});
+
+
+// ================= ORDERS =================
+
+app.get("/orders", (req, res) => {
+  const db = readDB();
+  res.json(db.orders);
+});
+
+app.post("/orders", (req, res) => {
+  const db = readDB();
+
+  const newOrder = {
+    id: Date.now().toString(), // 🔥 generate id
+    ...req.body
+  };
+
+  db.orders.push(newOrder);
+  writeDB(db);
+
+  res.status(201).json(newOrder);
+});
+
+app.patch("/orders/:id", (req, res) => {
+  const db = readDB();
+  const id = req.params.id;
+    console.log("Updating ID:", id);
+  console.log("Existing IDs:", db.orders.map(o => o.id));
+
+
+  let found = false;
+
+  db.orders = db.orders.map((order) => {
+    if (String(order.id) === String(id)) {
+      found = true;
+      return { ...order, ...req.body };
+    }
+    return order;
+  });
+
+  if (!found) {
+    return res.status(404).json({ message: "Order not found" });
+  }
+
+  writeDB(db);
+  res.json({ message: "Order updated successfully" });
+});
+
+
+
+app.delete("/orders/:id", (req, res) => {
+  const db = readDB();
+  const id = req.params.id;
+
+  db.orders = db.orders.filter((order) => order.id !== id);
+  writeDB(db);
+  res.json({ message: "Order deleted" });
+});
+
+// ================= FEEDBACK =================
 
 const readFeedbacks = () => {
   if (!fs.existsSync(FEEDBACK_FILE)) {
-    fs.writeFileSync(FEEDBACK_FILE, JSON.stringify([]));
+    fs.writeFileSync(FEEDBACK_FILE, JSON.stringify([], null, 2));
   }
-  const data = fs.readFileSync(FEEDBACK_FILE, "utf-8");
-  return JSON.parse(data || "[]");
+  return JSON.parse(fs.readFileSync(FEEDBACK_FILE, "utf-8"));
 };
 
 const writeFeedbacks = (feedbacks) => {
@@ -41,7 +181,6 @@ const storage = multer.diskStorage({
 
 const upload = multer({ storage });
 
-// GET all feedbacks
 app.get("/feedbacks", (req, res) => {
   try {
     const feedbacks = readFeedbacks();
@@ -51,7 +190,6 @@ app.get("/feedbacks", (req, res) => {
   }
 });
 
-// POST feedback with image
 app.post("/feedbacks", upload.single("image"), (req, res) => {
   try {
     const feedbacks = readFeedbacks();
@@ -79,6 +217,8 @@ app.post("/feedbacks", upload.single("image"), (req, res) => {
   }
 });
 
+// ================= START SERVER =================
+
 app.listen(PORT, () => {
-  console.log(`✅ Feedback server running at http://localhost:${PORT}`);
+  console.log(`✅ Express server running at http://localhost:${PORT}`);
 });

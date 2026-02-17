@@ -48,7 +48,10 @@ export default function Login() {
       //  ROLE-BASED NAVIGATION
       if (matchedUser.role === "admin") {
         navigate("/adminmenu");
-      } else {
+      } else if (matchedUser.role === "delivery") {
+        navigate("/delivery");
+      }
+      else {
         navigate("/usermenu");
       } setLoading(true)
     } catch (err) {
@@ -75,7 +78,7 @@ export default function Login() {
             justifyContent={"center"}
             textAlign={"center"}
             flexDirection={"column"}
-            >
+          >
             <Typography variant="h3" fontWeight="bold"
               sx={{
                 background: "linear-gradient(135deg,  #ec9d26, #ff5722)",
@@ -104,7 +107,7 @@ export default function Login() {
               marginRight: "10rem"
             }}
           >
-            
+
             <Box display="flex" justifyContent="center" mb={2}>
               <Avatar sx={{ bgcolor: "#ff5722", width: 56, height: 56 }}>
                 <LockOutlineIcon />
