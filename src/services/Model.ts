@@ -64,6 +64,8 @@ export interface Address {
   addressLine: string;
   city: string;
   pincode: string;
+    lat?: number;   // 🔥 ADD
+  lng?: number;
 }
 
 export interface AddUserDetails {

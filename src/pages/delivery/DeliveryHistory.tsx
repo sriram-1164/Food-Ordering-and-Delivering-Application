@@ -11,6 +11,7 @@ import {
 } from "@mui/material";
 import { CrudService } from "../../services/CrudService";
 import { OrderDetails, UserDetails } from "../../services/Model";
+import BackButton from "../../components/common/BackButton";
 
 const crud = CrudService();
 
@@ -41,6 +42,24 @@ const DeliveryHistory = () => {
   );
 
   return (
+        <Box
+      sx={{
+        minHeight: "100vh",
+        background: "linear-gradient(135deg, #0f2027, #203a43, #2c5364)",
+        position: "relative", // 🔥 IMPORTANT
+      }}
+    >
+
+      {/* 🔥 BACK BUTTON TOP LEFT */}
+      <Box
+        sx={{
+          position: "absolute",
+          top: 20,
+          left: 20,
+        }}
+      >
+        <BackButton to="/delivery" />
+      </Box>
     <Box
       sx={{
         minHeight: "100vh",
@@ -151,6 +170,7 @@ const DeliveryHistory = () => {
           </Stack>
         )}
       </Paper>
+    </Box>
     </Box>
   );
 };

@@ -91,7 +91,7 @@ export default function AdminFeedbackPage() {
       }}
     >
       <Box mb={2}>
-        <BackButton to="/adminorders" />
+        <BackButton to="/adminorders"  gradient="linear-gradient(135deg, #113fe4, #68acef)"/>
       </Box>
 
       <Typography

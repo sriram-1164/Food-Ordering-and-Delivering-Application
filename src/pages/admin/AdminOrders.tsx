@@ -133,7 +133,7 @@ export default function AdminOrders() {
       >
         {/* TOP BAR */}
         <Box mb={2} display="flex" gap={2}>
-          <BackButton to="/adminmenu" />
+          <BackButton to="/adminmenu"  gradient="linear-gradient(135deg, #ff5722, #ff9800)" />
           <Button
             variant="contained"
             onClick={() => navigate("/adminfeedback")}

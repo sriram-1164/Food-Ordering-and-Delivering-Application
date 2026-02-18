@@ -269,26 +269,47 @@ const UserProfile = () => {
       alert("Enter valid 6-digit pincode");
       return;
     }
-console.log("User ID:", user.id);
 
-    const newAddress = {
-      id: Date.now(),
-      label: addressLabel,
-      addressLine,
-      city,
-      pincode,
-    };
-
-    const updatedAddresses = user.addresses
-      ? [...user.addresses, newAddress]
-      : [newAddress];
+    const fullAddress = `${addressLine}, ${city}, Tamil Nadu, India, ${pincode}`;
 
     try {
-      // await axios.patch(
-      //   `http://localhost:3001/users/${user.id}`,
-      //   { addresses: updatedAddresses }
-      // );
-      await crud.updateUser(user.id, { addresses: updatedAddresses });
+      const geoRes = await fetch(
+        `https://nominatim.openstreetmap.org/search?format=json&countrycodes=in&q=${encodeURIComponent(fullAddress)}`
+        ,
+        {
+          headers: {
+            "User-Agent": "FoodPointApp/1.0"
+          }
+        }
+      );
+
+      const geoData = await geoRes.json();
+
+      if (!geoData.length) {
+        alert("Location not found. Please enter valid address.");
+        return;
+      }
+
+      const lat = parseFloat(geoData[0].lat);
+      const lng = parseFloat(geoData[0].lon);
+
+      const newAddress = {
+        id: Date.now(),
+        label: addressLabel,
+        addressLine,
+        city,
+        pincode,
+        lat,
+        lng,
+      };
+
+      const updatedAddresses = user.addresses
+        ? [...user.addresses, newAddress]
+        : [newAddress];
+
+      await crud.updateUser(user.id, {
+        addresses: updatedAddresses,
+      });
 
       setUser({
         ...user,
@@ -299,11 +320,12 @@ console.log("User ID:", user.id);
       showSnackbar("Address added successfully 🏠");
 
     } catch (err) {
-      console.error("Failed to save address", err);
+      console.error("Geocoding failed:", err);
       alert("Address save failed");
     }
   };
-  
+
+
   if (loading) {
     return (
       <Box display="flex" justifyContent="center" mt={6}>
@@ -319,10 +341,10 @@ console.log("User ID:", user.id);
     );
   }
 
-const validateEmail = (value: string) => {
-  const emailRegex = /^[a-z0-9.]+@[a-z0-9.]+\.[a-z]{2,}$/;
-  return emailRegex.test(value);
-};
+  const validateEmail = (value: string) => {
+    const emailRegex = /^[a-z0-9.]+@[a-z0-9.]+\.[a-z]{2,}$/;
+    return emailRegex.test(value);
+  };
 
 
 
@@ -484,7 +506,7 @@ const validateEmail = (value: string) => {
                             onClick={handleEditEmail}
                             sx={{
                               background: "linear-gradient(135deg, #1c4be4, #97acf0)",
-                              px:1
+                              px: 1
                             }}
                           >
                             {user.email ? "Edit Email" : "Add Email"}
@@ -510,7 +532,7 @@ const validateEmail = (value: string) => {
                             onClick={handleSaveEmail}
                             sx={{
                               background: "linear-gradient(135deg, #1c4be4, #97acf0)",
-                              px:1
+                              px: 1
                             }}
                           >
                             Save Email
@@ -521,10 +543,10 @@ const validateEmail = (value: string) => {
 
                   </Stack>
                 </Grid>
-               
+
                 <Grid size={{ xl: 12, md: 7 }}>
                   <Stack spacing={2}>
-                     <Divider />
+                    <Divider />
                     <Typography fontWeight="bold">⚙️Account Actions</Typography>
                     <Box display="flex" justifyContent="flex-start">
                       <Button

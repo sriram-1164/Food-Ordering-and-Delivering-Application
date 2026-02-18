@@ -30,8 +30,22 @@
           "addressLine": "614,Anna Nagar,Andampallam,",
           "city": "tiruvannamalai",
           "pincode": "606804"
+        },
+        {
+          "id": 1,
+          "label": "Home",
+          "addressLine": "T Nagar",
+          "city": "Chennai",
+          "pincode": "600017",
+          "lat": 13.0418,
+          "lng": 80.2337
         }
-      ]
+      ],
+      "isOnline": true,
+      "currentLocation": {
+        "lat": 12.89338167295136,
+        "lng": 77.6355608295122
+      }
     },
     {
       "userId": 2,
@@ -47,22 +61,13 @@
           "addressLine": "Bengaluru",
           "city": "Kudlu Gate",
           "pincode": "606804"
-        },
-        {
-          "id": 1770704481057,
-          "label": "Work",
-          "addressLine": "614,Anna Nagar",
-          "city": "Chennai",
-          "pincode": "606800"
-        },
-        {
-          "id": 1771315221907,
-          "label": "Home",
-          "addressLine": "614,Anna Nagar,Andampallam,",
-          "city": "tiruvannamalai",
-          "pincode": "606804"
         }
-      ]
+      ],
+      "isOnline": true,
+      "currentLocation": {
+        "lat": 12.89338167295136,
+        "lng": 77.6355608295122
+      }
     },
     {
       "id": 1771305681280,
@@ -72,10 +77,10 @@
       "phonenumber": "9360790976",
       "role": "delivery",
       "isOnline": true,
-      "isBusy": false,
+      "isBusy": true,
       "currentLocation": {
-        "lat": 12.893364922760114,
-        "lng": 77.63574483380488
+        "lat": 12.794198154859966,
+        "lng": 77.69499607907743
       }
     },
     {
@@ -88,8 +93,8 @@
       "isOnline": true,
       "isBusy": true,
       "currentLocation": {
-        "lat": 12.893363599428907,
-        "lng": 77.63587672770367
+        "lat": 12.893364310053805,
+        "lng": 77.63587915866144
       }
     },
     {
@@ -101,6 +106,16 @@
       "role": "delivery",
       "isOnline": true,
       "isBusy": true
+    },
+    {
+      "id": "1771319703139",
+      "userId": 1771319703139,
+      "username": "Joe",
+      "password": "1234",
+      "phonenumber": "9360790976",
+      "role": "delivery",
+      "isOnline": false,
+      "isBusy": false
     }
   ],
   "foods": [
@@ -362,6 +377,54 @@
       "phonenumber": "8888888888",
       "status": "Delivered",
       "date": "2026-02-17T08:00:43.781Z",
+      "deliveryPartnerId": 1771305681280
+    },
+    {
+      "id": "1771320085565",
+      "userId": "1",
+      "username": "Ram",
+      "foodId": 1770982001098,
+      "foodname": "Pine Apple Juice",
+      "price": 50,
+      "quantity": 1,
+      "totalPrice": 50,
+      "mealtype": "Juice",
+      "foodtype": "Veg",
+      "address": {
+        "id": 1770704439040,
+        "label": "Home",
+        "addressLine": "Bengaluru",
+        "city": "Kudlu Gate",
+        "pincode": "606804"
+      },
+      "phonenumber": "7777777777",
+      "status": "Delivered",
+      "date": "2026-02-17T09:21:24.502Z",
+      "deliveryPartnerId": 1771305681280
+    },
+    {
+      "id": "1771325466873",
+      "userId": "1",
+      "username": "Ram",
+      "foodId": 1771240077813,
+      "foodname": "Pannir",
+      "price": 30,
+      "quantity": 1,
+      "totalPrice": 30,
+      "mealtype": "Dinner",
+      "foodtype": "Veg",
+      "address": {
+        "id": 1,
+        "label": "Home",
+        "addressLine": "T Nagar",
+        "city": "Chennai",
+        "pincode": "600017",
+        "lat": 12.80448,
+        "lng": 77.70489
+      },
+      "phonenumber": "8888888888",
+      "status": "OutforDelivery",
+      "date": "2026-02-17T10:51:05.353Z",
       "deliveryPartnerId": 1771305681280
     }
   ],

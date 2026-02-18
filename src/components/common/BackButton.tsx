@@ -1,21 +1,44 @@
 import { Button } from "@mui/material";
 import { useNavigate } from "react-router-dom";
-const BackButton = ({ to }: { to: string }) => {
+
+interface BackButtonProps {
+  to: string;
+  label?: string;
+  variant?: "contained" | "outlined" | "text";
+  color?: "primary" | "secondary" | "error" | "success" | "info" | "warning";
+  gradient?: string; // custom gradient override
+}
+
+const BackButton = ({
+  to,
+  label = "← Back",
+  variant = "contained",
+  color = "primary",
+  gradient,
+}: BackButtonProps) => {
   const navigate = useNavigate();
+
   return (
-    <Button 
-     variant="contained"
-                    sx={{
-          px: 4,
-          borderRadius: 3,
-          background: "linear-gradient(135deg, #ff5722, #ff9800)",
-          ":hover": {
-            background: "linear-gradient(135deg, #e64a19, #fb8c00)",
+    <Button
+      variant={variant}
+      color={!gradient ? color : undefined}
+      sx={{
+        px: 4,
+        borderRadius: 3,
+        fontWeight: "bold",
+        ...(gradient && {
+          background: gradient,
+          color: "#fff",
+          "&:hover": {
+            opacity: 0.9,
           },
-        }}
-        onClick={() => navigate(to)}>
-      ← Back
+        }),
+      }}
+      onClick={() => navigate(to)}
+    >
+      {label}
     </Button>
   );
 };
+
 export default BackButton;

@@ -12,15 +12,19 @@ import {
 } from "@mui/material";
 import { CrudService } from "../../services/CrudService";
 import { OrderDetails, UserDetails } from "../../services/Model";
+import BackButton from "../../components/common/BackButton";
+import { useNavigate } from "react-router-dom";
 
 const crud = CrudService();
+
+
 
 const DeliveryOrders = () => {
   const [orders, setOrders] = useState<OrderDetails[]>([]);
   const loggedUser: UserDetails = JSON.parse(
     localStorage.getItem("user") || "{}"
   );
-
+const navigate = useNavigate();
   useEffect(() => {
     loadOrders();
     const interval = setInterval(loadOrders, 5000); // auto refresh
@@ -51,142 +55,145 @@ const DeliveryOrders = () => {
     <Box
       sx={{
         minHeight: "100vh",
-        background: "linear-gradient(135deg, #1e3c72, #2a5298)",
-        display: "flex",
-        justifyContent: "center",
-        alignItems: "center",
-        p: 3,
+        background: "linear-gradient(135deg, #0f2027, #203a43, #2c5364)",
+        position: "relative", // 🔥 IMPORTANT
       }}
     >
-      <Paper
-        elevation={6}
+
+      {/* 🔥 BACK BUTTON TOP LEFT */}
+      <Box
         sx={{
-          width: "100%",
-          maxWidth: 900,
-          borderRadius: 4,
-          p: 4,
-          background: "rgba(255,255,255,0.95)",
+          position: "absolute",
+          top: 20,
+          left: 20,
         }}
       >
-        {/* HEADER */}
-        <Typography
-          variant="h4"
-          fontWeight="bold"
-          textAlign="center"
-          mb={4}
+        <BackButton to="/delivery" />
+      </Box>
+      <Box
+        sx={{
+          minHeight: "100vh",
+          background: "linear-gradient(135deg, #1e3c72, #2a5298)",
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          p: 3,
+        }}
+      >
+        <Paper
+          elevation={6}
+          sx={{
+            width: "100%",
+            maxWidth: 900,
+            borderRadius: 4,
+            p: 4,
+            background: "rgba(255,255,255,0.95)",
+          }}
         >
-          🚚 Assigned Orders
-        </Typography>
-
-        {orders.length === 0 ? (
-          <Typography textAlign="center" color="text.secondary">
-            No active deliveries right now.
+          {/* HEADER */}
+          <Typography
+            variant="h4"
+            fontWeight="bold"
+            textAlign="center"
+            mb={4}
+          >
+            🚚 Assigned Orders
           </Typography>
-        ) : (
-          <Stack spacing={3}>
-            {orders.map((order) => (
-              <Card
-                key={order.id}
-                sx={{
-                  borderRadius: 3,
-                  boxShadow: 4,
-                  transition: "0.3s",
-                  "&:hover": {
-                    transform: "scale(1.02)",
-                    boxShadow: 8,
-                  },
-                }}
-              >
-                <CardContent>
-                  {/* FOOD TITLE */}
-                  <Typography variant="h6" fontWeight="bold">
-                    {order.foodname}
-                  </Typography>
 
-                  <Divider sx={{ my: 1 }} />
+          {orders.length === 0 ? (
+            <Typography textAlign="center" color="text.secondary">
+              No active deliveries right now.
+            </Typography>
+          ) : (
+            <Stack spacing={3}>
+              {orders.map((order) => (
+                <Card
+                  key={order.id}
+                  sx={{
+                    borderRadius: 3,
+                    boxShadow: 4,
+                    transition: "0.3s",
+                    "&:hover": {
+                      transform: "scale(1.02)",
+                      boxShadow: 8,
+                    },
+                  }}
+                >
+                  <CardContent>
+                    {/* FOOD TITLE */}
+                    <Typography variant="h6" fontWeight="bold">
+                      {order.foodname}
+                    </Typography>
 
-                  {/* ORDER DETAILS */}
-                  <Typography>
-                    <strong>Customer:</strong> {order.username}
-                  </Typography>
+                    <Divider sx={{ my: 1 }} />
 
-                  <Typography>
-                    <strong>Phone:</strong> {order.phonenumber}
-                  </Typography>
+                    {/* ORDER DETAILS */}
+                    <Typography>
+                      <strong>Customer:</strong> {order.username}
+                    </Typography>
 
-                  <Typography mt={1}>
-                    <strong>Address:</strong><br />
-                    {order.address.addressLine},<br />
-                    {order.address.city} - {order.address.pincode}
-                  </Typography>
+                    <Typography>
+                      <strong>Phone:</strong> {order.phonenumber}
+                    </Typography>
 
-                  <Chip
-                    label={order.status}
-                    sx={{ mt: 2 }}
-                    color="warning"
-                  />
+                    <Typography mt={1}>
+                      <strong>Address:</strong><br />
+                      {order.address.addressLine},<br />
+                      {order.address.city} - {order.address.pincode}
+                    </Typography>
 
-                  {/* ACTION BUTTONS */}
-                  <Box
-                    mt={3}
-                    display="flex"
-                    flexWrap="wrap"
-                    gap={2}
-                  >
-                    <Button
-                      variant="contained"
-                      color="success"
-                      onClick={() =>
-                        handleDelivered(order.id)
-                      }
-                      sx={{
-                        borderRadius: 3,
-                        px: 3,
-                      }}
+                    <Chip
+                      label={order.status}
+                      sx={{ mt: 2 }}
+                      color="warning"
+                    />
+
+                    {/* ACTION BUTTONS */}
+                    <Box
+                      mt={3}
+                      display="flex"
+                      flexWrap="wrap"
+                      gap={2}
                     >
-                      Mark Delivered
-                    </Button>
+                      <Button
+                        variant="contained"
+                        color="success"
+                        onClick={() =>
+                          handleDelivered(order.id)
+                        }
+                        sx={{
+                          borderRadius: 3,
+                          px: 3,
+                        }}
+                      >
+                        Mark Delivered
+                      </Button>
 
-                    <Button
-                      variant="outlined"
-                      href={`tel:${order.phonenumber}`}
-                      sx={{
-                        borderRadius: 3,
-                        px: 3,
-                      }}
-                    >
-                      Call Customer
-                    </Button>
+                      <Button
+                        variant="outlined"
+                        href={`tel:${order.phonenumber}`}
+                        sx={{
+                          borderRadius: 3,
+                          px: 3,
+                        }}
+                      >
+                        Call Customer
+                      </Button>
+                      <Button
+                        variant="outlined"
+                        onClick={() => navigate(`/track/${order.id}`)}
+                      >
+                        Open Tracker
+                      </Button>
 
-                    <Button
-                      variant="outlined"
-                      sx={{
-                        borderRadius: 3,
-                        px: 3,
-                      }}
-                      onClick={() => {
-                        const fullAddress = `
-                          ${order.address.addressLine},
-                          ${order.address.city},
-                          ${order.address.pincode}
-                        `;
-
-                        const mapUrl = `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(
-                          fullAddress
-                        )}`;
-
-                        window.open(mapUrl, "_blank");
-                      }}
-                    >
-                      Open in Maps
-                    </Button>
-                  </Box>
-                </CardContent>
-              </Card>
-            ))}
-          </Stack>
-        )}
-      </Paper>
+                    </Box>
+                  </CardContent>
+                </Card>
+              ))}
+            </Stack>
+          )}
+        </Paper>
+      </Box>
     </Box>
   );
 };
