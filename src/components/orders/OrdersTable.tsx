@@ -236,10 +236,22 @@ export default function OrdersTable({
                       <Button
                         size="small"
                         variant="contained"
-                        onClick={() => navigate(`/track/${o.id}`)}
+                        onClick={() => navigate(`/delivery/track/${o.id}`)}
                       >
                         Track Order
                       </Button>
+                    ) : o.status === "Reached" ? (
+                      <Box>
+                        <Chip
+                          label={`OTP: ${o.deliveryOtp}`}
+                          color="error"
+                          size="small"
+                          sx={{ fontWeight: "bold" }}
+                        />
+                        <Typography variant="caption" display="block" mt={1}>
+                          Share this OTP with delivery partner
+                        </Typography>
+                      </Box>
                     ) : (
                       <Chip label="Hold On" size="small" />
                     )}

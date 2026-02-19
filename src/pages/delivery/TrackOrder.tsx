@@ -184,7 +184,10 @@ export default function TrackOrder() {
           newPos.lng
         );
 
-        setBearing(newBearing);
+        if (Math.abs(newBearing - bearing) > 1) {
+          setBearing(newBearing);
+        }
+
 
         console.log("🧭 Heading:", newBearing);
 

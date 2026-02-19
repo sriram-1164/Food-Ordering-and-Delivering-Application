@@ -72,7 +72,6 @@ export default function StatusDialog({ open, onClose, onSubmit }: any) {
             }
             label="Delivered"
           />
-
         </Box>
 
 

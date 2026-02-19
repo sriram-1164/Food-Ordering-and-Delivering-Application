@@ -30,11 +30,14 @@ export interface OrderDetails {
   quantity: number;
   date: string;
 
-  status: "Preparing" | "Delivered" | "Cancelled" | "OutforDelivery";
+  status: "Preparing" | "Delivered" | "Cancelled" | "OutforDelivery" | "Reached";
   phonenumber: string;
 
   feedbackGiven?: boolean;
   deliveryPartnerId?: number;
+  deliveryOtp?: number;
+  otpExpiry?: number;
+
 }
 
 export interface UserDetails {
@@ -44,7 +47,7 @@ export interface UserDetails {
   userId: number;
   username: string;
   password: string;
-  
+
   role: "user" | "admin" | "delivery";
   isOnline?: boolean;
   isBusy?: boolean;
@@ -53,9 +56,9 @@ export interface UserDetails {
   email?: string;
 
   currentLocation?: {
-  lat: number;
-  lng: number;
-};
+    lat: number;
+    lng: number;
+  };
 
 }
 export interface Address {
@@ -64,7 +67,7 @@ export interface Address {
   addressLine: string;
   city: string;
   pincode: string;
-    lat?: number;   // 🔥 ADD
+  lat?: number;   // 🔥 ADD
   lng?: number;
 }
 

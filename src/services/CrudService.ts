@@ -35,13 +35,13 @@ interface ICrudService {
 export function CrudService(): ICrudService {
   const axiosService = useAxios(
     axios.create({
-      baseURL: "http://192.168.0.222:3001",
+      baseURL: "http://localhost:3001",
       headers: { "Content-Type": "application/json" }
     })
   );
 
   const uploadAxios = axios.create({
-    baseURL: "http://192.168.0.222:3001", // 👈 Node server
+    baseURL: "http://localhost:3001", // 👈 Node server
   });
 
   // getting user details

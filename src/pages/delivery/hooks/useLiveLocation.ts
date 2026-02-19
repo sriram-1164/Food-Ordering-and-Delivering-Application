@@ -41,7 +41,7 @@ console.log("📡 GPS Fired:", lat, lng);
         );
 
         // Only update if moved > 10 meters
-        if (distance > 0.01) {
+        if (distance > 0.1) {
           lastLocation.current = { lat, lng };
 
           await crud.updateUser(user.id, {
@@ -49,6 +49,8 @@ console.log("📡 GPS Fired:", lat, lng);
           });
 
           console.log("✅ Location Updated:", lat, lng);
+          console.log("Distance (m):", (distance * 1000).toFixed(2));
+
         }
       },
       (error) => console.log("Location Error:", error),

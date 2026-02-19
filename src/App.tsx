@@ -13,6 +13,7 @@ import DeliveryHistory from "./pages/delivery/DeliveryHistory";
 import AddDelivery from "./pages/admin/AddDelivery";
 import TrackOrder from "./pages/delivery/TrackOrder";
 import DeliveryLayout from "./pages/delivery/DeliveryLayout";
+import DeliveryMonitoring from "./pages/admin/DeliveryMonitoring";
 
 export default function App() {
   return (
@@ -28,6 +29,7 @@ export default function App() {
         <Route path="/adminfeedback" element={<AdminFeedbackPage />} />
         <Route path="/admin/reports" element={<AdminSalesReport />} />
         <Route path="/adminadddelivery" element={<AddDelivery />} />
+        <Route path="/deliverydashboard" element={<DeliveryMonitoring />} />
         
         <Route path="/delivery" element={<DeliveryLayout />}>
           <Route index element={<DeliveryDashboard />} />

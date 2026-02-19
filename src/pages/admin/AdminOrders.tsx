@@ -38,6 +38,7 @@ export default function AdminOrders() {
     Delivered: true,
     Cancelled: true,
     OutforDelivery: true,
+    Reached:true
   });
 
 
@@ -165,6 +166,17 @@ export default function AdminOrders() {
           >
             Add Delivery Person
           </Button>
+              <Button
+            variant="contained"
+            onClick={() => navigate("/deliverydashboard")}
+            sx={{
+              px: 4,
+              borderRadius: 3,
+              background: "linear-gradient(135deg, #273ab7, #1aa1db)",
+            }}
+          >
+            Delivery Person Details
+          </Button>
 
         </Box>
         <Typography
@@ -194,7 +206,7 @@ export default function AdminOrders() {
           </Typography>
 
           <FormGroup row>
-            {["Preparing", "Delivered", "Cancelled" , "OutforDelivery"].map((status) => (
+            {["Preparing", "Delivered", "Cancelled" , "OutforDelivery" ,"Reached"].map((status) => (
               <FormControlLabel
                 key={status}
                 control={
