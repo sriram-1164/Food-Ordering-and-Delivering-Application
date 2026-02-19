@@ -90,10 +90,8 @@ export default function AdminOrders() {
       });
 
     } else {
-
       // Normal status update
       await crud.updateOrder(id, { status });
-
     }
 
     setOpen(false);

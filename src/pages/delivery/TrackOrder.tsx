@@ -16,6 +16,10 @@ import BackButton from "../../components/common/BackButton";
 import L from "leaflet";
 import bikeIconImg from "../../assests/bike.png";
 import homeIconImg from "../../assests/home.png";
+import { useMap } from "react-leaflet";
+import "leaflet-rotatedmarker";
+import { useRef } from "react";
+import { Marker as LeafletMarker } from "leaflet";
 
 // 🚴 Delivery Bike Icon
 const deliveryIcon = new L.Icon({
@@ -24,7 +28,6 @@ const deliveryIcon = new L.Icon({
   iconAnchor: [22, 45],
 });
 
-
 // 🏠 Home Icon
 const homeIcon = new L.Icon({
   iconUrl: homeIconImg,
@@ -32,6 +35,19 @@ const homeIcon = new L.Icon({
   iconAnchor: [17, 35],
 });
 
+function calculateBearing(lat1: number, lon1: number, lat2: number, lon2: number) {
+  const toRad = (deg: number) => (deg * Math.PI) / 180;
+  const toDeg = (rad: number) => (rad * 180) / Math.PI;
+  const dLon = toRad(lon2 - lon1);
+  const y = Math.sin(dLon) * Math.cos(toRad(lat2));
+  const x =
+    Math.cos(toRad(lat1)) * Math.sin(toRad(lat2)) -
+    Math.sin(toRad(lat1)) *
+    Math.cos(toRad(lat2)) *
+    Math.cos(dLon);
+  const bearing = toDeg(Math.atan2(y, x));
+  return (bearing + 360) % 360;
+}
 
 const crud = CrudService();
 const API_KEY = "eyJvcmciOiI1YjNjZTM1OTc4NTExMTAwMDFjZjYyNDgiLCJpZCI6ImJmY2I5NmIyZjYyZDRmNGFhZGY3NDgzOGMyNzQxMjU5IiwiaCI6Im11cm11cjY0In0=";// 🔥 Add your key
@@ -48,23 +64,23 @@ export default function TrackOrder() {
   const [eta, setEta] = useState("");
   const [animatedPosition, setAnimatedPosition] = useState<any>(null);
 
-
+  const [bearing, setBearing] = useState(0);   // ✅ STEP 4
+  const markerRef = useRef<LeafletMarker | null>(null);
   // 🔥 Fetch order & locations
   useEffect(() => {
     const interval = setInterval(async () => {
       const orders = await crud.getOrders();
       const order = orders.find((o: OrderDetails) => o.id === id);
       if (!order) return;
-
       // Delivery Location
       const users = await crud.getUsers();
       const delivery = users.find(
         (u: UserDetails) => u.id === order.deliveryPartnerId
       );
       if (delivery?.currentLocation) {
+        console.log("📍 DB Delivery Location:", delivery.currentLocation);
         setDeliveryLocation(delivery.currentLocation);
       }
-
       // Customer Location (for demo we use address saved lat/lng later)
       if (!customerLocation && order.address?.lat) {
         setCustomerLocation({
@@ -73,7 +89,6 @@ export default function TrackOrder() {
         });
       }
     }, 3000);
-
     return () => clearInterval(interval);
   }, [id]);
 
@@ -133,6 +148,17 @@ export default function TrackOrder() {
       setAnimatedPosition(deliveryLocation);
       return;
     }
+    // ✅ STEP 5 — Calculate heading
+    const newBearing = calculateBearing(
+      animatedPosition.lat,
+      animatedPosition.lng,
+      deliveryLocation.lat,
+      deliveryLocation.lng
+    );
+
+    console.log("🧭 Heading:", newBearing);
+
+    setBearing(newBearing);
 
     const steps = 30;
     const latStep =
@@ -145,10 +171,25 @@ export default function TrackOrder() {
     const interval = setInterval(() => {
       current++;
 
-      setAnimatedPosition((prev: any) => ({
-        lat: prev.lat + latStep,
-        lng: prev.lng + lngStep,
-      }));
+      setAnimatedPosition((prev: any) => {
+        const newPos = {
+          lat: prev.lat + latStep,
+          lng: prev.lng + lngStep,
+        };
+
+        const newBearing = calculateBearing(
+          prev.lat,
+          prev.lng,
+          newPos.lat,
+          newPos.lng
+        );
+
+        setBearing(newBearing);
+
+        console.log("🧭 Heading:", newBearing);
+
+        return newPos;
+      });
 
       if (current >= steps) {
         clearInterval(interval);
@@ -156,9 +197,14 @@ export default function TrackOrder() {
     }, 50);
 
     return () => clearInterval(interval);
-  }, [deliveryLocation]);
+  }, [deliveryLocation, animatedPosition]);
 
-
+  // 🔥 4️⃣ PLACE ROTATION EFFECT HERE
+  useEffect(() => {
+    if (markerRef.current) {
+      (markerRef.current as any).setRotationAngle(bearing);
+    }
+  }, [bearing]);
 
   const openGoogleMaps = () => {
     if (!deliveryLocation || !customerLocation) return;
@@ -166,14 +212,32 @@ export default function TrackOrder() {
     const origin = `${deliveryLocation.lat},${deliveryLocation.lng}`;
     const destination = `${customerLocation.lat},${customerLocation.lng}`;
 
-    const url = `https://www.google.com/maps/dir/?api=1&origin=${origin}&destination=${destination}&travelmode=driving`;
+    const mode =
+      loggedUser.role === "delivery"
+        ? "bicycling"
+        : "driving";
+
+    const url = `https://www.google.com/maps/dir/?api=1&origin=${origin}&destination=${destination}&travelmode=${mode}`;
 
     window.open(url, "_blank");
   };
-  ;
+
 
   const isUser = loggedUser.role === "user";
   const isDelivery = loggedUser.role === "delivery";
+
+  function AutoCenter({ position }: { position: any }) {
+    const map = useMap();
+
+    useEffect(() => {
+      if (position) {
+        map.setView([position.lat, position.lng], map.getZoom());
+      }
+    }, [position]);
+
+    return null;
+  }
+
 
   return (
     <Box
@@ -242,6 +306,7 @@ export default function TrackOrder() {
               zoom={14}
               style={{ height: "90%", width: "100%" }}
             >
+              <AutoCenter position={deliveryLocation} />
               <TileLayer
                 attribution="&copy; OpenStreetMap"
                 url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
@@ -249,10 +314,12 @@ export default function TrackOrder() {
 
               {animatedPosition && (
                 <Marker
+                  ref={markerRef}
                   position={[
                     animatedPosition.lat,
                     animatedPosition.lng,
-                  ]}    icon={deliveryIcon}
+                  ]}
+                  icon={deliveryIcon}
                 >
                   <Popup>🚚 Delivery</Popup>
                 </Marker>
@@ -263,7 +330,8 @@ export default function TrackOrder() {
                 position={[
                   customerLocation.lat,
                   customerLocation.lng,
-                ]}  icon={homeIcon}
+                ]} icon={homeIcon}
+
               >
                 <Popup>🏠 Customer</Popup>
               </Marker>

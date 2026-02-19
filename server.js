@@ -220,5 +220,5 @@ app.post("/feedbacks", upload.single("image"), (req, res) => {
 // ================= START SERVER =================
 
 app.listen(PORT, () => {
-  console.log(`✅ Express server running at http://localhost:${PORT}`);
+  console.log(`✅ Express server running at http://192.168.0.222:${PORT}`);
 });

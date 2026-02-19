@@ -17,14 +17,12 @@ import { useNavigate } from "react-router-dom";
 
 const crud = CrudService();
 
-
-
 const DeliveryOrders = () => {
   const [orders, setOrders] = useState<OrderDetails[]>([]);
   const loggedUser: UserDetails = JSON.parse(
     localStorage.getItem("user") || "{}"
   );
-const navigate = useNavigate();
+  const navigate = useNavigate();
   useEffect(() => {
     loadOrders();
     const interval = setInterval(loadOrders, 5000); // auto refresh
@@ -181,7 +179,8 @@ const navigate = useNavigate();
                       </Button>
                       <Button
                         variant="outlined"
-                        onClick={() => navigate(`/track/${order.id}`)}
+                        onClick={() => navigate(`/delivery/track/${order.id}`)}
+
                       >
                         Open Tracker
                       </Button>

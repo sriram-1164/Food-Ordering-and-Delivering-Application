@@ -9,6 +9,11 @@ import {
   Switch,
   FormControlLabel,
   Paper,
+  DialogActions,
+  DialogContentText,
+  DialogTitle,
+  DialogContent,
+  Dialog,
 } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import { CrudService } from "../../services/CrudService";
@@ -18,18 +23,20 @@ const crud = CrudService();
 
 const DeliveryDashboard = () => {
   const navigate = useNavigate();
-
   const [orders, setOrders] = useState<OrderDetails[]>([]);
+  const [logoutOpen, setLogoutOpen] = useState(false);
 
   const loggedUser: UserDetails = JSON.parse(
     localStorage.getItem("user") || "{}"
   );
 
-  const [isOnline, setIsOnline] = useState(loggedUser.isOnline || false);
+  const [isOnline, setIsOnline] = useState(
+    loggedUser?.isOnline ?? false
+  );
 
   useEffect(() => {
     loadOrders();
-    const interval = setInterval(loadOrders, 5000); // auto refresh
+    const interval = setInterval(loadOrders, 5000);
     return () => clearInterval(interval);
   }, []);
 
@@ -49,28 +56,43 @@ const DeliveryDashboard = () => {
     (o) => o.status === "Delivered"
   ).length;
 
-
+  // 🔥 Save initial location once
   useEffect(() => {
-  if (!isOnline) return;
+    if (!loggedUser?.id) return;
 
-  const watchId = navigator.geolocation.watchPosition(
-    async (position) => {
-      const { latitude, longitude } = position.coords;
+    navigator.geolocation.getCurrentPosition(
+      async (position) => {
+        const lat = position.coords.latitude;
+        const lng = position.coords.longitude;
 
+        await crud.updateUser(loggedUser.id, {
+          currentLocation: { lat, lng },
+        });
+
+        console.log("📍 Initial Location Saved:", lat, lng);
+      },
+      (error) => console.log("Initial Location Error:", error),
+      { enableHighAccuracy: true }
+    );
+  }, []);
+
+  // 🔴 LOGOUT FUNCTION
+  const handleLogout = async () => {
+    try {
+      // Set user offline in DB
       await crud.updateUser(loggedUser.id, {
-        currentLocation: {
-          lat: latitude,
-          lng: longitude,
-        },
+        isOnline: false,
       });
-    },
-    (error) => console.log(error),
-    { enableHighAccuracy: true }
-  );
 
-  return () => navigator.geolocation.clearWatch(watchId);
-}, [isOnline]);
+      // Clear local storage
+      localStorage.removeItem("user");
 
+      // Redirect to login
+      navigate("/");
+    } catch (error) {
+      console.log("Logout error:", error);
+    }
+  };
 
   return (
     <Box
@@ -80,8 +102,29 @@ const DeliveryDashboard = () => {
         justifyContent: "center",
         alignItems: "center",
         background: "linear-gradient(135deg, #1e3c72, #2a5298)",
+         position: "relative",
       }}
     >
+      {/* 🔴 LOGOUT BUTTON TOP RIGHT */}
+      <Box
+        sx={{
+          position: "absolute",
+          top: 20,
+          right: 20,
+        }}
+      >
+        <Button
+          variant="contained"
+          color="error"
+          onClick={() => setLogoutOpen(true)}
+          sx={{
+            borderRadius: 3,
+            px: 3,
+          }}
+        >
+          Logout
+        </Button>
+      </Box>
       <Paper
         elevation={6}
         sx={{
@@ -93,7 +136,6 @@ const DeliveryDashboard = () => {
           background: "rgba(255,255,255,0.95)",
         }}
       >
-        {/* HEADER */}
         <Box textAlign="center" mb={4}>
           <Typography variant="h4" fontWeight="bold">
             Welcome, {loggedUser.username} 👋
@@ -103,7 +145,6 @@ const DeliveryDashboard = () => {
           </Typography>
         </Box>
 
-        {/* STAT CARDS */}
         <Stack direction="row" spacing={3} mb={4}>
           <Card
             sx={{
@@ -112,10 +153,9 @@ const DeliveryDashboard = () => {
               borderRadius: 3,
               background: "linear-gradient(135deg, #42a5f5, #478ed1)",
               color: "#fff",
-              transition: "0.3s",
               "&:hover": { transform: "scale(1.05)" },
             }}
-            onClick={() => navigate("/delivery/orders")}
+            // onClick={() => navigate("/delivery/orders")}
           >
             <CardContent sx={{ textAlign: "center" }}>
               <Typography>Total Assigned</Typography>
@@ -132,7 +172,6 @@ const DeliveryDashboard = () => {
               borderRadius: 3,
               background: "linear-gradient(135deg, #ffa726, #fb8c00)",
               color: "#fff",
-              transition: "0.3s",
               "&:hover": { transform: "scale(1.05)" },
             }}
             onClick={() => navigate("/delivery/orders")}
@@ -152,7 +191,6 @@ const DeliveryDashboard = () => {
               borderRadius: 3,
               background: "linear-gradient(135deg, #66bb6a, #43a047)",
               color: "#fff",
-              transition: "0.3s",
               "&:hover": { transform: "scale(1.05)" },
             }}
             onClick={() => navigate("/delivery/history")}
@@ -166,8 +204,7 @@ const DeliveryDashboard = () => {
           </Card>
         </Stack>
 
-        {/* ONLINE SWITCH */}
-        <Box textAlign="center" mb={4}>
+        <Box textAlign="center">
           <FormControlLabel
             control={
               <Switch
@@ -195,37 +232,36 @@ const DeliveryDashboard = () => {
             }
           />
         </Box>
-
-        {/* NAVIGATION BUTTONS */}
-        <Stack direction="row" spacing={3} justifyContent="center">
-          <Button
-            variant="contained"
-            size="large"
-            sx={{
-              borderRadius: 3,
-              px: 4,
-              background: "linear-gradient(135deg, #1e88e5, #1565c0)",
-            }}
-            onClick={() => navigate("/delivery/orders")}
-          >
-            View Assigned Orders
-          </Button>
-
-          <Button
-            variant="outlined"
-            size="large"
-            sx={{
-              borderRadius: 3,
-              px: 4,
-              borderColor: "#1e88e5",
-              color: "#1e88e5",
-            }}
-            onClick={() => navigate("/delivery/history")}
-          >
-            View Delivery History
-          </Button>
-        </Stack>
       </Paper>
+
+       {/* 🔥 LOGOUT CONFIRMATION DIALOG */}
+      <Dialog
+        open={logoutOpen}
+        onClose={() => setLogoutOpen(false)}
+      >
+        <DialogTitle>Confirm Logout</DialogTitle>
+        <DialogContent>
+          <DialogContentText>
+            Are you sure you want to logout? You will be marked as
+            offline.
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button
+            onClick={() => setLogoutOpen(false)}
+            color="primary"
+          >
+            Cancel
+          </Button>
+          <Button
+            onClick={handleLogout}
+            color="error"
+            variant="contained"
+          >
+            Logout
+          </Button>
+        </DialogActions>
+      </Dialog>
     </Box>
   );
 };
