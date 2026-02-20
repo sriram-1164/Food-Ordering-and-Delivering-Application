@@ -75,6 +75,7 @@ const DeliveryDashboard = () => {
         const lat = position.coords.latitude;
         const lng = position.coords.longitude;
         await crud.updateUser(loggedUser.id, { currentLocation: { lat, lng } });
+         console.log("📍 Initial Location Saved:", lat, lng);
       },
       (error) => console.log("Location Error:", error),
       { enableHighAccuracy: true }

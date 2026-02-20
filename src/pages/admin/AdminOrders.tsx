@@ -59,8 +59,45 @@ export default function AdminOrders() {
 
   useEffect(() => { loadOrders(); }, []);
 
-  const handleStatus = async (id: string, status: any) => {
-    // ... (Your existing handleStatus logic)
+
+  // UPDATE ORDER STATUS
+  const handleStatus = async (
+    id: string,
+    status: "Preparing" | "Delivered" | "OutforDelivery"
+  ) => {
+
+    // 🔥 If OutforDelivery → auto assign
+    if (status === "OutforDelivery") {
+
+      const users = await crud.getUsers();
+
+      const availableDelivery = users.find(
+        (u) =>
+          u.role === "delivery" &&
+          u.isOnline === true &&
+          u.isBusy === false
+      );
+
+      if (!availableDelivery) {
+        alert("No delivery partner available!");
+        return;
+      }
+
+      // 1️⃣ Update order
+      await crud.updateOrder(id, {
+        status: "OutforDelivery",
+        deliveryPartnerId: availableDelivery.id,
+      });
+
+      // 2️⃣ Mark delivery busy
+      await crud.updateUser(availableDelivery.id, {
+        isBusy: true,
+      });
+
+    } else {
+      // Normal status update
+      await crud.updateOrder(id, { status });
+    }
     setOpen(false);
     setSelected(null);
     setSnackbarOpen(true);
@@ -190,7 +227,7 @@ export default function AdminOrders() {
               <OrdersTable
                 orders={paginatedOrders}
                 admin
-                onStatusChange={(order) => { setSelected(order); setOpen(true); }}
+                onStatusChange={(order : OrderDetails) => { setSelected(order); setOpen(true); }}
               />
 
               <Box sx={{ p: 3, display: 'flex', justifyContent: 'center', bgcolor: '#fff' }}>

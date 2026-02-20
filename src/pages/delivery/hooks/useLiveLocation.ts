@@ -7,9 +7,10 @@ export const useLiveLocation = (user: any, isOnline: boolean) => {
   const lastLocation = useRef<any>(null);
 
   useEffect(() => {
-    if (!user?.id || !isOnline){
-    console.log("❌ Live tracking NOT started", user?.id, isOnline);
-     return; }
+    if (!user?.id || !isOnline) {
+      console.log("❌ Live tracking NOT started", user?.id, isOnline);
+      return;
+    }
 
     console.log("📍 Live tracking started");
 
@@ -29,8 +30,8 @@ export const useLiveLocation = (user: any, isOnline: boolean) => {
           return;
         }
 
-        
-console.log("📡 GPS Fired:", lat, lng);
+
+        console.log("📡 GPS Fired:", lat, lng);
 
         // Calculate distance
         const distance = getDistance(
@@ -78,9 +79,9 @@ function getDistance(lat1: number, lon1: number, lat2: number, lon2: number) {
   const a =
     Math.sin(dLat / 2) * Math.sin(dLat / 2) +
     Math.cos((lat1 * Math.PI) / 180) *
-      Math.cos((lat2 * Math.PI) / 180) *
-      Math.sin(dLon / 2) *
-      Math.sin(dLon / 2);
+    Math.cos((lat2 * Math.PI) / 180) *
+    Math.sin(dLon / 2) *
+    Math.sin(dLon / 2);
 
   const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
 

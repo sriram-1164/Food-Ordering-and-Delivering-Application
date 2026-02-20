@@ -54,7 +54,8 @@
       "currentLocation": {
         "lat": 12.893349730589797,
         "lng": 77.63578013114656
-      }
+      },
+      "isBusy": false
     },
     {
       "userId": 2,
@@ -76,7 +77,8 @@
       "currentLocation": {
         "lat": 12.893349730589797,
         "lng": 77.63578013114656
-      }
+      },
+      "isBusy": false
     },
     {
       "id": 1771305681280,
@@ -85,11 +87,11 @@
       "password": "1234",
       "phonenumber": "9360790976",
       "role": "delivery",
-      "isOnline": false,
-      "isBusy": false,
+      "isOnline": true,
+      "isBusy": true,
       "currentLocation": {
-        "lat": 12.893366661477572,
-        "lng": 77.63582457970234
+        "lat": 12.893174552105206,
+        "lng": 77.63586081398869
       }
     },
     {
@@ -102,8 +104,8 @@
       "isOnline": true,
       "isBusy": true,
       "currentLocation": {
-        "lat": 12.893359761527487,
-        "lng": 77.63575046313782
+        "lat": 12.893360451877388,
+        "lng": 77.63586261679811
       }
     },
     {
@@ -608,8 +610,33 @@
         "pincode": "606804"
       },
       "phonenumber": "7777777777",
-      "status": "Preparing",
+      "status": "Cancelled",
       "date": "2026-02-20T07:29:10.568Z"
+    },
+    {
+      "id": "1771582257462",
+      "userId": "1",
+      "username": "Ram",
+      "foodId": 1771240077813,
+      "foodname": "Pannir",
+      "price": 30,
+      "quantity": 1,
+      "totalPrice": 30,
+      "mealtype": "Dinner",
+      "foodtype": "Veg",
+      "address": {
+        "id": 1770704439040,
+        "label": "Home",
+        "addressLine": "Bengaluru",
+        "city": "Kudlu Gate",
+        "pincode": "606804"
+      },
+      "phonenumber": "9999999999",
+      "status": "Delivered",
+      "date": "2026-02-20T10:10:56.412Z",
+      "deliveryPartnerId": 1771305681280,
+      "deliveryOtp": 4659,
+      "otpExpiry": 1771582797607
     }
   ],
   "feedbacks": []

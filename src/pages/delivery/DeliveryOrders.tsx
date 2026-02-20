@@ -150,6 +150,7 @@ const DeliveryOrders = () => {
 
                 <CardContent sx={{ flex: 1, p: 3 }}>
                   <Box display="flex" justifyContent="space-between" alignItems="center" mb={2}>
+                    <Typography variant="h5" fontWeight="900" color="#1a1a2e">{order.username}</Typography>
                     <Typography variant="h5" fontWeight="900" color="#1a1a2e">{order.foodname}</Typography>
                     <Chip 
                         label={order.status} 
