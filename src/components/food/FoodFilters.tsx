@@ -1,12 +1,5 @@
-import {
-  Box,
-  TextField,
-  RadioGroup,
-  FormControlLabel,
-  Radio,
-  Autocomplete,
-  Typography,
-} from "@mui/material";
+import { Box, TextField, Chip, Typography, Stack, Autocomplete, InputAdornment, Paper } from "@mui/material";
+import SearchIcon from '@mui/icons-material/Search';
 import { useEffect, useState } from "react";
 const meals = ["Breakfast", "Lunch", "Dinner", "Snacks"];
 export default function FoodFilters({ foods = [], onFilter }: any) {
@@ -35,67 +28,43 @@ export default function FoodFilters({ foods = [], onFilter }: any) {
     onFilter(filtered);
   }, [search, type, meal, safeFoods, onFilter]);
 
-  return (
-    <Box
-      mb={2}
-      p={2}
-      sx={{
-        backgroundColor: "#ffffff",
-        borderRadius: 2,
-        boxShadow: 1,
-      }}
-    >
-      <Typography
-        variant="subtitle1"
-        fontWeight="bold"
-        mb={2}
-        sx={{ color: "#ff5722" }}
-      >
-        Filter Food Items
-      </Typography>
-      <Box
-        display="flex"
-        gap={2}
-        flexWrap="wrap"
-        alignItems="center"
-      >
+ return (
+    <Paper elevation={0} sx={{ p: 3, mb: 4, borderRadius: 5, border: '1px solid #e2e8f0', bgcolor: '#fff' }}>
+      <Stack direction={{ xs: 'column', md: 'row' }} spacing={3} alignItems="center">
         <TextField
-          label="Search Here"
-          value={search}   
+          placeholder="Search for dishes..."
+          fullWidth
+          value={search}
           onChange={(e) => setSearch(e.target.value)}
-          sx={{ minWidth: 220 }}
+          InputProps={{
+            startAdornment: (<InputAdornment position="start"><SearchIcon color="disabled" /></InputAdornment>),
+            sx: { borderRadius: 4, bgcolor: '#f8fafc' }
+          }}
         />
-        <Box>
-          <Typography variant="caption" fontWeight="bold">
-            Food Type
-          </Typography>
-          <RadioGroup
-            row
-            value={type}
-            onChange={(e) => setType(e.target.value)}
-          >
-            <FormControlLabel
-              value="Veg"
-              control={<Radio />}
-              label="Veg"
-            />
-            <FormControlLabel
-              value="Non-Veg"
-              control={<Radio />}
-              label="Non-Veg"
-            />
-          </RadioGroup>
-        </Box>
+        
+   <Stack direction="row" spacing={1}>
+  {["Veg", "Non-Veg"].map((t) => (
+    <Chip
+      key={t}
+      label={t}
+      clickable
+      onClick={() => setType(type === t ? "" : t)}
+      color={type === t ? "primary" : "default"}
+      // CHANGE "contained" TO "filled" HERE:
+      variant={type === t ? "filled" : "outlined"} 
+      sx={{ fontWeight: 700, px: 2 }}
+    />
+  ))}
+</Stack>
+
         <Autocomplete
           options={meals}
           value={meal}
           onChange={(_, value) => setMeal(value)}
           sx={{ minWidth: 200 }}
-          renderInput={(params) => (
-            <TextField {...params} label="Meal Type" />
-          )}
+          renderInput={(params) => <TextField {...params} label="Meal Type" variant="outlined" sx={{ '& fieldset': { borderRadius: 4 } }} />}
         />
-      </Box>
-    </Box>
+      </Stack>
+    </Paper>
   );
 }

@@ -11,13 +11,15 @@ import {
   Divider,
   Stack,
   Paper,
+  Fade,
 } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
+import FiberManualRecordIcon from '@mui/icons-material/FiberManualRecord';
+import DeliveryDiningIcon from '@mui/icons-material/DeliveryDining';
 import { CrudService } from "../../services/CrudService";
 import { UserDetails, OrderDetails } from "../../services/Model";
-import Grid from "@mui/material/Grid";
+import Grid from "@mui/material/Grid"; 
 import BackButton from "../../components/common/BackButton";
-
 
 const crud = CrudService();
 
@@ -25,6 +27,7 @@ const DeliveryMonitoring = () => {
   const [users, setUsers] = useState<UserDetails[]>([]);
   const [orders, setOrders] = useState<OrderDetails[]>([]);
   const [selectedUser, setSelectedUser] = useState<UserDetails | null>(null);
+  const [orderDrawerOpen, setOrderDrawerOpen] = useState(false);
 
   useEffect(() => {
     loadData();
@@ -35,265 +38,221 @@ const DeliveryMonitoring = () => {
   const loadData = async () => {
     const u = await crud.getUsers();
     const o = await crud.getOrders();
-
     setUsers(u.filter((user) => user.role === "delivery"));
     setOrders(o);
   };
 
+  // Logics (Untouched)
   const onlineCount = users.filter((u) => u.isOnline).length;
   const busyCount = users.filter((u) => u.isBusy).length;
-
-  const getDeliveredCount = (userId: number) =>
-    orders.filter(
-      (o) =>
-        o.deliveryPartnerId === userId &&
-        o.status === "Delivered"
-    ).length;
-
-  const getActiveOrders = (userId: number) =>
-    orders.filter(
-      (o) =>
-        o.deliveryPartnerId === userId &&
-        o.status !== "Delivered" &&
-        o.status !== "Cancelled"
-    );
+  const getDeliveredCount = (userId: number) => orders.filter((o) => o.deliveryPartnerId === userId && o.status === "Delivered").length;
+  const getActiveOrders = (userId: number) => orders.filter((o) => o.deliveryPartnerId === userId && o.status !== "Delivered" && o.status !== "Cancelled");
+  const today = new Date().toDateString();
+  const todayOrders = orders.filter((o) => new Date(o.date).toDateString() === today);
+  const preparingCount = todayOrders.filter((o) => o.status === "Preparing").length;
+  const outForDeliveryCount = todayOrders.filter((o) => o.status === "OutforDelivery").length;
+  const reachedCount = todayOrders.filter((o) => o.status === "Reached").length;
+  const deliveredCount = todayOrders.filter((o) => o.status === "Delivered").length;
+  const activeCount = preparingCount + outForDeliveryCount + reachedCount;
 
   return (
-    <Box
-      sx={{
-        minHeight: "100vh",
-        p: 4,
-        background: "linear-gradient(135deg, #0f2027, #203a43, #2c5364)",
-        position: "relative",
-      }}
-    >
-          <Box
-        sx={{
-          position: "absolute",
-          top: 20,
-          left: 20,
-        }}
-      >
+    <Box sx={{ 
+      minHeight: "100vh", 
+      p: { xs: 2, md: 5 }, 
+      background: "#f0f2f5", // Soft neutral background for high contrast
+      color: "#1e293b"
+    }}>
+      
+      {/* TOP NAVIGATION BAR */}
+      <Box display="flex" justifyContent="space-between" alignItems="center" mb={4}>
         <BackButton to="/adminorders" />
+        <Box textAlign="center">
+            <Typography variant="h4" sx={{ fontWeight: 800, color: "#0f172a", mb: 0.5 }}>
+                Delivery Console
+            </Typography>
+            <Typography variant="body2" sx={{ color: "#64748b", fontWeight: 500 }}>
+                Real-time fleet monitoring and order tracking
+            </Typography>
+        </Box>
+        <Chip 
+            label="Daily Statistics" 
+            onClick={() => setOrderDrawerOpen(true)}
+            sx={{ 
+                bgcolor: "#0f172a", 
+                color: "#fff", 
+                fontWeight: "bold", 
+                px: 2, py: 2.5,
+                borderRadius: "10px",
+                '&:hover': { bgcolor: "#334155" } 
+            }} 
+        />
       </Box>
-      <Typography
-        variant="h4"
-        fontWeight="bold"
-        textAlign="center"
-        mb={4}
-        color="#fff"
-      >
-        🚚 Delivery Monitoring Dashboard
-      </Typography>
 
-      {/* SUMMARY CARDS */}
+      {/* STATS OVERVIEW SECTION */}
       <Grid container spacing={3} mb={5}>
-        <Grid  size={{ xs: 12, md: 4 }}>
-          <Card sx={{ borderRadius: 3 }}>
-            <CardContent>
-              <Typography variant="h6" fontWeight="bold" textAlign="center">Online Partners</Typography>
-              <Typography variant="h3" color="success.main" fontWeight="bold" textAlign="center">
-                {onlineCount}
-              </Typography>
-            </CardContent>
-          </Card>
-        </Grid>
-
-        <Grid  size={{ xs: 12, md: 4 }}>
-          <Card sx={{ borderRadius: 3 }}>
-            <CardContent>
-              <Typography variant="h6" fontWeight="bold" textAlign="center">Busy Partners</Typography>
-              <Typography variant="h3" color="warning.main" fontWeight="bold" textAlign="center">
-                {busyCount}
-              </Typography>
-            </CardContent>
-          </Card>
-        </Grid>
-
-        <Grid  size={{ xs: 12, md: 4 }}>
-          <Card sx={{ borderRadius: 3 }}>
-            <CardContent>
-              <Typography variant="h6" fontWeight="bold" textAlign="center">Total Delivery Partners</Typography>
-              <Typography variant="h3" color="primary.main" fontWeight="bold" textAlign="center">
-                {users.length}
-              </Typography>
-            </CardContent>
-          </Card>
-        </Grid>
+        {[
+          { label: "Online Partners", val: onlineCount, color: "#10b981", bg: "#ecfdf5" },
+          { label: "Currently Busy", val: busyCount, color: "#f59e0b", bg: "#fffbeb" },
+          { label: "Total Fleet", val: users.length, color: "#3b82f6", bg: "#eff6ff" }
+        ].map((stat, i) => (
+          <Grid size={{ xs: 12, md: 4 }} key={i}>
+            <Paper elevation={0} sx={{ 
+                p: 3, 
+                borderRadius: "16px", 
+                textAlign: 'center', 
+                border: `1px solid ${stat.color}20`,
+                bgcolor: stat.bg
+            }}>
+              <Typography variant="subtitle2" sx={{ color: "#64748b", fontWeight: 700, textTransform: 'uppercase' }}>{stat.label}</Typography>
+              <Typography variant="h3" sx={{ color: stat.color, fontWeight: 900, mt: 1 }}>{stat.val}</Typography>
+            </Paper>
+          </Grid>
+        ))}
       </Grid>
 
-      {/* DELIVERY CARDS */}
-      <Grid container spacing={3}>
-        {users.map((user) => {
-          const delivered = getDeliveredCount(user.id);
-          const activeOrders = getActiveOrders(user.id);
+      {/* LIVE PARTNER CARDS */}
+      <Typography variant="h6" sx={{ color: "#1e293b", fontWeight: 700, mb: 3, display: 'flex', alignItems: 'center', gap: 1.5 }}>
+        <DeliveryDiningIcon color="primary" /> Fleet Operations
+      </Typography>
 
-          return (
-            <Grid  size={{ xs: 12, md: 4 }} key={user.id}>
-              <Card
-                sx={{
-                  borderRadius: 4,
-                  transition: "0.3s",
-                  cursor: "pointer",
-                  "&:hover": { transform: "scale(1.03)" },
-                }}
+      <Grid container spacing={3}>
+        {users.map((user) => (
+          <Grid size={{ xs: 12, sm: 6, md: 4 }} key={user.id}>
+            <Fade in={true} timeout={600}>
+              <Card 
                 onClick={() => setSelectedUser(user)}
+                sx={{ 
+                  borderRadius: "20px", 
+                  boxShadow: "0 4px 6px -1px rgb(0 0 0 / 0.1)",
+                  border: "1px solid #e2e8f0",
+                  cursor: "pointer",
+                  transition: "all 0.2s",
+                  "&:hover": { transform: "translateY(-5px)", boxShadow: "0 10px 15px -3px rgb(0 0 0 / 0.1)" }
+                }}
               >
-                <CardContent>
+                <CardContent sx={{ p: 3 }}>
                   <Stack direction="row" spacing={2} alignItems="center">
-                    <Avatar>
+                    <Avatar sx={{ 
+                        width: 52, height: 52, 
+                        bgcolor: "#f1f5f9", color: "#0f172a", 
+                        fontWeight: "bold", border: "2px solid #e2e8f0" 
+                    }}>
                       {user.username?.charAt(0).toUpperCase()}
                     </Avatar>
-                    <Box fontWeight="bold" textAlign="center">
-                      <Typography fontWeight="bold">
-                        {user.username}
-                      </Typography>
-                      <Stack direction="row" spacing={1} mt={1}>
-                        <Chip
-                          label={
-                            user.isOnline ? "Online" : "Offline"
-                          }
-                          color={
-                            user.isOnline ? "success" : "default"
-                          }
-                          size="small"
+                    <Box sx={{ flexGrow: 1 }}>
+                      <Typography variant="h6" sx={{ fontWeight: 700, color: "#0f172a" }}>{user.username}</Typography>
+                      <Stack direction="row" spacing={1} mt={0.5}>
+                        <Chip 
+                            size="small" 
+                            icon={<FiberManualRecordIcon sx={{ fontSize: '10px !important' }} />}
+                            label={user.isOnline ? "Online" : "Offline"} 
+                            sx={{ bgcolor: user.isOnline ? "#d1fae5" : "#f1f5f9", color: user.isOnline ? "#065f46" : "#64748b", fontWeight: 700 }} 
                         />
-                        <Chip
-                          label={
-                            user.isBusy ? "Busy" : "Free"
-                          }
-                          color={
-                            user.isBusy ? "warning" : "info"
-                          }
-                          size="small"
+                        <Chip 
+                            size="small" 
+                            label={user.isBusy ? "Busy" : "Free"} 
+                            sx={{ bgcolor: user.isBusy ? "#ffedd5" : "#e0f2fe", color: user.isBusy ? "#9a3412" : "#075985", fontWeight: 700 }} 
                         />
                       </Stack>
                     </Box>
                   </Stack>
 
-                  <Divider sx={{ my: 2 }} />
-
-                  <Typography>
-                    📦 Active Orders: {activeOrders.length}
-                  </Typography>
-                  <Typography>
-                    ✅ Delivered: {delivered}
-                  </Typography>
+                  <Box sx={{ mt: 3, p: 2, bgcolor: "#f8fafc", borderRadius: "12px" }}>
+                    <Stack direction="row" justifyContent="space-between">
+                        <Box>
+                            <Typography variant="caption" color="textSecondary" fontWeight={600}>ACTIVE ORDERS</Typography>
+                            <Typography variant="h6" fontWeight={800}>{getActiveOrders(user.id).length}</Typography>
+                        </Box>
+                        <Divider orientation="vertical" flexItem />
+                        <Box textAlign="right">
+                            <Typography variant="caption" color="textSecondary" fontWeight={600}>TOTAL DELIVERED</Typography>
+                            <Typography variant="h6" fontWeight={800}>{getDeliveredCount(user.id)}</Typography>
+                        </Box>
+                    </Stack>
+                  </Box>
                 </CardContent>
               </Card>
-            </Grid>
-          );
-        })}
+            </Fade>
+          </Grid>
+        ))}
       </Grid>
 
-      {/* RIGHT SIDE DRAWER */}
-      <Drawer
-        anchor="right"
-        open={Boolean(selectedUser)}
-        onClose={() => setSelectedUser(null)}
-      
-      >
-        <Box sx={{background: "linear-gradient(135deg, #d3db64, #eceed0)",width:"full"}} >
-        {selectedUser && (
-          <Box sx={{ width: 400, p: 3, }}>
-            <Box display="flex" justifyContent="space-between">
-              <Typography variant="h6">
-                {selectedUser.username}
-              </Typography>
-              <IconButton
-                onClick={() => setSelectedUser(null)}
-              >
-                <CloseIcon />
-              </IconButton>
-            </Box>
+      {/* PARTNER DETAIL DRAWER */}
+      <Drawer anchor="right" open={Boolean(selectedUser)} onClose={() => setSelectedUser(null)}>
+        <Box sx={{ width: { xs: '100vw', sm: 400 }, p: 4, bgcolor: "#fff", height: '100%' }}>
+          {selectedUser && (
+            <>
+              <Box display="flex" justifyContent="space-between" alignItems="center" mb={4}>
+                <Typography variant="h5" fontWeight={800}>Partner Profile</Typography>
+                <IconButton onClick={() => setSelectedUser(null)}><CloseIcon /></IconButton>
+              </Box>
 
-            <Divider sx={{ my: 2 }} />
+              <Stack alignItems="center" spacing={1} mb={4}>
+                <Avatar sx={{ width: 80, height: 80, fontSize: "2rem", bgcolor: "#0f172a" }}>{selectedUser.username?.charAt(0)}</Avatar>
+                <Typography variant="h6" fontWeight={700}>{selectedUser.username}</Typography>
+              </Stack>
 
-            <Typography>
-              Status:{" "}
-              <Chip
-                label={
-                  selectedUser.isOnline
-                    ? "Online"
-                    : "Offline"
-                }
-                color={
-                  selectedUser.isOnline
-                    ? "success"
-                    : "default"
-                }
-                size="small"
-              />
-            </Typography>
-
-            <Typography mt={2}>
-              Busy:{" "}
-              <Chip
-                label={
-                  selectedUser.isBusy ? "Busy" : "Free"
-                }
-                color={
-                  selectedUser.isBusy
-                    ? "warning"
-                    : "info"
-                }
-                size="small"
-              />
-            </Typography>
-
-            <Divider sx={{ my: 3 }} />
-
-            <Typography fontWeight="bold" mb={1}>
-              Active Orders
-            </Typography>
-
-            {getActiveOrders(selectedUser.id).length === 0 ? (
-              <Typography>No active orders</Typography>
-            ) : (
-              getActiveOrders(selectedUser.id).map((o) => (
-                <Paper
-                  key={o.id}
-                  sx={{ p: 2, mb: 2, borderRadius: 2 }}
-                >
-                  <Typography>
-                    🍽 {o.foodname}
-                  </Typography>
-                  <Typography fontSize={13}>
-                    {o.username}
-                  </Typography>
-                  <Chip
-                    label={o.status}
-                    size="small"
-                    sx={{ mt: 1 }}
-                  />
+              <Typography variant="subtitle2" sx={{ color: "#64748b", mb: 2, fontWeight: 700, textTransform: 'uppercase' }}>Active Tasks</Typography>
+              {getActiveOrders(selectedUser.id).length === 0 ? (
+                <Paper sx={{ p: 3, textAlign: 'center', bgcolor: "#f8fafc", borderRadius: "12px", border: "1px dashed #cbd5e1" }}>
+                    <Typography color="textSecondary">No active orders assigned</Typography>
                 </Paper>
-              ))
-            )}
+              ) : (
+                getActiveOrders(selectedUser.id).map((o) => (
+                  <Paper key={o.id} elevation={0} sx={{ p: 2, mb: 2, borderRadius: "12px", border: "1px solid #e2e8f0", bgcolor: "#fff" }}>
+                    <Typography fontWeight={700} color="#0f172a">🍽 {o.foodname}</Typography>
+                    <Typography variant="body2" color="textSecondary" sx={{ mb: 1 }}>Client: {o.username}</Typography>
+                    <Chip label={o.status} size="small" color="primary" sx={{ fontWeight: 700 }} />
+                  </Paper>
+                ))
+              )}
 
-            <Divider sx={{ my: 3 }} />
+              {selectedUser.currentLocation && (
+                  <Box sx={{ mt: 4, p: 2, bgcolor: "#f1f5f9", borderRadius: "12px" }}>
+                      <Typography variant="caption" sx={{ fontWeight: 700, color: "#475569" }}>LAST KNOWN LOCATION</Typography>
+                      <Typography variant="body2" sx={{ mt: 1, fontFamily: 'monospace' }}>
+                          Lat: {selectedUser.currentLocation.lat} <br/>
+                          Lng: {selectedUser.currentLocation.lng}
+                      </Typography>
+                  </Box>
+              )}
+            </>
+          )}
+        </Box>
+      </Drawer>
 
-            <Typography>
-              Total Delivered:{" "}
-              {getDeliveredCount(selectedUser.id)}
-            </Typography>
-
-            {selectedUser.currentLocation && (
-              <Typography mt={2} fontSize={13}>
-                📍 Lat:{" "}
-                {selectedUser.currentLocation.lat}
-                <br />
-                📍 Lng:{" "}
-                {selectedUser.currentLocation.lng}
-              </Typography>
-            )}
-
+      {/* STATISTICS DRAWER */}
+      <Drawer anchor="right" open={orderDrawerOpen} onClose={() => setOrderDrawerOpen(false)}>
+        <Box sx={{ width: { xs: '100vw', sm: 380 }, p: 4 }}>
+          <Box display="flex" justifyContent="space-between" alignItems="center" mb={4}>
+            <Typography variant="h5" fontWeight={800}>Today's Metrics</Typography>
+            <IconButton onClick={() => setOrderDrawerOpen(false)}><CloseIcon /></IconButton>
           </Box>
           
-        )}
+          <Stack spacing={2.5}>
+            <StatRow label="Total Volume" value={todayOrders.length} color="#0f172a" isBold />
+            <Divider />
+            <StatRow label="Preparing" value={preparingCount} color="#9333ea" />
+            <StatRow label="Out for Delivery" value={outForDeliveryCount} color="#2563eb" />
+            <StatRow label="Reached Destination" value={reachedCount} color="#0891b2" />
+            <StatRow label="Delivered Successfully" value={deliveredCount} color="#16a34a" />
+            <Box sx={{ p: 2, bgcolor: "#fff7ed", borderRadius: "12px", mt: 2 }}>
+                <Typography variant="subtitle2" color="#9a3412" fontWeight={700}>TOTAL ACTIVE</Typography>
+                <Typography variant="h4" color="#c2410c" fontWeight={900}>{activeCount}</Typography>
+            </Box>
+          </Stack>
         </Box>
       </Drawer>
     </Box>
   );
 };
+
+// Helper component for cleaner stats
+const StatRow = ({ label, value, color, isBold = false }: any) => (
+    <Box display="flex" justifyContent="space-between" alignItems="center">
+        <Typography sx={{ color: "#64748b", fontWeight: 600 }}>{label}</Typography>
+        <Typography sx={{ color: color, fontWeight: isBold ? 900 : 700, fontSize: isBold ? '1.5rem' : '1.1rem' }}>{value}</Typography>
+    </Box>
+);
 
 export default DeliveryMonitoring;

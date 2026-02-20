@@ -1,4 +1,4 @@
-import { Box, Typography, Button, DialogActions, Dialog, DialogContent, DialogTitle, } from "@mui/material";
+import { Box, Typography, Button, DialogActions, Dialog, DialogContent, DialogTitle, Grid, Stack, Avatar } from "@mui/material";
 import { useEffect, useState } from "react";
 import FoodFilters from "../../components/food/FoodFilters";
 import FoodTable from "../../components/food/FoodTable";
@@ -8,34 +8,28 @@ import { useNavigate } from "react-router-dom";
 import Loader from "../../components/common/Loader";
 import CallIcon from "@mui/icons-material/Call";
 import CoPresentIcon from '@mui/icons-material/CoPresent';
-
+import LogoutIcon from '@mui/icons-material/Logout';
+import ShoppingBagIcon from '@mui/icons-material/ShoppingBag';
 
 export default function UserMenu() {
-
   const crud = CrudService();
+  const navigate = useNavigate();
 
   const [foods, setFoods] = useState<any[]>([]);
   const [filtered, setFiltered] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedFood, setSelectedFood] = useState<any>(null);
   const [open, setOpen] = useState(false);
-
   const [username, setUsername] = useState("Friend");
   const [logoutOpen, setLogoutOpen] = useState(false);
 
-  // for calling option
+  // calling option logic
   const phoneNumber = "+919600652526";
   const [openCallDialog, setOpenCallDialog] = useState(false);
-  const handleOpenCallDialog = () => {
-    setOpenCallDialog(true);
-  };
-  const handleCloseCallDialog = () => {
-    setOpenCallDialog(false);
-  };
-  const handleCallNow = () => {
-    window.location.href = `tel:${phoneNumber}`;
-  };
-
+  
+  const handleOpenCallDialog = () => setOpenCallDialog(true);
+  const handleCloseCallDialog = () => setOpenCallDialog(false);
+  const handleCallNow = () => { window.location.href = `tel:${phoneNumber}`; };
 
   useEffect(() => {
     const userStr = localStorage.getItem("user");
@@ -43,23 +37,16 @@ export default function UserMenu() {
       const user = JSON.parse(userStr);
       setUsername(user.username);
     }
-  }, []);
-
-
-  const navigate = useNavigate();
-  useEffect(() => {
     const role = localStorage.getItem("role");
     if (role !== "user") navigate("/");
   }, [navigate]);
 
   useEffect(() => {
     crud.getFoods().then((res) => {
-
       const normalizedFoods = res.map((f: any) => ({
         ...f,
         name: f.foodname,
       }));
-
       setFoods(normalizedFoods);
       setFiltered(normalizedFoods);
       setLoading(false);
@@ -74,152 +61,118 @@ export default function UserMenu() {
   if (loading) return <Loader />;
 
   return (
-    <><>
-      <Box
-        p={3}
-        sx={{
-          minHeight: "100vh",
-          background: "linear-gradient(135deg, #fff7ed, #ffe0d1)",
+    <Box
+      sx={{
+        minHeight: "100vh",
+        background: "linear-gradient(135deg, #fff7ed, #ffe0d1)",
+        pb: 6
+      }}
+    >
+      {/* NAVBAR / TOP ACTION BAR */}
+      <Box 
+        sx={{ 
+          position: 'sticky', top: 0, zIndex: 1000, 
+          bgcolor: 'rgba(255, 255, 255, 0.8)', 
+          backdropFilter: 'blur(10px)',
+          px: { xs: 2, md: 4 }, py: 1.5,
+          display: 'flex', justifyContent: 'space-between', alignItems: 'center',
+          boxShadow: '0 2px 10px rgba(0,0,0,0.05)'
         }}
       >
-        <Box display="flex" justifyContent="flex-end" mb={2}>
-          <Button
-            sx={{
-              px: 4,
-              borderRadius: 3,
-              background: "linear-gradient(135deg, #f04b4b, #95391f)",
-              ":hover": {
-                background: "linear-gradient(135deg, #e64a19, #fb8c00)",
-              },
-            }}
-            variant="contained" onClick={() => setLogoutOpen(true)}>
-            Logout
-          </Button>
-        </Box>
-        <Dialog
-          open={logoutOpen}
-          onClose={() => setLogoutOpen(false)}
-        >
-          <DialogTitle>Confirm Logout</DialogTitle>
+        <Typography variant="h6" fontWeight="900" sx={{ color: '#f67c0a' }}>
+          FOODIE<span style={{ color: '#333' }}>HUB</span>
+        </Typography>
 
-          <DialogContent>
-            <Typography>
-              Are you sure you want to logout?
-            </Typography>
-          </DialogContent>
-
-          <DialogActions>
-            <Button
-              onClick={() => setLogoutOpen(false)}
-              color="inherit"
-            >
-              Cancel
-            </Button>
-
-            <Button
-              onClick={handleLogout}
-              color="error"
-              variant="contained"
-            >
-              Logout
-            </Button>
-          </DialogActions>
-        </Dialog>
-
-        <Box display="flex" justifyContent="flex-end" gap={2} mb={2}>
-          <Button
-            variant="contained"
-            sx={{
-              px: 4,
-              borderRadius: 3,
-              background: "linear-gradient(135deg, #6dee31, #3c921f)",
-              ":hover": {
-                background: "linear-gradient(135deg, #e64a19, #fb8c00)",
-              },
-            }}
-            startIcon={<CallIcon />}
+        <Stack direction="row" spacing={1}>
+          <Button 
+            size="small"
+            startIcon={<CallIcon />} 
             onClick={handleOpenCallDialog}
+            sx={{ color: '#2e7d32', fontWeight: 'bold' }}
           >
             Support
           </Button>
-
-          <Dialog open={openCallDialog} onClose={handleCloseCallDialog}>
-            <DialogTitle>Call Support</DialogTitle>
-
-            <DialogContent>
-              <Typography>
-                If you are facing any issues, do you want to call support now?
-              </Typography>
-              <Typography mt={1} fontWeight="bold">
-                📞  +91 9600652526
-              </Typography>
-            </DialogContent>
-
-            <DialogActions>
-              <Button onClick={handleCloseCallDialog}>
-                Cancel
-              </Button>
-              <Button
-                onClick={handleCallNow}
-                variant="contained"
-                color="success"
-              >
-                Call Now
-              </Button>
-            </DialogActions>
-          </Dialog>
-
-          <Button
-            variant="contained"
-            sx={{
-              px: 4,
-              borderRadius: 3,
-              background: "linear-gradient(135deg, #6dee31, #3c921f)",
-              ":hover": {
-                background: "linear-gradient(135deg, #e64a19, #fb8c00)",
-              },
-            }}
-            startIcon={<CoPresentIcon />}
-            onClick={() => navigate("/profile")}>
+          <Button 
+            size="small"
+            startIcon={<CoPresentIcon />} 
+            onClick={() => navigate("/profile")}
+            sx={{ color: '#333', fontWeight: 'bold' }}
+          >
             Profile
           </Button>
-        </Box>
-        <Box
-          display="flex"
-          justifyContent="center"
-          textAlign="center"
-          flexDirection="column"
-        >
-          <Typography
-            variant="h2"
-            fontWeight="bold"
-            sx={{
-              background: "linear-gradient(135deg, #ff5722, #ff9800)",
-              WebkitBackgroundClip: "text",
-              WebkitTextFillColor: "transparent",
-            }}
+          <Button 
+            variant="outlined" 
+            color="error" 
+            size="small"
+            onClick={() => setLogoutOpen(true)}
+            sx={{ borderRadius: 2, fontWeight: 'bold' }}
           >
-            Place Your Order {username}
-            <span
-              style={{
-                marginLeft: "8px",
-                WebkitTextFillColor: "initial",
-                color: "red",
+            Logout
+          </Button>
+        </Stack>
+      </Box>
+
+      {/* HERO SECTION */}
+      <Box sx={{ px: { xs: 2, md: 6 }, pt: 4, pb: 2 }}>
+        <Grid container spacing={4} alignItems="center">
+          <Grid size={{ xs: 12, md: 7 }}>
+            <Typography
+              variant="h2"
+              fontWeight="900"
+              sx={{
+                fontSize: { xs: '2.5rem', md: '4rem' },
+                lineHeight: 1.1,
+                mb: 2,
+                background: "linear-gradient(135deg, #601600, #ff5722)",
+                WebkitBackgroundClip: "text",
+                WebkitTextFillColor: "transparent",
               }}
             >
-              ❤️
-            </span>
-          </Typography>
+              Hungry, {username}?
+            </Typography>
+            <Typography variant="h5" color="text.secondary" sx={{ mb: 3 }}>
+              Discover the best food & drinks in your area. ❤️
+            </Typography>
+            
+            <Button
+              variant="contained"
+              startIcon={<ShoppingBagIcon />}
+              onClick={() => navigate("/userorders")}
+              sx={{
+                px: 4, py: 1.5, borderRadius: 3, fontWeight: 'bold',
+                background: "linear-gradient(135deg, #ff5722, #ff9800)",
+                boxShadow: "0 8px 20px rgba(255, 87, 34, 0.3)",
+              }}
+            >
+              Track My Orders
+            </Button>
+          </Grid>
+          
+          <Grid size={{ xs: 12, md: 5 }} sx={{ display: { xs: 'none', md: 'block' } }}>
+             {/* Decorative Food Illustration Placeholder */}
+             <Box 
+              component="img"
+              src="https://cdn-icons-png.flaticon.com/512/3170/3170733.png"
+              sx={{ width: '100%', maxWidth: 350, filter: 'drop-shadow(0 20px 30px rgba(0,0,0,0.1))' }}
+             />
+          </Grid>
+        </Grid>
+      </Box>
+
+      {/* FILTER & MENU SECTION */}
+      <Box sx={{ px: { xs: 2, md: 6 }, mt: 4 }}>
+        <Box sx={{ mb: 3 }}>
+          <FoodFilters foods={foods} onFilter={setFiltered} />
         </Box>
 
-        <FoodFilters foods={foods} onFilter={setFiltered} />
-
         <Box
-          p={2}
           sx={{
             backgroundColor: "#ffffff",
-            borderRadius: 2,
-            boxShadow: 2,
+            borderRadius: 5,
+            p: 1,
+            boxShadow: "0 10px 40px rgba(0,0,0,0.05)",
+            border: "1px solid rgba(255,255,255,0.8)",
+            overflow: "hidden"
           }}
         >
           <FoodTable
@@ -228,35 +181,47 @@ export default function UserMenu() {
             onOrder={(food: any) => {
               setSelectedFood(food);
               setOpen(true);
-            }} />
+            }} 
+          />
         </Box>
-
-
-        <Box display="flex" justifyContent="center" mt={3}>
-          <Button
-            variant="contained"
-            size="large"
-            sx={{
-              px: 4,
-              borderRadius: 3,
-              background: "linear-gradient(135deg, #ff5722, #ff9800)",
-              ":hover": {
-                background: "linear-gradient(135deg, #e64a19, #fb8c00)",
-              },
-            }}
-            onClick={() => navigate("/userorders")}
-          >
-            View My Orders
-          </Button>
-        </Box>
-
-        <OrderDialog
-          open={open}
-          food={selectedFood}
-          onClose={() => setOpen(false)}
-          onSubmit={(data: any) => crud.addOrder(data).then(() => setOpen(false))} />
       </Box>
-    </>
-    </>
+
+      {/* --- DIALOGS (Redesigned) --- */}
+
+      {/* Logout Dialog */}
+      <Dialog open={logoutOpen} onClose={() => setLogoutOpen(false)} PaperProps={{ sx: { borderRadius: 4 } }}>
+        <DialogTitle sx={{ fontWeight: 'bold' }}>Confirm Logout</DialogTitle>
+        <DialogContent>
+          <Typography color="text.secondary">Are you sure you want to logout from your account?</Typography>
+        </DialogContent>
+        <DialogActions sx={{ p: 2 }}>
+          <Button onClick={() => setLogoutOpen(false)} color="inherit">Cancel</Button>
+          <Button onClick={handleLogout} color="error" variant="contained" sx={{ borderRadius: 2 }}>Logout</Button>
+        </DialogActions>
+      </Dialog>
+
+      {/* Call Dialog */}
+      <Dialog open={openCallDialog} onClose={handleCloseCallDialog} PaperProps={{ sx: { borderRadius: 4 } }}>
+        <DialogTitle sx={{ fontWeight: 'bold' }}>Need Help?</DialogTitle>
+        <DialogContent sx={{ textAlign: 'center', py: 3 }}>
+          <Avatar sx={{ bgcolor: '#4caf50', width: 60, height: 60, mx: 'auto', mb: 2 }}>
+            <CallIcon fontSize="large" />
+          </Avatar>
+          <Typography variant="h6" fontWeight="bold">{phoneNumber}</Typography>
+          <Typography variant="body2" color="text.secondary">Our support team is available 24/7</Typography>
+        </DialogContent>
+        <DialogActions sx={{ p: 2, justifyContent: 'center' }}>
+          <Button onClick={handleCloseCallDialog} color="inherit">Maybe Later</Button>
+          <Button onClick={handleCallNow} variant="contained" color="success" sx={{ borderRadius: 2, px: 4 }}>Call Now</Button>
+        </DialogActions>
+      </Dialog>
+
+      <OrderDialog
+        open={open}
+        food={selectedFood}
+        onClose={() => setOpen(false)}
+        onSubmit={(data: any) => crud.addOrder(data).then(() => setOpen(false))} 
+      />
+    </Box>
   );
 }

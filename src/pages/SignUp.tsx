@@ -8,14 +8,21 @@ import {
   Avatar,
   Box,
   Typography,
+  InputAdornment,
+  IconButton,
+  Fade,
 } from "@mui/material";
 import PersonAddIcon from "@mui/icons-material/PersonAdd";
-import { useState } from "react";
+import PhoneIphoneIcon from "@mui/icons-material/PhoneIphone";
+import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
+import AccountCircleOutlinedIcon from "@mui/icons-material/AccountCircleOutlined";
+import VerifiedUserIcon from "@mui/icons-material/VerifiedUser";
+import CloseIcon from "@mui/icons-material/Close";
+import { useState, useRef } from "react";
 import { CrudService } from "../services/CrudService";
 import { AddUserDetails } from "../services/Model";
 import React from "react";
-import { useRef } from "react";
-import {RecaptchaVerifier,signInWithPhoneNumber,} from "firebase/auth";
+import { RecaptchaVerifier, signInWithPhoneNumber } from "firebase/auth";
 import { auth } from "../firebase";
 
 const SignupDialog = () => {
@@ -35,12 +42,9 @@ const SignupDialog = () => {
   const [error, setError] = useState("");
   const recaptchaRef = useRef<RecaptchaVerifier | null>(null);
 
-  const isValidPhoneNumber = (phone: string) =>
-    /^[6-9]\d{9}$/.test(phone);
+  const isValidPhoneNumber = (phone: string) => /^[6-9]\d{9}$/.test(phone);
 
-  const handleOpen = () => {
-    setOpenDialog(true);
-  };
+  const handleOpen = () => setOpenDialog(true);
 
   const handleClose = () => {
     setOpenDialog(false);
@@ -65,13 +69,10 @@ const SignupDialog = () => {
 
     try {
       setError("");
-
       if (!recaptchaRef.current) {
-        recaptchaRef.current = new RecaptchaVerifier(
-          auth,
-          "recaptcha-container",
-          { size: "invisible" }
-        );
+        recaptchaRef.current = new RecaptchaVerifier(auth, "recaptcha-container", {
+          size: "invisible",
+        });
       }
 
       const result = await signInWithPhoneNumber(
@@ -81,44 +82,33 @@ const SignupDialog = () => {
       );
 
       setConfirmationResult(result);
-      alert("OTP sent successfully");
     } catch (error: any) {
-      console.error("OTP ERROR:", error);
       setError(error.message || "Failed to send OTP");
     }
   };
 
   const handleVerifyOtp = async () => {
     if (!confirmationResult) return;
-
     try {
       await confirmationResult.confirm(otp);
       setOtpVerified(true);
       setError("");
-      alert("OTP verified successfully");
     } catch {
-      setError("Invalid OTP");
+      setError("Invalid OTP code. Please try again.");
     }
   };
 
   const handleSignup = async () => {
-    if (!username.trim()) {
-      setError("Username is required");
+    if (!username.trim() || !password.trim()) {
+      setError("All fields are required");
       return;
     }
-
-    if (!password.trim()) {
-      setError("Password is required");
-      return;
-    }
-
     if (password.length <= 3) {
-      setError("Password must be more than 3 characters");
+      setError("Password is too short");
       return;
     }
-
     if (!otpVerified) {
-      setError("Please verify OTP before signup");
+      setError("Please verify your phone number first");
       return;
     }
 
@@ -127,35 +117,29 @@ const SignupDialog = () => {
 
     try {
       const users = await crud.getUsers();
-
-      const alreadyExists = users.some(
-        (u: any) => u.username === username
-      );
+      const alreadyExists = users.some((u: any) => u.username === username);
 
       if (alreadyExists) {
-        setError("Username already exists");
+        setError("This username is already taken");
         setLoading(false);
         return;
       }
 
       const timestamp = Date.now();
-
       const newUser: AddUserDetails = {
-        id: timestamp,         
-        userId: timestamp,      
+        id: timestamp,
+        userId: timestamp,
         username,
         password,
         role: "user",
         phonenumber,
-        profileImage: ""
+        profileImage: "",
       };
 
       await crud.addUser(newUser);
-
-      alert("Signup successful. Please login.");
       handleClose();
     } catch {
-      setError("Signup failed");
+      setError("Signup failed. Please try again later.");
     } finally {
       setLoading(false);
     }
@@ -163,14 +147,19 @@ const SignupDialog = () => {
 
   return (
     <>
-      <Button
-        variant="contained"
-        color="info"
-        sx={{ mt: 2 }}
+      <Typography
+        variant="body2"
+        sx={{
+          color: "#ff5722",
+          fontWeight: "bold",
+          cursor: "pointer",
+          textDecoration: "underline",
+          "&:hover": { color: "#e64a19" },
+        }}
         onClick={handleOpen}
       >
-        Sign Up
-      </Button>
+        Create an account
+      </Typography>
 
       <Dialog
         open={openDialog}
@@ -179,109 +168,180 @@ const SignupDialog = () => {
         maxWidth="xs"
         PaperProps={{
           sx: {
-            borderRadius: 3,
-            backgroundColor:  "#bfdfea",    
+            borderRadius: 6,
+            background: "rgba(255, 255, 255, 0.95)",
+            backdropFilter: "blur(10px)",
+            p: 1,
           },
         }}
       >
         <div id="recaptcha-container"></div>
 
-        <Box
-          display="flex"
-          flexDirection="column"
-          alignItems="center"
-          mt={2}
-        >
-          <Avatar sx={{ bgcolor: "info.main", mb: 1 }}>
-            <PersonAddIcon />
-          </Avatar>
-
-          <DialogTitle sx={{ pb: 0 }}>
-            <Typography variant="h6" fontWeight="bold">
-              Create Account
-            </Typography>
-          </DialogTitle>
+        {/* Header with Close Icon */}
+        <Box display="flex" justifyContent="flex-end" px={1} pt={1}>
+          <IconButton onClick={handleClose} size="small">
+            <CloseIcon />
+          </IconButton>
         </Box>
 
-        <DialogContent>
+        <Box display="flex" flexDirection="column" alignItems="center" px={3}>
+          <Avatar
+            sx={{
+              bgcolor: otpVerified ? "#4caf50" : "#ff5722",
+              width: 60,
+              height: 60,
+              mb: 2,
+              boxShadow: "0 8px 20px rgba(0,0,0,0.1)",
+            }}
+          >
+            {otpVerified ? (
+              <VerifiedUserIcon sx={{ fontSize: 35 }} />
+            ) : (
+              <PersonAddIcon sx={{ fontSize: 35 }} />
+            )}
+          </Avatar>
+
+          <Typography variant="h5" fontWeight="900" color="#333">
+            Join QuickCravings
+          </Typography>
+          <Typography variant="body2" color="text.secondary" textAlign="center" mb={2}>
+            Create an account to start ordering your favorite meals
+          </Typography>
+        </Box>
+
+        <DialogContent sx={{ px: 4 }}>
+          {error && (
+            <Fade in={!!error}>
+              <Typography
+                color="error"
+                variant="caption"
+                display="block"
+                textAlign="center"
+                sx={{ bgcolor: "#ffebee", p: 1, borderRadius: 2, mb: 2, fontWeight: "bold" }}
+              >
+                {error}
+              </Typography>
+            </Fade>
+          )}
+
           <TextField
-            label="Username"
+            label="Choose Username"
             fullWidth
-            margin="normal"
+            margin="dense"
+            variant="standard"
             value={username}
+            disabled={otpVerified}
             onChange={(e) => setUsername(e.target.value)}
+            InputProps={{
+              startAdornment: (
+                <InputAdornment position="start">
+                  <AccountCircleOutlinedIcon fontSize="small" />
+                </InputAdornment>
+              ),
+            }}
           />
 
           <TextField
-            label="Password"
+            label="Set Password"
             type="password"
             fullWidth
-            margin="normal"
+            margin="dense"
+            variant="standard"
             value={password}
+            disabled={otpVerified}
             onChange={(e) => setPassword(e.target.value)}
+            InputProps={{
+              startAdornment: (
+                <InputAdornment position="start">
+                  <LockOutlinedIcon fontSize="small" />
+                </InputAdornment>
+              ),
+            }}
           />
 
-          <TextField
-            label="Mobile Number"
-            fullWidth
-            margin="normal"
-            value={phonenumber}
-            onChange={(e) =>
-              setPhoneNumber(e.target.value.replace(/\D/g, ""))
-            }
-            inputProps={{ maxLength: 10 }}
-          />
+          <Box sx={{ mt: 3, p: 2, borderRadius: 4, bgcolor: "#f9f9f9", border: "1px solid #eee" }}>
+            <Typography variant="caption" fontWeight="bold" color="text.secondary">
+              VERIFICATION
+            </Typography>
+            <TextField
+              placeholder="Mobile Number"
+              fullWidth
+              margin="dense"
+              value={phonenumber}
+              disabled={otpVerified || !!confirmationResult}
+              onChange={(e) => setPhoneNumber(e.target.value.replace(/\D/g, ""))}
+              inputProps={{ maxLength: 10 }}
+              InputProps={{
+                startAdornment: (
+                  <InputAdornment position="start">
+                    <PhoneIphoneIcon fontSize="small" />
+                  </InputAdornment>
+                ),
+                sx: { borderRadius: 3, bgcolor: "#fff" },
+              }}
+            />
 
-          <Button
-            fullWidth
-            variant="outlined"
-            sx={{ mt: 1 }}
-            onClick={handleSendOtp}
-          >
-            Send OTP
-          </Button>
-
-          {confirmationResult && (
-            <>
-              <TextField
-                label="Enter OTP"
-                fullWidth
-                margin="normal"
-                value={otp}
-                onChange={(e) => setOtp(e.target.value)}
-                inputProps={{ maxLength: 6 }}
-              />
-
+            {!confirmationResult && !otpVerified && (
               <Button
                 fullWidth
                 variant="contained"
-                sx={{ mt: 1 }}
-                onClick={handleVerifyOtp}
+                sx={{ mt: 1, borderRadius: 3, bgcolor: "#333" }}
+                onClick={handleSendOtp}
               >
-                Verify OTP
+                Send OTP
               </Button>
-            </>
-          )}
+            )}
 
-          {error && (
-            <Typography color="error" mt={1}>
-              {error}
-            </Typography>
-          )}
+            {confirmationResult && !otpVerified && (
+              <Fade in={true}>
+                <Box mt={2}>
+                  <TextField
+                    label="Enter 6-digit OTP"
+                    fullWidth
+                    size="small"
+                    value={otp}
+                    onChange={(e) => setOtp(e.target.value)}
+                    inputProps={{ maxLength: 6 }}
+                    sx={{ mb: 1 }}
+                  />
+                  <Button
+                    fullWidth
+                    variant="contained"
+                    color="success"
+                    sx={{ borderRadius: 3 }}
+                    onClick={handleVerifyOtp}
+                  >
+                    Verify Code
+                  </Button>
+                </Box>
+              </Fade>
+            )}
+
+            {otpVerified && (
+              <Box display="flex" alignItems="center" justifyContent="center" gap={1} mt={1} color="success.main">
+                <VerifiedUserIcon fontSize="small" />
+                <Typography variant="body2" fontWeight="bold">Number Verified</Typography>
+              </Box>
+            )}
+          </Box>
         </DialogContent>
 
-        <DialogActions sx={{ px: 3, pb: 2 }}>
-          <Button onClick={handleClose} color="inherit">
-            Cancel
-          </Button>
-
+        <DialogActions sx={{ px: 4, pb: 4 }}>
           <Button
+            fullWidth
             variant="contained"
-            color="info"
             disabled={!otpVerified || loading}
             onClick={handleSignup}
+            sx={{
+              py: 1.5,
+              borderRadius: 4,
+              fontWeight: "bold",
+              bgcolor: "#ff5722",
+              boxShadow: "0 8px 20px rgba(255,87,34,0.3)",
+              "&:hover": { bgcolor: "#e64a19" },
+            }}
           >
-            Signup
+            {loading ? "Creating Account..." : "Complete Signup"}
           </Button>
         </DialogActions>
       </Dialog>

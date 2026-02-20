@@ -1,16 +1,10 @@
 import {
-  Table,
-  TableHead,
-  TableRow,
-  TableCell,
-  TableBody,
-  Button,
-  TableContainer,
-  Chip,
-  Box,
-  Paper,
-
+  Table, TableHead, TableRow, TableCell, TableBody,
+  Button, TableContainer, Chip, Box, Paper, Typography, IconButton
 } from "@mui/material";
+import EditIcon from '@mui/icons-material/Edit';
+import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
+import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
 import { useEffect, useState } from "react";
 import { FoodDetails } from "../../services/Model";
 
@@ -27,94 +21,60 @@ export default function FoodTable({
     setAllFoods(foods)
   }, [foods])
 
-  return (
-    <TableContainer
-      component={Paper}
-      sx={{
-        borderRadius: 2,
-        boxShadow: 1,
-      }}
-    >
+ return (
+    <TableContainer component={Paper} elevation={0} sx={{ borderRadius: 4, border: '1px solid #eef2f6', overflow: 'hidden' }}>
       <Table>
-
-        <TableHead>
-          <TableRow
-            sx={{
-              background: "linear-gradient(135deg, #ff5722, #ff9800)",
-            }}
-          >
-            <TableCell sx={{ color: "#fff", fontWeight: "bold" }}>
-              Food Name
-            </TableCell>
-            <TableCell sx={{ color: "#fff", fontWeight: "bold" }}>
-              Price
-            </TableCell>
-            <TableCell sx={{ color: "#fff", fontWeight: "bold" }}>
-              Type
-            </TableCell>
-            <TableCell sx={{ color: "#fff", fontWeight: "bold" }}>
-              Meal
-            </TableCell>
-            <TableCell sx={{ color: "#fff", fontWeight: "bold" }}>
-              Action
-            </TableCell>
+        <TableHead sx={{ bgcolor: '#f8fafc' }}>
+          <TableRow>
+            <TableCell sx={{ fontWeight: 800, color: '#64748b' }}>ITEM DETAILS</TableCell>
+            <TableCell sx={{ fontWeight: 800, color: '#64748b' }}>PRICE</TableCell>
+            <TableCell sx={{ fontWeight: 800, color: '#64748b' }}>CATEGORY</TableCell>
+            <TableCell sx={{ fontWeight: 800, color: '#64748b', textAlign: 'right' }}>ACTIONS</TableCell>
           </TableRow>
         </TableHead>
-
         <TableBody>
           {foods.map((food: any) => (
-            <TableRow
-              key={food.foodId}
-              sx={{
-                "&:hover": {
-                  backgroundColor: "#fff3e0",
-                },
-              }}
-            >
-              <TableCell>{food.foodname}</TableCell>
-              <TableCell>₹{food.price}</TableCell>
+            <TableRow key={food.foodId} hover sx={{ '&:last-child td, &:last-child th': { border: 0 } }}>
               <TableCell>
-                <Chip
-                  label={food.foodtype}
-                  size="small"
-                  color={
-                    food.foodtype === "Veg" ? "success" : "error"
-                  }
+                <Box>
+                  <Typography variant="body1" fontWeight={700} color="#1e293b">{food.foodname}</Typography>
+                  <Typography variant="caption" color="textSecondary">{food.mealtype}</Typography>
+                </Box>
+              </TableCell>
+              <TableCell>
+                <Typography fontWeight={800} color="#10b981">₹{food.price}</Typography>
+              </TableCell>
+              <TableCell>
+                <Chip 
+                  label={food.foodtype} 
+                  size="small" 
+                  sx={{ 
+                    fontWeight: 700,
+                    bgcolor: food.foodtype === "Veg" ? "#ecfdf5" : "#fef2f2",
+                    color: food.foodtype === "Veg" ? "#10b981" : "#ef4444",
+                    border: `1px solid ${food.foodtype === "Veg" ? "#10b981" : "#ef4444"}`
+                  }} 
                 />
               </TableCell>
-
-              <TableCell>{food.mealtype}</TableCell>
-
-              <TableCell>
+              <TableCell align="right">
                 {user && (
                   <Button
                     variant="contained"
-                    size="small"
-                    color="success"
+                    startIcon={<ShoppingCartIcon />}
                     onClick={() => onOrder(food)}
+                    sx={{ borderRadius: 2, textTransform: 'none', fontWeight: 700, bgcolor: '#FF5200', '&:hover': { bgcolor: '#e64a19' } }}
                   >
-                    Order
+                    Order Now
                   </Button>
                 )}
-
                 {admin && (
-                  <Box display="flex" gap={1}>
-                    <Button
-                      size="small"
-                      variant="contained"
-                      color="success"
-                      onClick={() => onEdit(food)}
-                    >
-                      Edit
-                    </Button>
-                    <Button
-                      size="small"
-                      variant="contained"
-                      color="error"
-                      onClick={() => onDelete(food.id)}
-                    >
-                      Delete
-                    </Button>
+                  <Box display="flex" justifyContent="flex-end" gap={1}>
+                    <IconButton size="small" onClick={() => onEdit(food)} sx={{ color: '#10b981', bgcolor: '#f0fdf4' }}>
+                      <EditIcon fontSize="small" />
+                    </IconButton>
+                    <IconButton size="small" onClick={() => onDelete(food.id)} sx={{ color: '#ef4444', bgcolor: '#fef2f2' }}>
+                      <DeleteOutlineIcon fontSize="small" />
+                    </IconButton>
                   </Box>
                 )}
               </TableCell>
@@ -124,5 +84,4 @@ export default function FoodTable({
       </Table>
     </TableContainer>
   );
-
 }

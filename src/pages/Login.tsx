@@ -6,12 +6,17 @@ import {
   Paper,
   Typography,
   Avatar,
+  InputAdornment,
+  Container,
 } from "@mui/material";
 import LockOutlineIcon from '@mui/icons-material/LockOutline';
+import PersonOutlineIcon from '@mui/icons-material/PersonOutline';
+import VpnKeyIcon from '@mui/icons-material/VpnKey';
 import { useNavigate } from "react-router-dom";
 import Loader from "../components/common/Loader";
 import { CrudService } from "../services/CrudService";
 import SignupDialog from "../pages/SignUp";
+
 export default function Login() {
   const crud = CrudService();
   const navigate = useNavigate();
@@ -20,10 +25,10 @@ export default function Login() {
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
-  console.log(username, password)
 
   const delay = (ms: number) =>
     new Promise(resolve => setTimeout(resolve, ms));
+
   const handleLogin = async () => {
     if (!username.trim() || !password.trim()) {
       setError("Username and Password are required");
@@ -45,15 +50,14 @@ export default function Login() {
       }
       localStorage.setItem("user", JSON.stringify(matchedUser));
       localStorage.setItem("role", matchedUser.role);
-      //  ROLE-BASED NAVIGATION
+      
       if (matchedUser.role === "admin") {
         navigate("/adminmenu");
       } else if (matchedUser.role === "delivery") {
         navigate("/delivery");
-      }
-      else {
+      } else {
         navigate("/usermenu");
-      } setLoading(true)
+      }
     } catch (err) {
       await delay(3000);
       setError("Login failed. Please try again.");
@@ -61,109 +65,189 @@ export default function Login() {
       setLoading(false);
     }
   };
+
   if (loading) return <Loader />;
+
   return (
     <React.Fragment>
-      <Box className="login">
+      {/* MAIN CONTAINER WITH BACKGROUND IMAGE */}
+      <Box
+        sx={{
+          minHeight: "100vh",
+          width: "100vw",
+          display: "flex",
+          position: "relative",
+          overflow: "hidden",
+          // The main background: A high-end dark food flat-lay
+          backgroundImage: `linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.8)), url('https://images.unsplash.com/photo-1504674900247-0877df9cc836?q=80&w=2070&auto=format&fit=crop')`,
+          backgroundSize: "cover",
+          backgroundPosition: "center",
+          alignItems: "center",
+          justifyContent: { xs: "center", md: "flex-end" },
+        }}
+      >
+        {/* DECORATIVE FLOATING FOOD ELEMENTS (Visible on Desktop) */}
         <Box
-          minHeight="100vh"
-          display="flex"
-          flexDirection={"column"}
-          justifyContent="right"
-          alignItems="end"
-          padding={5}
+          sx={{
+            display: { xs: "none", lg: "block" },
+            position: "absolute",
+            left: "5%",
+            top: "15%",
+            width: "40%",
+            zIndex: 1,
+          }}
         >
-          <Box
-            display={"flex"}
-            justifyContent={"center"}
-            textAlign={"center"}
-            flexDirection={"column"}
-          >
-            <Typography variant="h3" fontWeight="bold"
-              sx={{
-                background: "linear-gradient(135deg,  #ec9d26, #ff5722)",
-                WebkitBackgroundClip: "text",
-                WebkitTextFillColor: "transparent",
-              }}
-            >
-              அன்னபூரணா வலைத்தளத்திற்கு வரவேற்கிறோம்
-              <span
-                style={{
-                  marginLeft: "8px",
-                  WebkitTextFillColor: "initial", // remove gradient
-                  color: "red",                   // original heart color
-                }}
-              >
-                🙏🙂
-              </span>
-            </Typography>
-          </Box>
-          <Paper
-            elevation={10}
+          <Typography
+            variant="h1"
             sx={{
-              p: 4,
-              width: 360,
-              borderRadius: 3,
-              marginRight: "10rem"
+              fontWeight: 900,
+              color: "rgba(255,255,255,0.1)",
+              lineHeight: 0.8,
+              fontSize: "8rem",
+              mb: 2,
             }}
           >
+            QUICK<br />CRAVINGS
+          </Typography>
+          <Typography variant="h5" sx={{ color: "#fff", opacity: 0.8, maxWidth: 400 }}>
+            Experience the finest culinary delights delivered straight to your doorstep. 
+          </Typography>
+        </Box>
 
-            <Box display="flex" justifyContent="center" mb={2}>
-              <Avatar sx={{ bgcolor: "#ff5722", width: 56, height: 56 }}>
-                <LockOutlineIcon />
+        {/* LOGIN CARD SECTION */}
+        <Container maxWidth="sm" sx={{ zIndex: 2, mr: { md: "10%" } }}>
+          <Paper
+            elevation={0}
+            sx={{
+              p: { xs: 4, md: 6 },
+              borderRadius: 8,
+              // GLASSMORPHISM EFFECT
+              background: "rgba(255, 255, 255, 0.9)",
+              backdropFilter: "blur(20px)",
+              border: "1px solid rgba(255, 255, 255, 0.3)",
+              boxShadow: "0 25px 50px -12px rgba(0, 0, 0, 0.5)",
+              textAlign: "center",
+            }}
+          >
+            {/* BRANDING */}
+            <Box mb={4}>
+              <Avatar
+                sx={{
+                  bgcolor: "#ff5722",
+                  width: 70,
+                  height: 70,
+                  margin: "0 auto 16px",
+                  boxShadow: "0 8px 16px rgba(255,87,34,0.4)",
+                }}
+              >
+                <LockOutlineIcon sx={{ fontSize: 35 }} />
               </Avatar>
-            </Box>
-            <Typography variant="h5" align="center" fontWeight="bold">
-              Welcome Back
-            </Typography>
-            <Typography
-              variant="body2"
-              align="center"
-              color="text.secondary"
-              mb={2}
-            >
-              Please login to continue
-            </Typography>
-            {error && (
-              <Typography color="error" variant="body2" align="center" mb={1}>
-                {error}
+              <Typography
+                variant="h4"
+                fontWeight="900"
+                sx={{
+                  background: "linear-gradient(135deg, #ec9d26, #ff5722)",
+                  WebkitBackgroundClip: "text",
+                  WebkitTextFillColor: "transparent",
+                  mb: 1,
+                }}
+              >
+                Welcome Back
               </Typography>
+              <Typography variant="body1" color="text.secondary">
+                The food you love is just a login away 🍽️
+              </Typography>
+            </Box>
+
+            {/* ERROR MESSAGE */}
+            {error && (
+              <Box 
+                sx={{ 
+                  bgcolor: "rgba(211, 47, 47, 0.1)", 
+                  p: 1.5, 
+                  borderRadius: 2, 
+                  mb: 2, 
+                  border: "1px solid rgba(211, 47, 47, 0.3)" 
+                }}
+              >
+                <Typography color="error" variant="body2" fontWeight="bold">
+                  {error}
+                </Typography>
+              </Box>
             )}
-            <TextField
-              fullWidth
-              label="Username"
-              margin="normal"
-              value={username}
-              onChange={(e) => setUsername(e.target.value)}
-            />
-            <TextField
-              fullWidth
-              label="Password"
-              type="password"
-              margin="normal"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-            />
-            <Button
-              fullWidth
-              variant="contained"
-              size="large"
-              sx={{
-                mt: 2,
-                py: 1.2,
-                borderRadius: 2,
-                backgroundColor: "#ff5722",
-                ":hover": { backgroundColor: "#e64a19" },
-              }}
-              onClick={handleLogin}
-            >
-              Login🤤
-            </Button>
-            <Box textAlign="center" mt={2}>
-              <SignupDialog />
+
+            {/* INPUT FIELDS */}
+            <Box component="form" noValidate>
+              <TextField
+                fullWidth
+                placeholder="Username"
+                variant="outlined"
+                margin="normal"
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
+                InputProps={{
+                  startAdornment: (
+                    <InputAdornment position="start">
+                      <PersonOutlineIcon sx={{ color: "#ff5722" }} />
+                    </InputAdornment>
+                  ),
+                  sx: { borderRadius: 4, bgcolor: "#fff" }
+                }}
+              />
+              <TextField
+                fullWidth
+                placeholder="Password"
+                type="password"
+                variant="outlined"
+                margin="normal"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                InputProps={{
+                  startAdornment: (
+                    <InputAdornment position="start">
+                      <VpnKeyIcon sx={{ color: "#ff5722" }} />
+                    </InputAdornment>
+                  ),
+                  sx: { borderRadius: 4, bgcolor: "#fff" }
+                }}
+              />
+
+              <Button
+                fullWidth
+                variant="contained"
+                size="large"
+                onClick={handleLogin}
+                sx={{
+                  mt: 4,
+                  py: 1.8,
+                  borderRadius: 4,
+                  fontSize: "1.1rem",
+                  fontWeight: "bold",
+                  textTransform: "none",
+                  backgroundColor: "#ff5722",
+                  boxShadow: "0 10px 20px rgba(255,87,34,0.3)",
+                  transition: "all 0.3s ease",
+                  "&:hover": {
+                    backgroundColor: "#e64a19",
+                    transform: "translateY(-2px)",
+                    boxShadow: "0 15px 25px rgba(255,87,34,0.4)",
+                  },
+                }}
+              >
+                Sign In to QuickCravings 🤤
+              </Button>
+
+              <Box mt={3}>
+                <Typography variant="body2" color="text.secondary" display="inline">
+                  Don't have an account? 
+                </Typography>
+                <Box sx={{ display: "inline-block", ml: 1 }}>
+                  <SignupDialog />
+                </Box>
+              </Box>
             </Box>
           </Paper>
-        </Box>
+        </Container>
       </Box>
     </React.Fragment>
   );

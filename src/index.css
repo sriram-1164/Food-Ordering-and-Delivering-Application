@@ -14,11 +14,28 @@
  
 }
 
-.farm {
-  background-image: url("../public/image.png") !important;
+.delivery {
+  background-image: url("../public/deliveryimage.webp") !important;
   background-position: right;
   background-repeat: no-repeat;
   background-size: cover;
+   display: flex;
+  justify-content: center;
+  align-items: center;
+  position: relative; /* IMPORTANT for logout absolute positioning */
+  min-height: 100vh;
+}
+
+.deliveryorder {
+  background-image: url("../public/deliveryorder.jpg") !important;
+  background-position: right;
+  background-repeat: no-repeat;
+  background-size: cover;
+   display: flex;
+  justify-content: center;
+  align-items: center;
+  position: relative; /* IMPORTANT for logout absolute positioning */
+  min-height: 100vh;
 }
 
 

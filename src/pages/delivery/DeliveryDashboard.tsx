@@ -14,10 +14,21 @@ import {
   DialogTitle,
   DialogContent,
   Dialog,
+  Avatar,
+  IconButton,
+  Grid,
+  Tooltip,
 } from "@mui/material";
 import { useNavigate } from "react-router-dom";
+import DirectionsBikeIcon from "@mui/icons-material/DirectionsBike";
+import LogoutIcon from "@mui/icons-material/Logout";
+import LocalMallIcon from "@mui/icons-material/LocalMall";
+import CheckCircleIcon from "@mui/icons-material/CheckCircle";
+import WhatshotIcon from "@mui/icons-material/Whatshot";
+import StarsIcon from "@mui/icons-material/Stars";
 import { CrudService } from "../../services/CrudService";
 import { OrderDetails, UserDetails } from "../../services/Model";
+import "../../index.css";
 
 const crud = CrudService();
 
@@ -30,9 +41,15 @@ const DeliveryDashboard = () => {
     localStorage.getItem("user") || "{}"
   );
 
-  const [isOnline, setIsOnline] = useState(
-    loggedUser?.isOnline ?? false
-  );
+  const [isOnline, setIsOnline] = useState(loggedUser?.isOnline ?? false);
+
+  const quotes = [
+    "You're not just delivering food, you're delivering happiness! ✨",
+    "Fueling the city's hunger, one ride at a time. 🚀",
+    "Your hard work is the secret ingredient to our success! 🍕",
+    "Ride safe, stay bold, and keep crushing your goals! 🏁",
+  ];
+  const [randomQuote] = useState(quotes[Math.floor(Math.random() * quotes.length)]);
 
   useEffect(() => {
     loadOrders();
@@ -48,46 +65,26 @@ const DeliveryDashboard = () => {
     setOrders(filtered);
   };
 
-  const activeOrders = orders.filter(
-    (o) => o.status !== "Delivered"
-  ).length;
+  const activeOrders = orders.filter((o) => o.status !== "Delivered").length;
+  const completedOrders = orders.filter((o) => o.status === "Delivered").length;
 
-  const completedOrders = orders.filter(
-    (o) => o.status === "Delivered"
-  ).length;
-
-  // 🔥 Save initial location once
   useEffect(() => {
     if (!loggedUser?.id) return;
-
     navigator.geolocation.getCurrentPosition(
       async (position) => {
         const lat = position.coords.latitude;
         const lng = position.coords.longitude;
-
-        await crud.updateUser(loggedUser.id, {
-          currentLocation: { lat, lng },
-        });
-
-        console.log("📍 Initial Location Saved:", lat, lng);
+        await crud.updateUser(loggedUser.id, { currentLocation: { lat, lng } });
       },
-      (error) => console.log("Initial Location Error:", error),
+      (error) => console.log("Location Error:", error),
       { enableHighAccuracy: true }
     );
   }, []);
 
-  // 🔴 LOGOUT FUNCTION
   const handleLogout = async () => {
     try {
-      // Set user offline in DB
-      await crud.updateUser(loggedUser.id, {
-        isOnline: false,
-      });
-
-      // Clear local storage
+      await crud.updateUser(loggedUser.id, { isOnline: false });
       localStorage.removeItem("user");
-
-      // Redirect to login
       navigate("/");
     } catch (error) {
       console.log("Logout error:", error);
@@ -98,168 +95,182 @@ const DeliveryDashboard = () => {
     <Box
       sx={{
         minHeight: "100vh",
+        background: "linear-gradient(135deg, #1a1a2e 0%, #16213e 100%)",
         display: "flex",
-        justifyContent: "center",
+        flexDirection: "column",
         alignItems: "center",
-        background: "linear-gradient(135deg, #1e3c72, #2a5298)",
-         position: "relative",
+        justifyContent: "center",
+        p: { xs: 2, md: 4 },
       }}
     >
-      {/* 🔴 LOGOUT BUTTON TOP RIGHT */}
-      <Box
-        sx={{
-          position: "absolute",
-          top: 20,
-          right: 20,
-        }}
-      >
-        <Button
-          variant="contained"
-          color="error"
-          onClick={() => setLogoutOpen(true)}
-          sx={{
-            borderRadius: 3,
-            px: 3,
-          }}
-        >
-          Logout
-        </Button>
+      <Box sx={{ width: "100%", maxWidth: 1100, display: "flex", justifyContent: "space-between", mb: 3, px: 2 }}>
+        <Typography variant="h6" sx={{ color: "#00d2ff", fontWeight: "bold", letterSpacing: 2 }}>
+            QUICKCRAVINGS PARTNER
+        </Typography>
+        <IconButton 
+            onClick={() => setLogoutOpen(true)}
+            sx={{ bgcolor: "rgba(255,255,255,0.05)", color: "#ff5252", "&:hover": { bgcolor: "#ff5252", color: "#fff" } }}
+          >
+            <LogoutIcon />
+        </IconButton>
       </Box>
+
       <Paper
-        elevation={6}
+        elevation={24}
         sx={{
-          width: "90%",
-          maxWidth: 900,
-          p: 5,
-          borderRadius: 4,
-          backdropFilter: "blur(10px)",
-          background: "rgba(255,255,255,0.95)",
+          width: "100%",
+          maxWidth: 1100,
+          position: "relative",
+          borderRadius: 10,
+          overflow: "hidden",
+          background: "rgba(255, 255, 255, 0.02)",
+          backdropFilter: "blur(20px)",
+          border: "1px solid rgba(255, 255, 255, 0.1)",
         }}
       >
-        <Box textAlign="center" mb={4}>
-          <Typography variant="h4" fontWeight="bold">
-            Welcome, {loggedUser.username} 👋
-          </Typography>
-          <Typography color="text.secondary">
-            Delivery Dashboard
-          </Typography>
-        </Box>
-
-        <Stack direction="row" spacing={3} mb={4}>
-          <Card
+        <Box
             sx={{
-              flex: 1,
-              cursor: "pointer",
-              borderRadius: 3,
-              background: "linear-gradient(135deg, #42a5f5, #478ed1)",
-              color: "#fff",
-              "&:hover": { transform: "scale(1.05)" },
+                position: "absolute",
+                top: 0,
+                left: 0,
+                right: 0,
+                bottom: 0,
+                zIndex: -1,
+                backgroundImage: `url('https://images.unsplash.com/photo-1534120247760-c44c3e4a62f1?q=80&w=2098&auto=format&fit=crop')`,
+                backgroundSize: "cover",
+                backgroundPosition: "center",
+                opacity: 0.15,
+                filter: "grayscale(50%)",
             }}
-            // onClick={() => navigate("/delivery/orders")}
-          >
-            <CardContent sx={{ textAlign: "center" }}>
-              <Typography>Total Assigned</Typography>
-              <Typography variant="h3" fontWeight="bold">
-                {orders.length}
-              </Typography>
-            </CardContent>
-          </Card>
+        />
 
-          <Card
-            sx={{
-              flex: 1,
-              cursor: "pointer",
-              borderRadius: 3,
-              background: "linear-gradient(135deg, #ffa726, #fb8c00)",
-              color: "#fff",
-              "&:hover": { transform: "scale(1.05)" },
-            }}
-            onClick={() => navigate("/delivery/orders")}
-          >
-            <CardContent sx={{ textAlign: "center" }}>
-              <Typography>Active Orders</Typography>
-              <Typography variant="h3" fontWeight="bold">
-                {activeOrders}
-              </Typography>
-            </CardContent>
-          </Card>
+        <Box sx={{ p: { xs: 4, md: 7 }, position: "relative", zIndex: 1 }}>
+          <Grid container spacing={4} alignItems="center">
+            
+            <Grid size={{ xs: 12, md: 6 }}>
+              <Stack spacing={2}>
+                <Avatar 
+                    sx={{ width: 70, height: 70, bgcolor: "#ff5722", fontSize: "2rem", fontWeight: "bold" }}
+                >
+                    {loggedUser.username?.charAt(0)}
+                </Avatar>
+                <Typography variant="h2" sx={{ color: "#fff", fontWeight: 900, lineHeight: 1 }}>
+                    Ride on, <br/> 
+                    <span style={{ color: "#00d2ff" }}>{loggedUser.username}!</span>
+                </Typography>
+                <Typography variant="body1" sx={{ color: "rgba(255,255,255,0.6)", fontSize: "1.1rem" }}>
+                    {randomQuote}
+                </Typography>
+                
+                <Box sx={{ pt: 2 }}>
+                    <FormControlLabel
+                        control={
+                            <Switch
+                                checked={isOnline}
+                                onChange={async (e) => {
+                                    const value = e.target.checked;
+                                    setIsOnline(value);
+                                    await crud.updateUser(loggedUser.id, { isOnline: value });
+                                    localStorage.setItem("user", JSON.stringify({ ...loggedUser, isOnline: value }));
+                                }}
+                                color="success"
+                            />
+                        }
+                        label={
+                            <Typography sx={{ color: isOnline ? "#4caf50" : "#f44336", fontWeight: "bold", ml: 1 }}>
+                                {isOnline ? "YOU ARE CURRENTLY ACTIVE" : "YOU ARE CURRENTLY OFFLINE"}
+                            </Typography>
+                        }
+                    />
+                </Box>
+              </Stack>
+            </Grid>
 
-          <Card
-            sx={{
-              flex: 1,
-              cursor: "pointer",
-              borderRadius: 3,
-              background: "linear-gradient(135deg, #66bb6a, #43a047)",
-              color: "#fff",
-              "&:hover": { transform: "scale(1.05)" },
-            }}
-            onClick={() => navigate("/delivery/history")}
-          >
-            <CardContent sx={{ textAlign: "center" }}>
-              <Typography>Completed</Typography>
-              <Typography variant="h3" fontWeight="bold">
-                {completedOrders}
-              </Typography>
-            </CardContent>
-          </Card>
-        </Stack>
+            <Grid size={{ xs: 12, md: 6 }}>
+              <Grid container spacing={2}>
+                <Grid size={{ xs: 12 }}>
+                  <Card sx={{ 
+                    borderRadius: 5, 
+                    background: "linear-gradient(90deg, #1e3c72 0%, #2a5298 100%)",
+                    color: "#fff", p: 1
+                  }}>
+                    <CardContent sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                        <Box>
+                            <Typography variant="overline" sx={{ opacity: 0.8 }}>Total Assigned</Typography>
+                            <Typography variant="h4" fontWeight="bold">{orders.length}</Typography>
+                        </Box>
+                        <LocalMallIcon sx={{ fontSize: 50, opacity: 0.3 }} />
+                    </CardContent>
+                  </Card>
+                </Grid>
 
-        <Box textAlign="center">
-          <FormControlLabel
-            control={
-              <Switch
-                checked={isOnline}
-                onChange={async (e) => {
-                  const value = e.target.checked;
-                  setIsOnline(value);
+                <Grid size={{ xs: 6 }}>
+                  <Card 
+                    onClick={() => navigate("/delivery/orders")}
+                    sx={{ 
+                        borderRadius: 5, cursor: "pointer",
+                        background: "rgba(255,255,255,0.05)", 
+                        border: "1px solid rgba(255,255,255,0.1)",
+                        color: "#fff", transition: "0.3s", "&:hover": { bgcolor: "rgba(255,255,255,0.1)" }
+                    }}
+                  >
+                    <CardContent sx={{ textAlign: "center" }}>
+                        <WhatshotIcon sx={{ color: "#ffa726", mb: 1 }} />
+                        <Typography variant="body2" sx={{ opacity: 0.7 }}>Active</Typography>
+                        <Typography variant="h5" fontWeight="bold">{activeOrders}</Typography>
+                    </CardContent>
+                  </Card>
+                </Grid>
 
-                  await crud.updateUser(loggedUser.id, {
-                    isOnline: value,
-                  });
+                <Grid size={{ xs: 6 }}>
+                  <Card 
+                    onClick={() => navigate("/delivery/history")}
+                    sx={{ 
+                        borderRadius: 5, cursor: "pointer",
+                        background: "rgba(255,255,255,0.05)", 
+                        border: "1px solid rgba(255,255,255,0.1)",
+                        color: "#fff", transition: "0.3s", "&:hover": { bgcolor: "rgba(255,255,255,0.1)" }
+                    }}
+                  >
+                    <CardContent sx={{ textAlign: "center" }}>
+                        <CheckCircleIcon sx={{ color: "#66bb6a", mb: 1 }} />
+                        <Typography variant="body2" sx={{ opacity: 0.7 }}>Done</Typography>
+                        <Typography variant="h5" fontWeight="bold">{completedOrders}</Typography>
+                    </CardContent>
+                  </Card>
+                </Grid>
+              </Grid>
+            </Grid>
+          </Grid>
 
-                  localStorage.setItem(
-                    "user",
-                    JSON.stringify({ ...loggedUser, isOnline: value })
-                  );
+          <Box sx={{ mt: 6 }}>
+             <Button
+                variant="contained"
+                fullWidth
+                size="large"
+                startIcon={<DirectionsBikeIcon />}
+                onClick={() => navigate("/delivery/orders")}
+                sx={{
+                  py: 2, borderRadius: 5, fontWeight: "bold", fontSize: "1.2rem",
+                  background: "linear-gradient(45deg, #ff5722 30%, #ff8a65 90%)",
+                  boxShadow: "0 10px 30px rgba(255, 87, 34, 0.4)",
+                  "&:hover": { background: "#e64a19" }
                 }}
-                color="success"
-              />
-            }
-            label={
-              <Typography fontWeight="bold">
-                {isOnline ? "🟢 Online" : "🔴 Offline"}
-              </Typography>
-            }
-          />
+              >
+                GO TO LIVE ORDERS
+              </Button>
+          </Box>
         </Box>
       </Paper>
 
-       {/* 🔥 LOGOUT CONFIRMATION DIALOG */}
-      <Dialog
-        open={logoutOpen}
-        onClose={() => setLogoutOpen(false)}
-      >
-        <DialogTitle>Confirm Logout</DialogTitle>
+      <Dialog open={logoutOpen} onClose={() => setLogoutOpen(false)} PaperProps={{ sx: { borderRadius: 6, p: 1 } }}>
+        <DialogTitle sx={{ fontWeight: 800 }}>Finish for the day?</DialogTitle>
         <DialogContent>
-          <DialogContentText>
-            Are you sure you want to logout? You will be marked as
-            offline.
-          </DialogContentText>
+          <DialogContentText>You'll be set to offline. Great work today!</DialogContentText>
         </DialogContent>
-        <DialogActions>
-          <Button
-            onClick={() => setLogoutOpen(false)}
-            color="primary"
-          >
-            Cancel
-          </Button>
-          <Button
-            onClick={handleLogout}
-            color="error"
-            variant="contained"
-          >
-            Logout
-          </Button>
+        <DialogActions sx={{ p: 3 }}>
+          <Button onClick={() => setLogoutOpen(false)} color="inherit">Not yet</Button>
+          <Button onClick={handleLogout} variant="contained" color="error" sx={{ borderRadius: 3 }}>Logout</Button>
         </DialogActions>
       </Dialog>
     </Box>
