@@ -38,6 +38,12 @@ export interface OrderDetails {
   deliveryOtp?: number;
   otpExpiry?: number;
 
+  routeHistory?: {
+  lat: number;
+  lng: number;
+  timestamp: number;
+}[];
+
 }
 
 export interface UserDetails {

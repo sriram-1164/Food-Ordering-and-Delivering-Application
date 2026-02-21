@@ -3,7 +3,7 @@ import { CrudService } from "../../../services/CrudService";
 
 const crud = CrudService();
 
-export const useLiveLocation = (user: any, isOnline: boolean) => {
+export const useLiveLocation = (user: any, isOnline: boolean, orderId?: string) => {
   const lastLocation = useRef<any>(null);
 
   useEffect(() => {
@@ -11,7 +11,7 @@ export const useLiveLocation = (user: any, isOnline: boolean) => {
       console.log("❌ Live tracking NOT started", user?.id, isOnline);
       return;
     }
-
+    console.log("TRACKING STATUS:", isOnline);
     console.log("📍 Live tracking started");
 
     const watchId = navigator.geolocation.watchPosition(
@@ -48,6 +48,18 @@ export const useLiveLocation = (user: any, isOnline: boolean) => {
           await crud.updateUser(user.id, {
             currentLocation: { lat, lng },
           });
+          // 🔹 2️⃣ Update order (for route history)
+          if (orderId) {
+            await crud.updateOrder(orderId, {
+              newRoutePoint: {
+                lat,
+                lng,
+                timestamp: Date.now()
+              }
+            });
+          }
+          console.log("ORDER ID RECEIVED:", orderId);
+
 
           console.log("✅ Location Updated:", lat, lng);
           console.log("Distance (m):", (distance * 1000).toFixed(2));
@@ -66,7 +78,7 @@ export const useLiveLocation = (user: any, isOnline: boolean) => {
       navigator.geolocation.clearWatch(watchId);
       console.log("🛑 Live tracking stopped");
     };
-  }, [user?.id, isOnline]);
+  }, [user?.id, isOnline, orderId]);
 };
 
 

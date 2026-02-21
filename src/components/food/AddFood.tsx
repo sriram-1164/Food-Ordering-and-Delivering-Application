@@ -11,7 +11,7 @@ import {
 import { useEffect, useState } from "react";
 import { CrudService } from "../../services/CrudService";
 import { AddFoodDetails, FoodDetails } from "../../services/Model";
-const meals = ["Breakfast", "Lunch", "Dinner", "Snacks","Juice","Desert"];
+const meals = ["Breakfast", "Lunch", "Dinner", "Snacks", "Juice", "Desert"];
 export default function AddFood({
   editFood,
   onSave,
@@ -21,18 +21,46 @@ export default function AddFood({
 }) {
   const crud = CrudService();
   const [foodname, setFoodName] = useState("");
-  const [price, setPrice] = useState<any>();
+  const [price, setPrice] = useState<any>("");
   const [foodtype, setFoodType] = useState<"Veg" | "Non-Veg">("Veg");
   const [mealtype, setMealType] = useState("");
+  const [error, setError] = useState({
+    foodname: "",
+    price: "",
+    mealtype: "",
+  });
   const [foods, setFoods] = useState<AddFoodDetails[]>();
   const getAllFoods = async () => {
-    const responce= await crud.getFoods()
+    const responce = await crud.getFoods()
     setFoods(responce)
-    }
-    const timestamp = Date.now();
+  }
+
   const handleSubmit = async () => {
+    const newErrors = {
+      foodname: "",
+      price: "",
+      mealtype: "",
+    };
+
+    if (!foodname.trim()) {
+      newErrors.foodname = "Enter food name";
+    }
+
+    if (!price || price <= 0) {
+      newErrors.price = "Enter valid price";
+    }
+
+    if (!mealtype) {
+      newErrors.mealtype = "Select meal type";
+    }
+
+    // If any error exists → stop
+    if (newErrors.foodname || newErrors.price || newErrors.mealtype) {
+      setError(newErrors);
+      return;
+    }
     const payload: AddFoodDetails = {
-      foodId:timestamp,
+      foodId: editFood ? editFood.foodId : Date.now(),
       foodname,
       price,
       mealtype,
@@ -47,7 +75,7 @@ export default function AddFood({
     }
     onSave(); //  refresh parent list
   };
-  
+
   useEffect(() => {
     if (editFood) {
       setFoodName(editFood.foodname);
@@ -80,6 +108,8 @@ export default function AddFood({
         fullWidth
         margin="normal"
         value={foodname}
+        error={!!error.foodname}
+        helperText={error.foodname}
         onChange={(e) => setFoodName(e.target.value)}
       />
       <TextField
@@ -88,6 +118,8 @@ export default function AddFood({
         fullWidth
         margin="normal"
         value={price}
+        error={!!error.price}
+        helperText={error.price}
         onChange={(e) => setPrice(Number(e.target.value))}
       />
       <Autocomplete
@@ -95,12 +127,18 @@ export default function AddFood({
         value={mealtype}
         onChange={(_, value) => setMealType(value || "")}
         renderInput={(params) => (
-          <TextField {...params} label="Meal Type" margin="normal" />
+          <TextField
+            {...params}
+            label="Meal Type"
+            margin="normal"
+            error={!!error.mealtype}
+            helperText={error.mealtype}
+          />
         )}
         sx={{ mt: 1 }}
       />
       <Box mt={2}>
-        <Typography variant="subtitle1" fontWeight="bold"  sx={{ color: "#ff5722" }}>
+        <Typography variant="subtitle1" fontWeight="bold" sx={{ color: "#ff5722" }}>
           Food Type
         </Typography>
         <RadioGroup

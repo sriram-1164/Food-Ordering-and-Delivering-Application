@@ -28,7 +28,7 @@ export default function AdminMenu() {
 
   //  confirm delete dialog
   const [confirmOpen, setConfirmOpen] = useState(false);
-  const [deleteId, setDeleteId] = useState<string | null>(null);
+  const [deleteId, setDeleteId] = useState<number | null>(null);
 
   //  snackbar
   const [snackbarOpen, setSnackbarOpen] = useState(false);
@@ -71,6 +71,7 @@ export default function AdminMenu() {
     setSnackbarMsg("Food item deleted successfully");
     setSnackbarOpen(true);
   };
+  console.log(deleteId)
 
   if (loading) return <Loader />;
 
@@ -157,8 +158,8 @@ export default function AdminMenu() {
             foods={foods}
             admin
             onEdit={(food: any) => setEditFood(food)}
-            onDelete={(id: string) => {
-              setDeleteId(id);
+            onDelete={(foodId: any) => {
+              setDeleteId(foodId);
               setConfirmOpen(true);
             }}
           />

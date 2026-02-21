@@ -20,6 +20,8 @@ import { CrudService } from "../../services/CrudService";
 import { UserDetails, OrderDetails } from "../../services/Model";
 import Grid from "@mui/material/Grid"; 
 import BackButton from "../../components/common/BackButton";
+import { Dialog } from "@mui/material";
+import { MapContainer, TileLayer, Polyline } from "react-leaflet";
 
 const crud = CrudService();
 
@@ -28,6 +30,9 @@ const DeliveryMonitoring = () => {
   const [orders, setOrders] = useState<OrderDetails[]>([]);
   const [selectedUser, setSelectedUser] = useState<UserDetails | null>(null);
   const [orderDrawerOpen, setOrderDrawerOpen] = useState(false);
+
+  const [routeDialogOpen, setRouteDialogOpen] = useState(false);
+const [selectedRoute, setSelectedRoute] = useState<any[]>([]);
 
   useEffect(() => {
     loadData();
@@ -54,6 +59,36 @@ const DeliveryMonitoring = () => {
   const reachedCount = todayOrders.filter((o) => o.status === "Reached").length;
   const deliveredCount = todayOrders.filter((o) => o.status === "Delivered").length;
   const activeCount = preparingCount + outForDeliveryCount + reachedCount;
+
+
+  function downloadKML(routeHistory: any[]) {
+  const coordinates = routeHistory
+    .map((p) => `${p.lng},${p.lat},0`)
+    .join(" ");
+
+  const kml = `
+  <?xml version="1.0" encoding="UTF-8"?>
+  <kml xmlns="http://www.opengis.net/kml/2.2">
+    <Document>
+      <Placemark>
+        <LineString>
+          <coordinates>
+            ${coordinates}
+          </coordinates>
+        </LineString>
+      </Placemark>
+    </Document>
+  </kml>`;
+
+  const blob = new Blob([kml], {
+    type: "application/vnd.google-earth.kml+xml"
+  });
+
+  const link = document.createElement("a");
+  link.href = URL.createObjectURL(blob);
+  link.download = "delivery-route.kml";
+  link.click();
+}
 
   return (
     <Box sx={{ 
@@ -216,10 +251,118 @@ const DeliveryMonitoring = () => {
                       </Typography>
                   </Box>
               )}
+
+                      {/* DELIVERED ORDERS HISTORY */}
+<Typography
+  variant="subtitle2"
+  sx={{
+    color: "#64748b",
+    mt: 4,
+    mb: 2,
+    fontWeight: 700,
+    textTransform: "uppercase"
+  }}
+>
+  Delivered Orders History
+</Typography>
+
+{orders
+  .filter(
+    (o) =>
+      o.deliveryPartnerId === selectedUser!.id&&
+      o.status === "Delivered" &&
+      o.routeHistory?.length
+  )
+  .length === 0 ? (
+  <Paper
+    sx={{
+      p: 3,
+      textAlign: "center",
+      bgcolor: "#f8fafc",
+      borderRadius: "12px",
+      border: "1px dashed #cbd5e1"
+    }}
+  >
+    <Typography color="textSecondary">
+      No delivered orders with route data
+    </Typography>
+  </Paper>
+) : (
+  orders
+    .filter(
+      (o) =>
+        o.deliveryPartnerId === selectedUser.id &&
+        o.status === "Delivered" &&
+        o.routeHistory?.length
+    )
+    .map((o) => (
+      <Paper
+        key={o.id}
+        sx={{
+          p: 2,
+          mb: 2,
+          borderRadius: "12px",
+          border: "1px solid #e2e8f0",
+          bgcolor: "#fff"
+        }}
+      >
+        <Typography fontWeight={700}>
+          📦 {o.foodname}
+        </Typography>
+          <Typography fontWeight={700}>
+          📦Order-ID {o.id}
+        </Typography>
+
+        <Stack direction="row" spacing={1} mt={1}>
+          <Chip
+            label="View Route"
+            color="primary"
+            onClick={() => {
+              setSelectedRoute(
+                o.routeHistory!.map((p) => [p.lat, p.lng])
+              );
+              setRouteDialogOpen(true);
+            }}
+          />
+
+          <Chip
+            label="Download KML"
+            color="success"
+            onClick={() => downloadKML(o.routeHistory!)}
+          />
+        </Stack>
+      </Paper>
+    ))
+)}
             </>
           )}
         </Box>
+
+
       </Drawer>
+
+      <Dialog
+  open={routeDialogOpen}
+  onClose={() => setRouteDialogOpen(false)}
+  maxWidth="md"
+  fullWidth
+>
+  <Box sx={{ height: 500 }}>
+    {selectedRoute.length > 0 && (
+      <MapContainer
+        center={selectedRoute[0]}
+        zoom={14}
+        style={{ height: "100%", width: "100%" }}
+      >
+        <TileLayer
+          attribution="&copy; OpenStreetMap"
+          url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+        />
+        <Polyline positions={selectedRoute} />
+      </MapContainer>
+    )}
+  </Box>
+</Dialog>
 
       {/* STATISTICS DRAWER */}
       <Drawer anchor="right" open={orderDrawerOpen} onClose={() => setOrderDrawerOpen(false)}>

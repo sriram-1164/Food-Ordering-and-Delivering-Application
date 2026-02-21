@@ -77,10 +77,12 @@ app.post("/foods", (req, res) => {
 
 app.patch("/foods/:id", (req, res) => {
   const db = readDB();
-  const id = req.params.id; // keep as string
+  const id = Number(req.params.id);
 
   db.foods = db.foods.map((food) =>
-    food.id === id ? { ...food, ...req.body } : food
+    food.foodId === id
+      ? { ...food, ...req.body }
+      : food
   );
 
   writeDB(db);
@@ -90,14 +92,15 @@ app.patch("/foods/:id", (req, res) => {
 
 app.delete("/foods/:id", (req, res) => {
   const db = readDB();
-  const id = req.params.id; // DO NOT convert to Number
+  const id = Number(req.params.id);
 
-  db.foods = db.foods.filter((food) => food.id !== id);
+  db.foods = db.foods.filter(
+    (food) => food.foodId !== id
+  );
 
   writeDB(db);
   res.json({ message: "Food deleted successfully" });
 });
-
 
 // ================= ORDERS =================
 
@@ -123,17 +126,28 @@ app.post("/orders", (req, res) => {
 app.patch("/orders/:id", (req, res) => {
   const db = readDB();
   const id = req.params.id;
-    console.log("Updating ID:", id);
-  console.log("Existing IDs:", db.orders.map(o => o.id));
-
 
   let found = false;
 
   db.orders = db.orders.map((order) => {
     if (String(order.id) === String(id)) {
       found = true;
+
+      // 🔥 Special case: route tracking
+      if (req.body.newRoutePoint) {
+        return {
+          ...order,
+          routeHistory: [
+            ...(order.routeHistory || []),
+            req.body.newRoutePoint
+          ]
+        };
+      }
+
+      // ✅ Normal updates (status, otp, etc.)
       return { ...order, ...req.body };
     }
+
     return order;
   });
 

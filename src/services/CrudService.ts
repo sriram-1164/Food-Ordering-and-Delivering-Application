@@ -11,15 +11,24 @@ interface ICrudService {
 
   addFoods: (foodInformation: AddFoodDetails) => Promise<AddFoodDetails>;
 
-  updateFood: (id: number, foodInformation: AddFoodDetails) => Promise<FoodDetails>;
+  updateFood: (foodId: number, foodInformation: AddFoodDetails) => Promise<FoodDetails>;
 
-  deleteFood: (id: string) => Promise<void>;
+  deleteFood: (foodId: number) => Promise<void>;
 
   getOrders: () => Promise<OrderDetails[]>
 
   addOrder: (orderInformation: OrderDetails) => Promise<OrderDetails>;
 
-  updateOrder: (id: string,orderInformation: Partial<OrderDetails>) => Promise<OrderDetails>;
+  updateOrder: (
+  id: string,
+  data: Partial<OrderDetails> & {
+    newRoutePoint?: {
+      lat: number;
+      lng: number;
+      timestamp: number;
+    };
+  }
+) => Promise<OrderDetails>;
 
   deleteOrder: (id: number) => Promise<void>
 
@@ -80,19 +89,19 @@ export function CrudService(): ICrudService {
     return axiosService.makeRequest<AddFoodDetails>(config);
   };
   //update food details
-  const updateFood = (id: number, foodInformation: AddFoodDetails) => {
+  const updateFood = (foodId: number, foodInformation: AddFoodDetails) => {
     const config: AxiosRequestConfig = {
       method: "patch",
-      url: `/foods/${id}`,
+      url: `/foods/${foodId}`,
       data: foodInformation
     };
     return axiosService.makeRequest<FoodDetails>(config);
   };
   //delete food
-  const deleteFood = async (id: string) => {
+  const deleteFood = async (foodId: any) => {
     const config: AxiosRequestConfig = {
       method: "delete",
-      url: `/foods/${id}`
+      url: `/foods/${foodId}`
     };
     await axiosService.makeRequest(config);
   };
@@ -114,14 +123,24 @@ export function CrudService(): ICrudService {
     return axiosService.makeRequest<OrderDetails>(config);
   };
   // updating order by pending or delivered
-  const updateOrder = (id: string, status: Partial<OrderDetails>) => {
-    const config: AxiosRequestConfig = {
-      method: "patch",
-      url: `/orders/${id}`,
-      data: status
+const updateOrder = (
+  id: string,
+  data: Partial<OrderDetails> & {
+    newRoutePoint?: {
+      lat: number;
+      lng: number;
+      timestamp: number;
     };
-    return axiosService.makeRequest<OrderDetails>(config);
+  }
+) => {
+  const config: AxiosRequestConfig = {
+    method: "patch",
+    url: `/orders/${id}`,
+    data
   };
+  console.log("CONFIG URL BEFORE REQUEST:", config.url);
+  return axiosService.makeRequest<OrderDetails>(config);
+};
   // deleting the order
   const deleteOrder = async (id: number) => {
     const config: AxiosRequestConfig = {

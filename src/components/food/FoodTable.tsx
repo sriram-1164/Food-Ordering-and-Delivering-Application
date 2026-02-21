@@ -72,7 +72,7 @@ export default function FoodTable({
                     <IconButton size="small" onClick={() => onEdit(food)} sx={{ color: '#10b981', bgcolor: '#f0fdf4' }}>
                       <EditIcon fontSize="small" />
                     </IconButton>
-                    <IconButton size="small" onClick={() => onDelete(food.id)} sx={{ color: '#ef4444', bgcolor: '#fef2f2' }}>
+                    <IconButton size="small" onClick={() => onDelete(food.foodId)} sx={{ color: '#ef4444', bgcolor: '#fef2f2' }}>
                       <DeleteOutlineIcon fontSize="small" />
                     </IconButton>
                   </Box>
