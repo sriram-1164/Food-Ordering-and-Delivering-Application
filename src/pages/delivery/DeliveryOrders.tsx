@@ -78,7 +78,8 @@ const DeliveryOrders = () => {
       setSnackbar({ open: true, message: "Invalid OTP", severity: "error" });
       return;
     }
-    await crud.updateOrder(selectedOrder.id, { status: "Delivered", deliveryOtp: undefined, otpExpiry: undefined });
+    await crud.updateOrder(selectedOrder.id, { status: "Delivered", deliveryOtp: undefined, otpExpiry: undefined 
+      ,endTime: new Date().toISOString()});
     await crud.updateUser(loggedUser.id, { isBusy: false });
     setSnackbar({ open: true, message: "Order Delivered!", severity: "success" });
     setOtpDialogOpen(false);

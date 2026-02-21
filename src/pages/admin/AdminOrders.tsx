@@ -83,11 +83,12 @@ export default function AdminOrders() {
         return;
       }
 
-      // 1️⃣ Update order
-      await crud.updateOrder(id, {
-        status: "OutforDelivery",
-        deliveryPartnerId: availableDelivery.id,
-      });
+     // 1️⃣ Update order with Status AND Start Time
+    await crud.updateOrder(id, {
+      status: "OutforDelivery",
+      deliveryPartnerId: availableDelivery.id,
+      startTime: new Date().toISOString(), // 👈 CAPTURE START TIME HERE
+    });
 
       // 2️⃣ Mark delivery busy
       await crud.updateUser(availableDelivery.id, {

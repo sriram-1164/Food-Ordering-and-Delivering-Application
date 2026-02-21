@@ -44,6 +44,10 @@ export interface OrderDetails {
   timestamp: number;
 }[];
 
+// 🔥 NEW FIELDS FOR TIME TRACKING
+  startTime?: string; // Captured when status moves to "OutforDelivery"
+  endTime?: string;   // Captured when status moves to "Delivered"
+
 }
 
 export interface UserDetails {

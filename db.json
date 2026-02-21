@@ -88,10 +88,10 @@
       "phonenumber": "9360790976",
       "role": "delivery",
       "isOnline": true,
-      "isBusy": true,
+      "isBusy": false,
       "currentLocation": {
-        "lat": 12.893340805400513,
-        "lng": 77.63592567446597
+        "lat": 12.893344568526167,
+        "lng": 77.63583771066378
       }
     },
     {
@@ -102,10 +102,10 @@
       "phonenumber": "9999999999",
       "role": "delivery",
       "isOnline": true,
-      "isBusy": true,
+      "isBusy": false,
       "currentLocation": {
-        "lat": 12.893297829730955,
-        "lng": 77.63579103705409
+        "lat": 12.893348653579539,
+        "lng": 77.63582508422827
       }
     },
     {
@@ -336,7 +336,9 @@
         }
       ],
       "deliveryOtp": 2962,
-      "otpExpiry": 1771652343278
+      "otpExpiry": 1771652343278,
+      "startTime": "2026-02-21T09:26:30.854Z",
+      "endTime": "2026-02-21T09:32:48.769Z"
     },
     {
       "id": "1771653268307",
@@ -375,7 +377,9 @@
         }
       ],
       "deliveryOtp": 7328,
-      "otpExpiry": 1771653662531
+      "otpExpiry": 1771653662531,
+      "startTime": "2026-02-21T09:26:30.854Z",
+      "endTime": "2026-02-21T09:32:18.769Z"
     },
     {
       "id": "1771657518144",
@@ -398,9 +402,69 @@
         "lng": 77.60550669294781
       },
       "phonenumber": "7777777777",
-      "status": "OutforDelivery",
+      "status": "Delivered",
       "date": "2026-02-21T07:05:16.934Z",
-      "deliveryPartnerId": 1771307520923
+      "deliveryPartnerId": 1771307520923,
+      "startTime": "2026-02-21T09:26:30.854Z",
+      "routeHistory": [
+        {
+          "lat": 12.893336032847193,
+          "lng": 77.63579685375929,
+          "timestamp": 1771658113236
+        },
+        {
+          "lat": 12.893347554000238,
+          "lng": 77.63580891802677,
+          "timestamp": 1771658129349
+        },
+        {
+          "lat": 12.893348659816523,
+          "lng": 77.63574809710853,
+          "timestamp": 1771658145443
+        },
+        {
+          "lat": 12.89333879561611,
+          "lng": 77.635756159949,
+          "timestamp": 1771658160805
+        },
+        {
+          "lat": 12.893345268558546,
+          "lng": 77.63583994778595,
+          "timestamp": 1771658178423
+        }
+      ],
+      "deliveryOtp": 2509,
+      "otpExpiry": 1771666982877,
+      "endTime": "2026-02-21T09:38:24.521Z"
+    },
+    {
+      "id": "1771665876603",
+      "userId": "1",
+      "username": "Ram",
+      "foodId": 1771305191488,
+      "foodname": "Chicken 65",
+      "price": 65,
+      "quantity": 1,
+      "totalPrice": 65,
+      "mealtype": "Dinner",
+      "foodtype": "Non-Veg",
+      "address": {
+        "id": 1,
+        "label": "work",
+        "addressLine": "T Nagar",
+        "city": "Chennai",
+        "pincode": "600017",
+        "lat": 12.906505862570866,
+        "lng": 77.60550669294781
+      },
+      "phonenumber": "7777777777",
+      "status": "Delivered",
+      "date": "2026-02-21T09:24:35.385Z",
+      "deliveryPartnerId": 1771305681280,
+      "startTime": "2026-02-21T09:26:30.854Z",
+      "deliveryOtp": 9822,
+      "otpExpiry": 1771666586420,
+      "endTime": "2026-02-21T09:32:18.769Z"
     }
   ],
   "feedbacks": []
