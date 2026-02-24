@@ -152,66 +152,119 @@
   "foods": [
     {
       "foodId": 1771655320098,
-      "foodname": "Paneer",
-      "price": 39,
-      "mealtype": "Snacks",
-      "foodtype": "Veg"
+      "foodname": "Paneer Tikka",
+      "price": 99,
+      "mealtype": "undefined",
+      "foodtype": "Veg",
+      "mealtypes": [
+        "Breakfast",
+        "Lunch",
+        "Dinner"
+      ],
+      "photoUrl": "/uploads/1771913963248-85898214.jpg"
     },
     {
       "foodId": 1771305191488,
       "foodname": "Chicken 65",
       "price": 65,
       "mealtype": "Dinner",
-      "foodtype": "Non-Veg"
+      "foodtype": "Non-Veg",
+      "mealtypes": [
+        "Lunch",
+        "Dinner",
+        "Snacks"
+      ],
+      "photoUrl": "/uploads/1771914052565-564370320.webp"
     },
     {
       "foodId": 1771845725188,
       "foodname": "Chicken Biriyani",
       "price": 89,
       "mealtype": "Lunch",
-      "foodtype": "Non-Veg"
+      "foodtype": "Non-Veg",
+      "mealtypes": [
+        "Lunch",
+        "Dinner"
+      ],
+      "photoUrl": "/uploads/1771914128976-292982913.webp"
     },
     {
       "foodId": 1771845745582,
       "foodname": "Mutton Biriyani",
       "price": 109,
       "mealtype": "Lunch",
-      "foodtype": "Non-Veg"
+      "foodtype": "Non-Veg",
+      "mealtypes": [
+        "Lunch",
+        "Dinner"
+      ],
+      "photoUrl": "/uploads/1771914228704-146232127.webp"
     },
     {
       "foodId": 1771845768230,
       "foodname": "Pine Apple Juice",
       "price": 49,
       "mealtype": "Juice",
-      "foodtype": "Veg"
+      "foodtype": "Veg",
+      "mealtypes": [
+        "Juice"
+      ],
+      "photoUrl": "/uploads/1771914284399-387796408.jfif"
     },
     {
       "foodId": 1771845813191,
       "foodname": "Ice Cream",
-      "price": 15,
+      "price": 55,
       "mealtype": "Desert",
-      "foodtype": "Veg"
-    },
-    {
-      "foodId": 1771855929798,
-      "foodname": "paneer tikka ",
-      "price": 150,
-      "mealtype": "Lunch",
-      "foodtype": "Veg"
+      "foodtype": "Veg",
+      "mealtypes": [
+        "Desert"
+      ],
+      "photoUrl": "/uploads/1771914328355-372515809.jfif"
     },
     {
       "foodId": 1771855975472,
-      "foodname": "chicken momos",
+      "foodname": "Chicken Momos",
       "price": 99,
       "mealtype": "Snacks",
-      "foodtype": "Non-Veg"
+      "foodtype": "Non-Veg",
+      "mealtypes": [
+        "Snacks"
+      ],
+      "photoUrl": "/uploads/1771914413059-615614728.avif"
     },
     {
       "foodId": 1771856011471,
-      "foodname": "chocolate milkshake ",
-      "price": 150,
+      "foodname": "chocolate milkshake",
+      "price": 65,
       "mealtype": "Juice",
-      "foodtype": "Veg"
+      "foodtype": "Veg",
+      "mealtypes": [
+        "Juice"
+      ],
+      "photoUrl": "/uploads/1771914459866-322636195.jfif"
+    },
+    {
+      "foodId": 1771914541481,
+      "foodname": "Dosa",
+      "price": 65,
+      "mealtypes": [
+        "Breakfast",
+        "Dinner"
+      ],
+      "foodtype": "Veg",
+      "photoUrl": "/uploads/1771914541478-481664742.jfif"
+    },
+    {
+      "foodId": 1771914603002,
+      "foodname": "Idly",
+      "price": 50,
+      "mealtypes": [
+        "Breakfast",
+        "Dinner"
+      ],
+      "foodtype": "Veg",
+      "photoUrl": "/uploads/1771914603000-98675393.jfif"
     }
   ],
   "orders": [

@@ -9,9 +9,9 @@ interface ICrudService {
 
   getFoods: () => Promise<FoodDetails[]>;
 
-  addFoods: (foodInformation: AddFoodDetails) => Promise<AddFoodDetails>;
+  addFoods: (foodInformation: AddFoodDetails, photoFile?: File) => Promise<AddFoodDetails>;
 
-  updateFood: (foodId: number, foodInformation: AddFoodDetails) => Promise<FoodDetails>;
+  updateFood: (foodId: number, foodInformation: AddFoodDetails, photoFile?: File) => Promise<FoodDetails>;
 
   deleteFood: (foodId: number) => Promise<void>;
 
@@ -20,15 +20,15 @@ interface ICrudService {
   addOrder: (orderInformation: OrderDetails) => Promise<OrderDetails>;
 
   updateOrder: (
-  id: string,
-  data: Partial<OrderDetails> & {
-    newRoutePoint?: {
-      lat: number;
-      lng: number;
-      timestamp: number;
-    };
-  }
-) => Promise<OrderDetails>;
+    id: string,
+    data: Partial<OrderDetails> & {
+      newRoutePoint?: {
+        lat: number;
+        lng: number;
+        timestamp: number;
+      };
+    }
+  ) => Promise<OrderDetails>;
 
   deleteOrder: (id: number) => Promise<void>
 
@@ -36,7 +36,7 @@ interface ICrudService {
 
   getFeedbacksFromNode: () => Promise<any>;
 
-  updateUser: (id: number,userInformation: Partial<UserDetails>) => Promise<UserDetails>;
+  updateUser: (id: number, userInformation: Partial<UserDetails>) => Promise<UserDetails>;
 
   uploadProfileImage: (data: FormData) => Promise<any>;
 }
@@ -80,23 +80,55 @@ export function CrudService(): ICrudService {
     return axiosService.makeRequest<FoodDetails[]>(config);
   };
   // add food 
-  const addFoods = (foodInformation: AddFoodDetails) => {
-    const config: AxiosRequestConfig = {
-      method: "post",
-      url: "/foods",
-      data: foodInformation
-    };
-    return axiosService.makeRequest<AddFoodDetails>(config);
+// ────────────────────────────────────────────────
+// addFoods
+const addFoods = (foodInformation: AddFoodDetails, photoFile?: File) => {
+  const formData = new FormData();
+  formData.append("foodname", foodInformation.foodname);
+  formData.append("price", foodInformation.price.toString());
+  formData.append("foodtype", foodInformation.foodtype);
+
+  // ──── IMPORTANT ────
+  formData.append("mealtypes", JSON.stringify(foodInformation.mealtypes || []));
+
+  if (foodInformation.foodId) {
+    formData.append("foodId", foodInformation.foodId.toString());
+  }
+  if (photoFile) {
+    formData.append("photo", photoFile);
+  }
+  const config: AxiosRequestConfig = {
+    method: "post",
+    url: "/foods",
+    data: formData,
+    headers: { "Content-Type": "multipart/form-data" },
   };
-  //update food details
-  const updateFood = (foodId: number, foodInformation: AddFoodDetails) => {
-    const config: AxiosRequestConfig = {
-      method: "patch",
-      url: `/foods/${foodId}`,
-      data: foodInformation
-    };
-    return axiosService.makeRequest<FoodDetails>(config);
+  return axiosService.makeRequest<FoodDetails>(config);
+};
+
+// ────────────────────────────────────────────────
+// updateFood
+const updateFood = (foodId: number, foodInformation: AddFoodDetails, photoFile?: File) => {
+  const formData = new FormData();
+  formData.append("foodname", foodInformation.foodname);
+  formData.append("price", foodInformation.price.toString());
+  formData.append("foodtype", foodInformation.foodtype);
+
+  // ──── IMPORTANT ────
+  formData.append("mealtypes", JSON.stringify(foodInformation.mealtypes || []));
+
+  if (photoFile) {
+    formData.append("photo", photoFile);
+  }
+
+  const config: AxiosRequestConfig = {
+    method: "patch",
+    url: `/foods/${foodId}`,
+    data: formData,
+    headers: { "Content-Type": "multipart/form-data" },
   };
+  return axiosService.makeRequest<FoodDetails>(config);
+};
   //delete food
   const deleteFood = async (foodId: any) => {
     const config: AxiosRequestConfig = {
@@ -123,24 +155,24 @@ export function CrudService(): ICrudService {
     return axiosService.makeRequest<OrderDetails>(config);
   };
   // updating order by pending or delivered
-const updateOrder = (
-  id: string,
-  data: Partial<OrderDetails> & {
-    newRoutePoint?: {
-      lat: number;
-      lng: number;
-      timestamp: number;
+  const updateOrder = (
+    id: string,
+    data: Partial<OrderDetails> & {
+      newRoutePoint?: {
+        lat: number;
+        lng: number;
+        timestamp: number;
+      };
+    }
+  ) => {
+    const config: AxiosRequestConfig = {
+      method: "patch",
+      url: `/orders/${id}`,
+      data
     };
-  }
-) => {
-  const config: AxiosRequestConfig = {
-    method: "patch",
-    url: `/orders/${id}`,
-    data
+    console.log("CONFIG URL BEFORE REQUEST:", config.url);
+    return axiosService.makeRequest<OrderDetails>(config);
   };
-  console.log("CONFIG URL BEFORE REQUEST:", config.url);
-  return axiosService.makeRequest<OrderDetails>(config);
-};
   // deleting the order
   const deleteOrder = async (id: number) => {
     const config: AxiosRequestConfig = {
@@ -169,15 +201,15 @@ const updateOrder = (
     });
   };
 
-const updateUser = (id: number, data: Partial<UserDetails>) => {
-  const config: AxiosRequestConfig = {
-    method: "patch",
-    url: `/users/${id}`,
-    data,
+  const updateUser = (id: number, data: Partial<UserDetails>) => {
+    const config: AxiosRequestConfig = {
+      method: "patch",
+      url: `/users/${id}`,
+      data,
+    };
+    console.log("CONFIG URL BEFORE REQUEST:", config.url);
+    return axiosService.makeRequest<UserDetails>(config);
   };
-  console.log("CONFIG URL BEFORE REQUEST:", config.url);
-  return axiosService.makeRequest<UserDetails>(config);
-};
 
   return {
     getUsers,
@@ -192,7 +224,7 @@ const updateUser = (id: number, data: Partial<UserDetails>) => {
     addOrder,
     addFeedback,
     getFeedbacksFromNode,
-    updateUser,         
+    updateUser,
     uploadProfileImage,
   };
 }

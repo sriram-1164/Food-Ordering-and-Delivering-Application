@@ -5,7 +5,25 @@ const fs = require("fs");
 const path = require("path");
 
 const app = express();
-const PORT = 3001; // Same as JSON Server
+// ================= MULTER CONFIG (NEW - ADD THIS) =================
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    const uploadDir = path.join(__dirname, "uploads");
+    if (!fs.existsSync(uploadDir)) {
+      fs.mkdirSync(uploadDir, { recursive: true });
+    }
+    cb(null, uploadDir);
+  },
+  filename: (req, file, cb) => {
+    const uniqueSuffix = Date.now() + "-" + Math.round(Math.random() * 1e9);
+    cb(null, uniqueSuffix + path.extname(file.originalname));
+  },
+});
+
+const upload = multer({ storage });
+
+// Now your existing routes will work (they already use upload.single("photo"))
+const PORT = 3001;
 
 const profilePicRoutes = require("./profilepic");
 
@@ -68,35 +86,79 @@ app.get("/foods", (req, res) => {
   res.json(db.foods);
 });
 
-app.post("/foods", (req, res) => {
+app.post("/foods", upload.single("photo"), (req, res) => {
   const db = readDB();
-  db.foods.push(req.body);
+
+const newFood = {
+  foodId: Date.now(),
+  foodname: req.body.foodname,
+  price: parseFloat(req.body.price),
+  mealtypes: req.body.mealtypes ? JSON.parse(req.body.mealtypes) : [],   // ← new array
+  foodtype: req.body.foodtype,
+  photoUrl: req.file ? `/uploads/${req.file.filename}` : null,
+};
+console.log("Received body:", req.body);
+console.log("Parsed mealtypes:", req.body.mealtypes ? JSON.parse(req.body.mealtypes) : "not received");
+  db.foods.push(newFood);
   writeDB(db);
-  res.status(201).json(req.body);
+  res.status(201).json(newFood);
 });
 
-app.patch("/foods/:id", (req, res) => {
+app.patch("/foods/:id", upload.single("photo"), (req, res) => {
   const db = readDB();
   const id = Number(req.params.id);
 
-  db.foods = db.foods.map((food) =>
-    food.foodId === id
-      ? { ...food, ...req.body }
-      : food
-  );
+  let found = false;
+
+  db.foods = db.foods.map((food) => {
+    if (food.foodId === id) {
+      found = true;
+
+    const updatedFood = {
+  ...food,
+  foodname: req.body.foodname || food.foodname,
+  price: req.body.price ? parseFloat(req.body.price) : food.price,
+  mealtypes: req.body.mealtypes ? JSON.parse(req.body.mealtypes) : food.mealtypes || [],   // ← new
+  foodtype: req.body.foodtype || food.foodtype,
+};
+
+      if (req.file) {
+        // Optional: remove old photo if exists
+        if (food.photoUrl) {
+          const oldFilePath = path.join(__dirname, food.photoUrl);
+          if (fs.existsSync(oldFilePath)) {
+            fs.unlinkSync(oldFilePath);
+          }
+        }
+        updatedFood.photoUrl = `/uploads/${req.file.filename}`;
+      }
+
+      return updatedFood;
+    }
+    return food;
+  });
+
+  if (!found) {
+    return res.status(404).json({ message: "Food not found" });
+  }
 
   writeDB(db);
   res.json({ message: "Food updated successfully" });
 });
 
-
 app.delete("/foods/:id", (req, res) => {
   const db = readDB();
   const id = Number(req.params.id);
 
-  db.foods = db.foods.filter(
-    (food) => food.foodId !== id
-  );
+  const foodToDelete = db.foods.find(f => f.foodId === id);
+  if (foodToDelete && foodToDelete.photoUrl) {
+    const filePath = path.join(__dirname, foodToDelete.photoUrl);
+    if (fs.existsSync(filePath)) {
+      fs.unlinkSync(filePath);
+    }
+  }
+
+  db.foods = db.foods.filter((food) => food.foodId !== id);
 
   writeDB(db);
   res.json({ message: "Food deleted successfully" });
@@ -113,7 +175,7 @@ app.post("/orders", (req, res) => {
   const db = readDB();
 
   const newOrder = {
-    id: Date.now().toString(), // 🔥 generate id
+    id: Date.now().toString(),
     ...req.body
   };
 
@@ -133,7 +195,6 @@ app.patch("/orders/:id", (req, res) => {
     if (String(order.id) === String(id)) {
       found = true;
 
-      // 🔥 Special case: route tracking
       if (req.body.newRoutePoint) {
         return {
           ...order,
@@ -144,10 +205,8 @@ app.patch("/orders/:id", (req, res) => {
         };
       }
 
-      // ✅ Normal updates (status, otp, etc.)
       return { ...order, ...req.body };
     }
-
     return order;
   });
 
@@ -158,8 +217,6 @@ app.patch("/orders/:id", (req, res) => {
   writeDB(db);
   res.json({ message: "Order updated successfully" });
 });
-
-
 
 app.delete("/orders/:id", (req, res) => {
   const db = readDB();
@@ -182,18 +239,6 @@ const readFeedbacks = () => {
 const writeFeedbacks = (feedbacks) => {
   fs.writeFileSync(FEEDBACK_FILE, JSON.stringify(feedbacks, null, 2));
 };
-
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    cb(null, "uploads/");
-  },
-  filename: (req, file, cb) => {
-    const uniqueName = Date.now() + "-" + file.originalname;
-    cb(null, uniqueName);
-  },
-});
-
-const upload = multer({ storage });
 
 app.get("/feedbacks", (req, res) => {
   try {

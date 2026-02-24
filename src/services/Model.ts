@@ -2,8 +2,9 @@ export interface FoodDetails {
   foodId: number;
   foodname: string;
   price: number;
-  mealtype: string;
+  mealtypes: string[];
   foodtype: string;
+  photoUrl?: string;
 }
 
 
@@ -11,8 +12,9 @@ export interface AddFoodDetails {
   foodId: number;
   foodname: string;
   price: number;
-  mealtype: string;
+  mealtypes: string[];
   foodtype: string;
+  photoUrl?: string;
 }
 
 export interface OrderDetails {

@@ -11,6 +11,14 @@ import CoPresentIcon from '@mui/icons-material/CoPresent';
 import LogoutIcon from '@mui/icons-material/Logout';
 import ShoppingBagIcon from '@mui/icons-material/ShoppingBag';
 
+ const supportNumbers = [
+  '+919600652526',
+  '+919360790976',
+  '+918056915752',
+  '+918148480938',
+  // Add as many as you want
+];
+
 export default function UserMenu() {
   const crud = CrudService();
   const navigate = useNavigate();
@@ -24,12 +32,17 @@ export default function UserMenu() {
   const [logoutOpen, setLogoutOpen] = useState(false);
 
   // calling option logic
-  const phoneNumber = "+919600652526";
-  const [openCallDialog, setOpenCallDialog] = useState(false);
-  
+ const [openCallDialog, setOpenCallDialog] = useState(false);
+
   const handleOpenCallDialog = () => setOpenCallDialog(true);
   const handleCloseCallDialog = () => setOpenCallDialog(false);
-  const handleCallNow = () => { window.location.href = `tel:${phoneNumber}`; };
+  const handleCallNow = () => {
+    // Pick a random number from the array
+    const randomIndex = Math.floor(Math.random() * supportNumbers.length);
+    const selectedNumber = supportNumbers[randomIndex];
+    window.location.href = `tel:${selectedNumber}`;
+    setOpenCallDialog(false);
+  };
 
   useEffect(() => {
     const userStr = localStorage.getItem("user");
@@ -201,18 +214,65 @@ export default function UserMenu() {
       </Dialog>
 
       {/* Call Dialog */}
-      <Dialog open={openCallDialog} onClose={handleCloseCallDialog} PaperProps={{ sx: { borderRadius: 4 } }}>
-        <DialogTitle sx={{ fontWeight: 'bold' }}>Need Help?</DialogTitle>
+   <Dialog
+        open={openCallDialog}
+        onClose={handleCloseCallDialog}
+        PaperProps={{
+          sx: {
+            borderRadius: 4,
+            minWidth: 320,
+          },
+        }}
+      >
+        <DialogTitle sx={{ fontWeight: 'bold', textAlign: 'center' }}>
+          Need Help?
+        </DialogTitle>
+
         <DialogContent sx={{ textAlign: 'center', py: 3 }}>
-          <Avatar sx={{ bgcolor: '#4caf50', width: 60, height: 60, mx: 'auto', mb: 2 }}>
+          <Avatar
+            sx={{
+              bgcolor: '#4caf50',
+              width: 64,
+              height: 64,
+              mx: 'auto',
+              mb: 2,
+            }}
+          >
             <CallIcon fontSize="large" />
           </Avatar>
-          <Typography variant="h6" fontWeight="bold">{phoneNumber}</Typography>
-          <Typography variant="body2" color="text.secondary">Our support team is available 24/7</Typography>
+
+          <Typography variant="h6" fontWeight="bold" gutterBottom>
+            Talk to our support team
+          </Typography>
+
+          <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
+            Available 24/7 • One of our team members will be connect
+          </Typography>
         </DialogContent>
-        <DialogActions sx={{ p: 2, justifyContent: 'center' }}>
-          <Button onClick={handleCloseCallDialog} color="inherit">Maybe Later</Button>
-          <Button onClick={handleCallNow} variant="contained" color="success" sx={{ borderRadius: 2, px: 4 }}>Call Now</Button>
+
+        <DialogActions sx={{ p: 3, pt: 1, justifyContent: 'center', gap: 2 }}>
+          <Button
+            onClick={handleCloseCallDialog}
+            color="inherit"
+            variant="outlined"
+            sx={{ borderRadius: 2, px: 4 }}
+          >
+            Maybe Later
+          </Button>
+
+          <Button
+            onClick={handleCallNow}
+            variant="contained"
+            color="success"
+            sx={{
+              borderRadius: 2,
+              px: 5,
+              py: 1.2,
+              fontWeight: 600,
+            }}
+          >
+            Call Now
+          </Button>
         </DialogActions>
       </Dialog>
 
