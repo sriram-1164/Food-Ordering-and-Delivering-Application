@@ -104,8 +104,8 @@
       "isOnline": true,
       "isBusy": false,
       "currentLocation": {
-        "lat": 12.893348653579539,
-        "lng": 77.63582508422827
+        "lat": 12.838935937251422,
+        "lng": 77.64961115707041
       }
     },
     {
@@ -140,30 +140,21 @@
       "role": "user",
       "phonenumber": "9999999999",
       "profileImage": "",
-      "addresses": [
-        {
-          "id": 1,
-          "label": "work",
-          "addressLine": "T Nagar",
-          "city": "Chennai",
-          "pincode": "600017",
-          "lat": 12.906505862570866,
-          "lng": 77.60550669294781
-        }
-      ],
+      "addresses": [],
       "isBusy": false,
       "currentLocation": {
         "lat": 12.893347871667917,
         "lng": 77.6359703471866
-      }
+      },
+      "email": "sasi@gmail.com"
     }
   ],
   "foods": [
     {
       "foodId": 1771655320098,
-      "foodname": "Pannir",
+      "foodname": "Paneer",
       "price": 39,
-      "mealtype": "Dinner",
+      "mealtype": "Snacks",
       "foodtype": "Veg"
     },
     {
@@ -172,6 +163,55 @@
       "price": 65,
       "mealtype": "Dinner",
       "foodtype": "Non-Veg"
+    },
+    {
+      "foodId": 1771845725188,
+      "foodname": "Chicken Biriyani",
+      "price": 89,
+      "mealtype": "Lunch",
+      "foodtype": "Non-Veg"
+    },
+    {
+      "foodId": 1771845745582,
+      "foodname": "Mutton Biriyani",
+      "price": 109,
+      "mealtype": "Lunch",
+      "foodtype": "Non-Veg"
+    },
+    {
+      "foodId": 1771845768230,
+      "foodname": "Pine Apple Juice",
+      "price": 49,
+      "mealtype": "Juice",
+      "foodtype": "Veg"
+    },
+    {
+      "foodId": 1771845813191,
+      "foodname": "Ice Cream",
+      "price": 15,
+      "mealtype": "Desert",
+      "foodtype": "Veg"
+    },
+    {
+      "foodId": 1771855929798,
+      "foodname": "paneer tikka ",
+      "price": 150,
+      "mealtype": "Lunch",
+      "foodtype": "Veg"
+    },
+    {
+      "foodId": 1771855975472,
+      "foodname": "chicken momos",
+      "price": 99,
+      "mealtype": "Snacks",
+      "foodtype": "Non-Veg"
+    },
+    {
+      "foodId": 1771856011471,
+      "foodname": "chocolate milkshake ",
+      "price": 150,
+      "mealtype": "Juice",
+      "foodtype": "Veg"
     }
   ],
   "orders": [
@@ -465,6 +505,28 @@
       "deliveryOtp": 9822,
       "otpExpiry": 1771666586420,
       "endTime": "2026-02-21T09:32:18.769Z"
+    },
+    {
+      "id": "1771855733970",
+      "userId": "1",
+      "username": "Ram",
+      "foodId": 1771305191488,
+      "foodname": "Chicken 65",
+      "price": 65,
+      "quantity": 2,
+      "totalPrice": 130,
+      "mealtype": "Dinner",
+      "foodtype": "Non-Veg",
+      "address": {
+        "id": 1770704439040,
+        "label": "Home",
+        "addressLine": "Bengaluru",
+        "city": "Kudlu Gate",
+        "pincode": "606804"
+      },
+      "phonenumber": "9360790976",
+      "status": "Cancelled",
+      "date": "2026-02-23T14:08:48.610Z"
     }
   ],
   "feedbacks": []

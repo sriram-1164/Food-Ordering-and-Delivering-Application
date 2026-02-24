@@ -31,6 +31,8 @@ import AddIcon from "@mui/icons-material/Add";
 import { CrudService } from "../../services/CrudService";
 import { Address, UserDetails } from "../../services/Model";
 import BackButton from "../../components/common/BackButton";
+import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
+
 
 const UserProfile = () => {
   const crud = CrudService();
@@ -60,6 +62,9 @@ const UserProfile = () => {
   const [addressLine, setAddressLine] = useState("");
   const [city, setCity] = useState("");
   const [pincode, setPincode] = useState("");
+  const [isEditMode, setIsEditMode] = useState(false);
+  const [editingAddressId, setEditingAddressId] = useState<number | null>(null);
+
 
   const [snackbar, setSnackbar] = useState({
     open: false,
@@ -76,6 +81,17 @@ const UserProfile = () => {
       message,
       severity,
     });
+  };
+
+  const handleEditAddress = (addr: any) => {
+    setAddressLabel(addr.label);
+    setAddressLine(addr.addressLine);
+    setCity(addr.city);
+    setPincode(addr.pincode);
+
+    setEditingAddressId(addr.id);
+    setIsEditMode(true);
+    setOpenAddress(true);
   };
 
   useEffect(() => {
@@ -214,49 +230,100 @@ const UserProfile = () => {
 
   const handleSaveAddress = async () => {
     if (!user) return;
+
     if (!addressLine.trim() || !city.trim() || !pincode.trim()) {
       alert("Please fill all address fields");
       return;
     }
+
     if (!/^\d{6}$/.test(pincode)) {
       alert("Enter valid 6-digit pincode");
       return;
     }
+
     const fullAddress = `${addressLine}, ${city}, Tamil Nadu, India, ${pincode}`;
+
     try {
       const geoRes = await fetch(
-        `https://nominatim.openstreetmap.org/search?format=json&countrycodes=in&q=${encodeURIComponent(
-          fullAddress
-        )}`,
+        `https://nominatim.openstreetmap.org/search?format=json&countrycodes=in&q=${encodeURIComponent(fullAddress)}`,
         { headers: { "User-Agent": "FoodPointApp/1.0" } }
       );
+
       const geoData = await geoRes.json();
+
       if (!geoData.length) {
-        alert("Location not found. Please enter valid address.");
+        alert("Location not found.");
         return;
       }
+
       const lat = parseFloat(geoData[0].lat);
       const lng = parseFloat(geoData[0].lon);
-      const newAddress = {
-        id: Date.now(),
-        label: addressLabel,
-        addressLine,
-        city,
-        pincode,
-        lat,
-        lng,
-      };
-      const updatedAddresses = user.addresses
-        ? [...user.addresses, newAddress]
-        : [newAddress];
+
+      let updatedAddresses;
+
+      if (isEditMode && editingAddressId !== null) {
+        // ✏️ UPDATE ADDRESS
+        updatedAddresses = (user.addresses ?? []).map((addr: any) =>
+          addr.id === editingAddressId
+            ? {
+              ...addr,
+              label: addressLabel,
+              addressLine,
+              city,
+              pincode,
+              lat,
+              lng,
+            }
+            : addr
+        );
+      } else {
+        // ➕ ADD NEW ADDRESS
+        const newAddress = {
+          id: Date.now(),
+          label: addressLabel,
+          addressLine,
+          city,
+          pincode,
+          lat,
+          lng,
+        };
+
+        updatedAddresses = user.addresses
+          ? [...user.addresses, newAddress]
+          : [newAddress];
+      }
+
       await crud.updateUser(user.id, { addresses: updatedAddresses });
+
       setUser({ ...user, addresses: updatedAddresses });
+
       setOpenAddress(false);
-      showSnackbar("Address added successfully 🏠");
+      setIsEditMode(false);
+      setEditingAddressId(null);
+
+      showSnackbar(isEditMode ? "Address updated ✏️" : "Address added 🏠");
+
     } catch (err) {
-      console.error("Geocoding failed:", err);
-      alert("Address save failed");
+      console.error("Error:", err);
+      alert("Operation failed");
     }
+  };
+
+  const handleDeleteAddress = async (id: number) => {
+    if (!user) return;
+
+    const confirmDelete = window.confirm("Are you sure you want to delete this address?");
+    if (!confirmDelete) return;
+
+    const updatedAddresses = (user.addresses ?? []).filter(
+      (addr: any) => addr.id !== id
+    );
+
+    await crud.updateUser(user.id, { addresses: updatedAddresses });
+
+    setUser({ ...user, addresses: updatedAddresses });
+
+    showSnackbar("Address deleted 🗑️");
   };
 
   const validateEmail = (value: string) => {
@@ -376,7 +443,7 @@ const UserProfile = () => {
                 >
                   {!user.profileImage && user.username.charAt(0).toUpperCase()}
                 </Avatar>
-                
+
                 <input type="file" hidden accept="image/*" id="profile-pic-input" onChange={handleFileChange} />
                 <label htmlFor="profile-pic-input">
                   <Tooltip title="Upload New Photo">
@@ -428,7 +495,7 @@ const UserProfile = () => {
             <CardContent sx={{ px: { xs: 2, md: 6 }, pb: 6, position: "relative", zIndex: 2, mt: -3 }}>
               <Grid container spacing={4}>
                 {/* Account Settings Card */}
-                <Grid size={{xs:12,md:6}}>
+                <Grid size={{ xs: 12, md: 6 }}>
                   <Paper
                     elevation={0}
                     sx={{
@@ -501,7 +568,7 @@ const UserProfile = () => {
                 </Grid>
 
                 {/* Addresses Card */}
-                <Grid size={{xs:12,md:6}}>
+                <Grid size={{ xs: 12, md: 6 }}>
                   <Paper
                     elevation={0}
                     sx={{
@@ -515,16 +582,18 @@ const UserProfile = () => {
                   >
                     <Stack direction="row" justifyContent="space-between" alignItems="center" mb={4}>
                       <Typography variant="h6" fontWeight="bold" color="#333">🏠 Saved Addresses</Typography>
-                      <IconButton onClick={handleOpenAddress} sx={{ bgcolor: "#ff5722", color: "#fff", "&:hover": { bgcolor: "#e64a19" } }}>
+                      <IconButton onClick={handleOpenAddress} sx={{ bgcolor: "#4f6df3", color: "#fff", "&:hover": { bgcolor: "#e64a19" } }}>
                         <AddIcon />
                       </IconButton>
                     </Stack>
 
                     <Box sx={{ maxHeight: 280, overflowY: "auto", pr: 1 }}>
-                      {user.addresses?.length === 0 ? (
-                        <Typography color="text.secondary" align="center" py={4}>No addresses found.</Typography>
+                      {(user.addresses ?? []).length === 0 ? (
+                        <Typography color="text.secondary" align="center" py={4}>
+                          No addresses found.
+                        </Typography>
                       ) : (
-                        user.addresses?.map((addr) => (
+                        (user.addresses ?? []).map((addr) => (
                           <Paper
                             key={addr.id}
                             elevation={0}
@@ -534,11 +603,54 @@ const UserProfile = () => {
                               borderRadius: 4,
                               border: "1px solid #f0f0f0",
                               bgcolor: "#fafafa",
+                              transition: "0.2s",
                               "&:hover": { borderColor: "#ff5722", bgcolor: "#fffbf0" },
                             }}
                           >
-                            <Typography fontWeight="900" color="#ff5722" variant="body2">{addr.label.toUpperCase()}</Typography>
-                            <Typography variant="body2" color="text.secondary">{addr.addressLine}, {addr.city} - {addr.pincode}</Typography>
+                            <Stack direction="row" justifyContent="space-between" alignItems="center">
+
+                              {/* LEFT SIDE - Address Info */}
+                              <Box>
+                                <Typography fontWeight="900" color="#ff5722" variant="body2">
+                                  {addr.label.toUpperCase()}
+                                </Typography>
+                                <Typography variant="body2" color="text.secondary">
+                                  {addr.addressLine}, {addr.city} - {addr.pincode}
+                                </Typography>
+                              </Box>
+
+                              {/* RIGHT SIDE - Icons */}
+                              <Stack direction="row" spacing={1}>
+                                <Tooltip title="Edit">
+                                  <IconButton
+                                    size="small"
+                                    onClick={() => handleEditAddress(addr)}
+                                    sx={{
+                                      bgcolor: "rgba(255,87,34,0.1)",
+                                      color: "#ff5722",
+                                      "&:hover": { bgcolor: "#ff5722", color: "#fff" },
+                                    }}
+                                  >
+                                    <EditIcon fontSize="small" />
+                                  </IconButton>
+                                </Tooltip>
+                                <Tooltip title="Delete">
+                                  <IconButton
+
+                                    size="small"
+                                    onClick={() => handleDeleteAddress(addr.id)}
+                                    sx={{
+                                      bgcolor: "rgba(244,67,54,0.1)",
+                                      color: "#f44336",
+                                      "&:hover": { bgcolor: "#f44336", color: "#fff" },
+                                    }}
+                                  >
+                                    <DeleteOutlineIcon fontSize="small" />
+                                  </IconButton>
+                                </Tooltip>
+                              </Stack>
+
+                            </Stack>
                           </Paper>
                         ))
                       )}
@@ -552,7 +664,7 @@ const UserProfile = () => {
       </Box>
 
       {/* --- RE-USED LOGIC DIALOGS (Styled consistently) --- */}
-      
+
       {/* Edit Profile */}
       <Dialog open={openEdit} onClose={handleCloseEdit} fullWidth maxWidth="xs" PaperProps={{ sx: { borderRadius: 6 } }}>
         <DialogTitle sx={{ fontWeight: "900", pt: 3 }}>Edit Profile</DialogTitle>
@@ -582,7 +694,7 @@ const UserProfile = () => {
 
       {/* Address Dialog */}
       <Dialog open={openAddress} onClose={handleCloseAddress} fullWidth maxWidth="xs" PaperProps={{ sx: { borderRadius: 6 } }}>
-        <DialogTitle sx={{ fontWeight: "900", pt: 3 }}>New Address</DialogTitle>
+        <DialogTitle sx={{ fontWeight: "900", pt: 3 }}> {isEditMode ? "Edit Address" : "New Address"}</DialogTitle>
         <DialogContent>
           <TextField select label="Type" fullWidth margin="normal" value={addressLabel} onChange={(e) => setAddressLabel(e.target.value)} SelectProps={{ native: true }}>
             <option value="Home">Home</option>

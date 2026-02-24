@@ -40,6 +40,7 @@ export default function OrderDialog({ open, food, onClose, onSubmit }: any) {
   const crud = CrudService();
 
   const user = JSON.parse(localStorage.getItem("user") || "{}");
+  const loggedUserPhone = user?.phonenumber || "";
 
   useEffect(() => {
     if (!open || !user?.userId) return;
@@ -60,6 +61,12 @@ export default function OrderDialog({ open, food, onClose, onSubmit }: any) {
     };
     loadAddresses();
   }, [open, user.userId]);
+  
+  useEffect(() => {
+    if (open) {
+      setPhoneNumber(loggedUserPhone);
+    }
+  }, [open]);
 
   if (!food) return null;
 
@@ -97,11 +104,11 @@ export default function OrderDialog({ open, food, onClose, onSubmit }: any) {
 
   return (
     <>
-      <Dialog 
-        open={open} 
-        onClose={onClose} 
-        fullWidth 
-        maxWidth="sm" 
+      <Dialog
+        open={open}
+        onClose={onClose}
+        fullWidth
+        maxWidth="sm"
         PaperProps={{ sx: { borderRadius: 4, px: 1 } }}
       >
         <DialogTitle sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', pb: 1 }}>
@@ -119,7 +126,7 @@ export default function OrderDialog({ open, food, onClose, onSubmit }: any) {
                 <Typography variant="subtitle1" fontWeight={800} color="#FF5200">{food.foodname}</Typography>
                 <Typography variant="caption" color="textSecondary">Premium {food.mealtype} • {food.foodtype}</Typography>
               </Box>
-              
+
               <Stack direction="row" alignItems="center" spacing={1} sx={{ bgcolor: '#fff', border: '1px solid #ddd', borderRadius: 2, p: 0.5 }}>
                 <IconButton size="small" onClick={() => setQuantity(Math.max(1, quantity - 1))}><RemoveIcon fontSize="small" /></IconButton>
                 <Typography fontWeight={700} sx={{ minWidth: 20, textAlign: 'center' }}>{quantity}</Typography>
@@ -135,9 +142,9 @@ export default function OrderDialog({ open, food, onClose, onSubmit }: any) {
 
           <Box sx={{ maxHeight: 200, overflowY: 'auto', mb: 2 }}>
             {addresses.length === 0 ? (
-              <Button 
-                fullWidth 
-                variant="outlined" 
+              <Button
+                fullWidth
+                variant="outlined"
                 onClick={() => navigate("/profile")}
                 sx={{ py: 2, borderRadius: 3, borderStyle: 'dashed' }}
               >
@@ -181,6 +188,7 @@ export default function OrderDialog({ open, food, onClose, onSubmit }: any) {
             size="small"
             value={phonenumber}
             onChange={(e) => setPhoneNumber(e.target.value.replace(/\D/g, ""))}
+            helperText="You can change this number for this order"
             inputProps={{ maxLength: 10 }}
             error={phonenumber.length > 0 && phonenumber.length !== 10}
             sx={{ '& .MuiOutlinedInput-root': { borderRadius: 3 } }}
@@ -205,16 +213,16 @@ export default function OrderDialog({ open, food, onClose, onSubmit }: any) {
         </DialogContent>
 
         <DialogActions sx={{ p: 3, pt: 0 }}>
-          <Button 
-            fullWidth 
-            variant="contained" 
+          <Button
+            fullWidth
+            variant="contained"
             size="large"
             disabled={!isValidPhoneNumber(phonenumber) || !selectedAddress}
             onClick={handlePrepareOrder}
-            sx={{ 
-              py: 1.5, 
-              borderRadius: 3, 
-              fontWeight: 800, 
+            sx={{
+              py: 1.5,
+              borderRadius: 3,
+              fontWeight: 800,
               textTransform: 'none',
               fontSize: '1rem',
               background: "linear-gradient(135deg, #FF5200, #ff7b39)",
@@ -237,13 +245,13 @@ export default function OrderDialog({ open, food, onClose, onSubmit }: any) {
           <Typography variant="body2" color="textSecondary" mb={3}>
             We will start preparing your <b>{food.foodname}</b> immediately after confirmation.
           </Typography>
-          
+
           <Stack direction="row" spacing={2}>
             <Button fullWidth onClick={() => setConfirmOpen(false)} sx={{ fontWeight: 700 }}>Back</Button>
-            <Button 
-              fullWidth 
-              variant="contained" 
-              color="success" 
+            <Button
+              fullWidth
+              variant="contained"
+              color="success"
               onClick={handleConfirmOrder}
               sx={{ borderRadius: 2, fontWeight: 700 }}
             >
